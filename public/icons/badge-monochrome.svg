@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96">
+  <!-- Android Monochrome Status Bar Notification Badge (Transparent background with solid white silhouette) -->
+  <circle cx="48" cy="20" r="10" fill="#FFFFFF"/>
+  <path d="M48 32 L48 58 M48 40 L24 26 M48 40 L72 26 M48 58 L28 84 M48 58 L68 84" 
+        stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="72" cy="26" r="4" fill="#FFFFFF"/>
+</svg>

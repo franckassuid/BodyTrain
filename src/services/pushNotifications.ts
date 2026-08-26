@@ -264,7 +264,7 @@ export const pushNotificationService = {
       await reg.showNotification("BodyTrain • Séance matinale", {
         body: "Bonjour ! Prêt pour votre réveil en mouvement de 7 minutes ?",
         icon: "/icons/icon-192.png",
-        badge: "/icons/icon-192.png",
+        badge: "/icons/badge-monochrome.png",
         data: { url: "/" },
         tag: "morning-reminder",
       } as NotificationOptions);

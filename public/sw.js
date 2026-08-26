@@ -1,5 +1,5 @@
 // BodyTrain Progressive Web App Service Worker with Auto-Update & Offline Support
-const CACHE_VERSION = "bodytrain-v2.1";
+const CACHE_VERSION = "bodytrain-v2.2";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 
@@ -11,6 +11,7 @@ const STATIC_ASSETS = [
   "/icons/icon.svg",
   "/icons/icon-192.png",
   "/icons/icon-512.png",
+  "/icons/badge-monochrome.png",
 ];
 
 // 1. Install Event: Cache essential shell & Skip Waiting immediately
@@ -123,7 +124,7 @@ self.addEventListener("push", (event) => {
   const options = {
     body: data.body,
     icon: "/icons/icon-192.png",
-    badge: "/icons/icon-192.png",
+    badge: "/icons/badge-monochrome.png",
     data: { url: data.url || "/" },
     tag: "morning-reminder",
     renotify: true,
