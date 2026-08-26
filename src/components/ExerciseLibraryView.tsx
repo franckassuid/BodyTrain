@@ -233,6 +233,7 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({ onPlay
 
         {filteredExercises.map((ex) => {
           const slug = ex.slug || ex.id;
+          const gifUrl = `/animations/${slug}.gif`;
           const photoUrl = `/exercises/${slug}/start.webp`;
 
           return (
@@ -269,11 +270,16 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({ onPlay
                   }}
                 >
                   <img
-                    src={photoUrl}
+                    src={gifUrl}
                     alt={ex.nameFr || ex.name}
                     style={{ width: "100%", height: "100%", objectFit: "contain" }}
                     onError={(e) => {
-                      (e.target as HTMLElement).style.display = "none";
+                      const target = e.target as HTMLImageElement;
+                      if (target.src !== photoUrl) {
+                        target.src = photoUrl;
+                      } else {
+                        target.style.display = "none";
+                      }
                     }}
                   />
                 </div>

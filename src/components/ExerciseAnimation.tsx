@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Activity, Wind, Sparkles, Image as ImageIcon } from "lucide-react";
+import { Activity, Wind, Play, Image as ImageIcon } from "lucide-react";
 import type { Exercise } from "../types/exercise.ts";
 
 interface ExerciseAnimationProps {
@@ -18,36 +18,25 @@ export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
   const slug = exercise.slug || exercise.id;
 
   // Check available media
-  const hasAnimationMedia = exercise.media?.some((m) => m.type === "animation");
   const hasStartPhoto = exercise.media?.some((m) => m.type === "start_position");
   const hasEndPhoto = exercise.media?.some((m) => m.type === "end_position");
   const hasPhotos = hasStartPhoto || hasEndPhoto;
 
-  // View mode: 'photos' | 'svg'
-  const [viewMode, setViewMode] = useState<"photos" | "svg">(() => {
-    if (hasPhotos) return "photos";
-    return "svg";
-  });
-
-  const [svgContent, setSvgContent] = useState<string | null>(null);
-  const [loadingSvg, setLoadingSvg] = useState<boolean>(false);
+  // View mode: 'gif' (default) | 'photos'
+  const [viewMode, setViewMode] = useState<"gif" | "photos">("gif");
   const [activePhotoStep, setActivePhotoStep] = useState<"start" | "end">("start");
   const [photoError, setPhotoError] = useState<boolean>(false);
   const [gifError, setGifError] = useState<boolean>(false);
 
   const gifUrl = `/animations/${slug}.gif`;
 
-  // Sync default view mode when exercise changes
+  // Reset states on exercise change
   useEffect(() => {
     setPhotoError(false);
     setGifError(false);
     setActivePhotoStep("start");
-    if (hasPhotos) {
-      setViewMode("photos");
-    } else {
-      setViewMode("svg");
-    }
-  }, [exercise.id, hasPhotos]);
+    setViewMode("gif");
+  }, [exercise.id, slug]);
 
   // Preload next exercise assets
   useEffect(() => {
@@ -55,8 +44,6 @@ export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
       const nextSlug = nextExercise.slug || nextExercise.id;
       const imgGif = new Image();
       imgGif.src = `/animations/${nextSlug}.gif`;
-      const imgSvg = new Image();
-      imgSvg.src = `/animations/${nextSlug}.svg`;
       const imgPhoto1 = new Image();
       imgPhoto1.src = `/exercises/${nextSlug}/start.webp`;
       const imgPhoto2 = new Image();
@@ -64,44 +51,7 @@ export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
     }
   }, [nextExercise]);
 
-  // Fetch SVG animation when in SVG mode
-  useEffect(() => {
-    let isCancelled = false;
-    setLoadingSvg(true);
-
-    const svgPath = `/animations/${slug}.svg`;
-    fetch(svgPath)
-      .then((res) => {
-        if (!res.ok) throw new Error("SVG not found");
-        return res.text();
-      })
-      .then((svgText) => {
-        if (!isCancelled) {
-          if (svgText.includes("<svg") && svgText.includes("</svg>")) {
-            let cleanSvg = svgText;
-            if (!cleanSvg.includes("preserveAspectRatio")) {
-              cleanSvg = cleanSvg.replace("<svg", '<svg preserveAspectRatio="xMidYMid meet"');
-            }
-            setSvgContent(cleanSvg);
-          } else {
-            setSvgContent(null);
-          }
-          setLoadingSvg(false);
-        }
-      })
-      .catch(() => {
-        if (!isCancelled) {
-          setSvgContent(null);
-          setLoadingSvg(false);
-        }
-      });
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [slug]);
-
-  // Alternating photo postures loop (1.7s per posture)
+  // Alternating photo postures loop (1.7s per posture) if in photo mode
   useEffect(() => {
     if (viewMode !== "photos" || !hasPhotos || !hasEndPhoto) return;
 
@@ -146,8 +96,21 @@ export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
           boxShadow: circularMode ? "inset 0 2px 10px rgba(0,0,0,0.04)" : "0 6px 20px rgba(0,0,0,0.06)",
         }}
       >
-        {/* MODE 1: High Quality Photo Demonstration with Live Loop */}
-        {viewMode === "photos" && hasPhotos && !photoError ? (
+        {/* MODE 1: Top Priority Fluid Animated GIF */}
+        {viewMode === "gif" && !gifError ? (
+          <img
+            src={gifUrl}
+            alt={exercise.nameFr || exercise.name}
+            onError={() => setGifError(true)}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+              display: "block",
+            }}
+          />
+        ) : (viewMode === "photos" || gifError) && hasPhotos && !photoError ? (
+          /* MODE 2: High Quality Photo Demonstration with Live Loop */
           <div
             style={{
               width: "100%",
@@ -231,34 +194,6 @@ export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
               </div>
             )}
           </div>
-        ) : viewMode === "svg" && (!gifError || (svgContent && !loadingSvg)) ? (
-          /* MODE 2: Clean Animated GIF (or SVG fallback) */
-          !gifError ? (
-            <img
-              src={gifUrl}
-              alt={exercise.nameFr || exercise.name}
-              onError={() => setGifError(true)}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "contain",
-                display: "block",
-              }}
-            />
-          ) : svgContent ? (
-            <div
-              className="animation-container"
-              style={{
-                width: "100%",
-                height: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                overflow: "hidden",
-              }}
-              dangerouslySetInnerHTML={{ __html: svgContent }}
-            />
-          ) : null
         ) : (
           /* MODE 3: Calming Harmony & Breath Bloom */
           <div
@@ -310,8 +245,8 @@ export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
         )}
       </div>
 
-      {/* Mode switcher (Photos / Schéma) */}
-      {hasPhotos && (hasAnimationMedia || svgContent) && (
+      {/* Mode switcher (Animation / Photos) when photos are also available */}
+      {hasPhotos && !gifError && (
         <div
           style={{
             display: "flex",
@@ -330,6 +265,29 @@ export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
               border: "1px solid var(--border-subtle)",
             }}
           >
+            <button
+              type="button"
+              onClick={() => setViewMode("gif")}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+                padding: "3px 10px",
+                borderRadius: "var(--radius-full)",
+                border: "none",
+                fontSize: "0.74rem",
+                fontWeight: 700,
+                cursor: "pointer",
+                backgroundColor: viewMode === "gif" ? "var(--bg-surface)" : "transparent",
+                color: viewMode === "gif" ? "var(--color-primary)" : "var(--text-muted)",
+                boxShadow: viewMode === "gif" ? "0 2px 6px rgba(0,0,0,0.06)" : "none",
+                transition: "all var(--transition-fast)",
+              }}
+            >
+              <Play size={12} fill="currentColor" />
+              <span>Animation</span>
+            </button>
+
             <button
               type="button"
               onClick={() => setViewMode("photos")}
@@ -351,29 +309,6 @@ export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
             >
               <ImageIcon size={12} />
               <span>Photos</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setViewMode("svg")}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 4,
-                padding: "3px 10px",
-                borderRadius: "var(--radius-full)",
-                border: "none",
-                fontSize: "0.74rem",
-                fontWeight: 700,
-                cursor: "pointer",
-                backgroundColor: viewMode === "svg" ? "var(--bg-surface)" : "transparent",
-                color: viewMode === "svg" ? "var(--color-primary)" : "var(--text-muted)",
-                boxShadow: viewMode === "svg" ? "0 2px 6px rgba(0,0,0,0.06)" : "none",
-                transition: "all var(--transition-fast)",
-              }}
-            >
-              <Sparkles size={12} />
-              <span>Schéma</span>
             </button>
           </div>
         </div>
