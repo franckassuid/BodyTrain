@@ -127,6 +127,8 @@ self.addEventListener("push", (event) => {
     data: { url: data.url || "/" },
     tag: "morning-reminder",
     renotify: true,
+    vibrate: [300, 100, 300, 100, 300],
+    requireInteraction: true,
   };
 
   event.waitUntil(self.registration.showNotification(data.title, options));

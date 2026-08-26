@@ -4,6 +4,7 @@ export interface PushSubscriptionState {
   isSupported: boolean;
   isIos: boolean;
   isStandalone: boolean;
+  isSecureContext: boolean;
   permission: NotificationPermission;
   isSubscribed: boolean;
   subscription: PushSubscription | null;
@@ -25,16 +26,26 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
   return outputArray;
 }
 
+// Local in-memory timer for in-app / background tab reminder fallback
+let localReminderTimer: number | null = null;
+
 export const pushNotificationService = {
   checkEnvironment(): {
     isSupported: boolean;
     isIos: boolean;
     isStandalone: boolean;
+    isSecureContext: boolean;
     canUsePush: boolean;
   } {
     if (typeof window === "undefined") {
-      return { isSupported: false, isIos: false, isStandalone: false, canUsePush: false };
+      return { isSupported: false, isIos: false, isStandalone: false, isSecureContext: false, canUsePush: false };
     }
+
+    const isSecureContext =
+      window.isSecureContext ||
+      window.location.protocol === "https:" ||
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1";
 
     const isIos =
       /iPad|iPhone|iPod/.test(navigator.userAgent) ||
@@ -51,6 +62,7 @@ export const pushNotificationService = {
       isSupported,
       isIos,
       isStandalone,
+      isSecureContext,
       canUsePush,
     };
   },
@@ -62,6 +74,7 @@ export const pushNotificationService = {
         isSupported: false,
         isIos: env.isIos,
         isStandalone: env.isStandalone,
+        isSecureContext: env.isSecureContext,
         permission: "default",
         isSubscribed: false,
         subscription: null,
@@ -76,6 +89,7 @@ export const pushNotificationService = {
         isSupported: true,
         isIos: env.isIos,
         isStandalone: env.isStandalone,
+        isSecureContext: env.isSecureContext,
         permission,
         isSubscribed: Boolean(sub),
         subscription: sub,
@@ -85,6 +99,7 @@ export const pushNotificationService = {
         isSupported: true,
         isIos: env.isIos,
         isStandalone: env.isStandalone,
+        isSecureContext: env.isSecureContext,
         permission,
         isSubscribed: false,
         subscription: null,
@@ -142,6 +157,9 @@ export const pushNotificationService = {
       console.warn("Backend push endpoint unreachable, subscription maintained locally.", e);
     }
 
+    // Setup in-app background interval fallback
+    this.startLocalSchedulerFallback(reminderTime, activeDays);
+
     return subscription;
   },
 
@@ -150,6 +168,9 @@ export const pushNotificationService = {
     reminderTime: string,
     activeDays: number[]
   ): Promise<boolean> {
+    // Also update local fallback
+    this.startLocalSchedulerFallback(reminderTime, activeDays);
+
     try {
       const reg = await navigator.serviceWorker.ready;
       const subscription = await reg.pushManager.getSubscription();
@@ -175,6 +196,11 @@ export const pushNotificationService = {
 
   /** Unsubscribe from Web Push */
   async unsubscribe(): Promise<boolean> {
+    if (localReminderTimer) {
+      clearInterval(localReminderTimer);
+      localReminderTimer = null;
+    }
+
     try {
       const reg = await navigator.serviceWorker.ready;
       const subscription = await reg.pushManager.getSubscription();
@@ -241,10 +267,37 @@ export const pushNotificationService = {
         badge: "/icons/icon-192.png",
         data: { url: "/" },
         tag: "morning-reminder",
-      });
+      } as NotificationOptions);
       return true;
     } catch {
       return false;
     }
+  },
+
+  /** In-app local timer fallback when browser tab is open / backgrounded */
+  startLocalSchedulerFallback(reminderTime: string, activeDays: number[]) {
+    if (localReminderTimer) {
+      clearInterval(localReminderTimer);
+    }
+
+    let lastSentDate = "";
+
+    localReminderTimer = window.setInterval(() => {
+      if (Notification.permission !== "granted") return;
+
+      const now = new Date();
+      const currentHours = String(now.getHours()).padStart(2, "0");
+      const currentMins = String(now.getMinutes()).padStart(2, "0");
+      const currentTime = `${currentHours}:${currentMins}`;
+      const currentDate = now.toDateString();
+      const currentDay = now.getDay();
+
+      if (activeDays.includes(currentDay) && currentTime === reminderTime) {
+        if (lastSentDate !== currentDate) {
+          lastSentDate = currentDate;
+          this.showLocalTestNotification();
+        }
+      }
+    }, 15000);
   },
 };

@@ -1,10 +1,18 @@
 import Fastify from "fastify";
+import fastifyCors from "@fastify/cors";
+import fastifyStatic from "@fastify/static";
 import { DatabaseSync } from "node:sqlite";
 import fs from "node:fs";
 import path from "node:path";
 import webpush from "web-push";
 
 const fastify = Fastify({ logger: true });
+
+// Enable CORS for all local and network requests
+await fastify.register(fastifyCors, {
+  origin: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+});
 
 // VAPID Keys configuration for Web Push Protocol (Apple APNs & Google FCM)
 const VAPID_PUBLIC_KEY =
@@ -278,12 +286,18 @@ fastify.post("/api/push/test", async (request, reply) => {
 
   try {
     const payload = JSON.stringify({
-      title: "BodyTrain • Notification de rappel",
+      title: "BodyTrain • Notification de test",
       body: "Bravo ! Les notifications programmées fonctionnent parfaitement sur votre appareil.",
       url: "/",
     });
 
-    await webpush.sendNotification(subscription, payload);
+    const pushOptions = {
+      TTL: 3600,
+      urgency: "high",
+    };
+
+    await webpush.sendNotification(subscription, payload, pushOptions);
+    console.log(`[PushService] Test notification successfully sent to ${subscription.endpoint.slice(0, 35)}...`);
     return { success: true, message: "Notification Web Push envoyée avec succès !" };
   } catch (err) {
     fastify.log.error(err);
@@ -344,8 +358,13 @@ function startPushScheduler() {
                 url: "/",
               });
 
+              const pushOptions = {
+                TTL: 3600,
+                urgency: "high",
+              };
+
               console.log(`[PushScheduler] Sending scheduled morning reminder (${userLocalTime} / ${userLocalDate}) to ${row.endpoint.slice(0, 35)}...`);
-              await webpush.sendNotification(subscription, payload);
+              await webpush.sendNotification(subscription, payload, pushOptions);
 
               db.prepare("UPDATE push_subscriptions SET last_notified_date = ? WHERE endpoint = ?").run(
                 userLocalDate,
@@ -366,7 +385,7 @@ function startPushScheduler() {
     } catch (e) {
       console.error("[PushScheduler] Global scheduler error:", e);
     }
-  }, 15000); // check every 15 seconds
+  }, 10000); // check every 10 seconds
 }
 
 startPushScheduler();
