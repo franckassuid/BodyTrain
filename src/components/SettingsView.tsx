@@ -14,6 +14,8 @@ import { soundService } from "../services/sound.ts";
 import { vibrationService } from "../services/vibration.ts";
 import type { AppSettings, DayOfWeek, DefaultDurationMinutes } from "../types/settings.ts";
 
+import { voiceCoach, type AudioSettings, type VoiceGenderPreference } from "../services/voiceCoach.ts";
+
 const DAYS_OF_WEEK: { label: string; value: DayOfWeek }[] = [
   { label: "Lun", value: 1 },
   { label: "Mar", value: 2 },
@@ -26,6 +28,7 @@ const DAYS_OF_WEEK: { label: string; value: DayOfWeek }[] = [
 
 export const SettingsView: React.FC = () => {
   const [settings, setSettings] = useState<AppSettings | null>(null);
+  const [audioSettings, setAudioSettings] = useState<AudioSettings>(voiceCoach.getSettings());
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [notificationStatus, setNotificationStatus] = useState<string | null>(null);
   const [isSubscribing, setIsSubscribing] = useState(false);
@@ -37,8 +40,42 @@ export const SettingsView: React.FC = () => {
   const loadSettings = async () => {
     const s = await storageService.getSettings();
     setSettings(s);
+    setAudioSettings(voiceCoach.getSettings());
     soundService.setEnabled(s.soundEnabled);
     vibrationService.setEnabled(s.vibrationEnabled);
+  };
+
+  const handleAudioUpdate = (updates: Partial<AudioSettings>) => {
+    const updated = { ...audioSettings, ...updates };
+    setAudioSettings(updated);
+    voiceCoach.saveSettings(updates);
+  };
+
+  const handleVoiceGenderChange = (gender: VoiceGenderPreference) => {
+    const voices = voiceCoach.getAvailableVoices();
+    let bestMatchUri: string | undefined;
+
+    if (gender === "male") {
+      const maleVoice = voices.find((v) => v.gender === "male");
+      bestMatchUri = maleVoice?.voiceURI;
+    } else if (gender === "female") {
+      const femaleVoice = voices.find((v) => v.gender === "female");
+      bestMatchUri = femaleVoice?.voiceURI;
+    }
+
+    const updates: Partial<AudioSettings> = {
+      voiceGenderPreference: gender,
+      selectedVoiceURI: bestMatchUri || undefined,
+    };
+
+    handleAudioUpdate(updates);
+    voiceCoach.testVoice(
+      gender === "male"
+        ? "Bonjour ! Voici la voix d'homme pour vos séances."
+        : gender === "female"
+        ? "Bonjour ! Voici la voix de femme pour vos séances."
+        : "Bonjour ! Voici la voix sélectionnée."
+    );
   };
 
   const handleUpdate = async (updates: Partial<AppSettings>) => {
@@ -303,12 +340,94 @@ export const SettingsView: React.FC = () => {
         </div>
       </div>
 
-      {/* 3. Audio & Haptics Toggles */}
-      <div className="card" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      {/* 3. Audio, Voice Coach & Haptics */}
+      <div className="card" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        {/* Voice Coach Toggle */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "1rem", fontWeight: 600 }}>
             <Volume2 size={18} style={{ color: "var(--color-primary)" }} />
-            <span>Signaux sonores</span>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: "0.98rem", color: "var(--text-main)" }}>Coach vocal parlé</div>
+              <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", fontWeight: 400 }}>Annonces et consignes pendant la séance</div>
+            </div>
+          </div>
+          <input
+            type="checkbox"
+            checked={audioSettings.voiceCoachEnabled}
+            onChange={(e) => handleAudioUpdate({ voiceCoachEnabled: e.target.checked })}
+            style={{ width: 22, height: 22, accentColor: "var(--color-primary)", cursor: "pointer" }}
+          />
+        </div>
+
+        {/* Male / Female Voice Selector */}
+        {audioSettings.voiceCoachEnabled && (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 10,
+              padding: "12px 14px",
+              backgroundColor: "var(--bg-surface-elevated)",
+              borderRadius: "var(--radius-lg)",
+              border: "1px solid var(--border-subtle)",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <span style={{ fontSize: "0.84rem", fontWeight: 700, color: "var(--text-main)" }}>
+                Voix de l'entraîneur
+              </span>
+              <button
+                type="button"
+                className="btn-ghost"
+                onClick={() => voiceCoach.testVoice()}
+                style={{
+                  fontSize: "0.76rem",
+                  padding: "4px 8px",
+                  color: "var(--color-primary)",
+                  fontWeight: 600,
+                }}
+              >
+                ▶ Tester la voix
+              </button>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6 }}>
+              {[
+                { id: "male" as const, label: "👨 Homme" },
+                { id: "female" as const, label: "👩 Femme" },
+                { id: "auto" as const, label: "✨ Auto" },
+              ].map((item) => {
+                const isSelected = (audioSettings.voiceGenderPreference || "auto") === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => handleVoiceGenderChange(item.id)}
+                    style={{
+                      padding: "8px 4px",
+                      borderRadius: "var(--radius-md)",
+                      backgroundColor: isSelected ? "var(--color-primary)" : "var(--bg-surface)",
+                      color: isSelected ? "#FFFFFF" : "var(--text-main)",
+                      fontWeight: isSelected ? 700 : 500,
+                      fontSize: "0.85rem",
+                      border: isSelected ? "none" : "1px solid var(--border-subtle)",
+                      cursor: "pointer",
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    {item.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Sound Effects Toggle */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "1rem", fontWeight: 600 }}>
+            <Volume2 size={18} style={{ color: "var(--color-primary)" }} />
+            <span>Signaux sonores (bips)</span>
           </div>
           <input
             type="checkbox"
@@ -318,6 +437,7 @@ export const SettingsView: React.FC = () => {
           />
         </div>
 
+        {/* Vibration Toggle */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "1rem", fontWeight: 600 }}>
             <Vibrate size={18} style={{ color: "var(--color-primary)" }} />

@@ -2,17 +2,21 @@ import React, { useState, useEffect } from "react";
 import {
   X,
   Volume2,
-  VolumeX,
   Mic,
   Bell,
   Clock,
   HelpCircle,
   Check,
   Play,
-  Sparkles,
   Gauge,
+  User,
 } from "lucide-react";
-import { voiceCoach, type AudioSettings, type AvailableVoice } from "../services/voiceCoach.ts";
+import {
+  voiceCoach,
+  type AudioSettings,
+  type AvailableVoice,
+  type VoiceGenderPreference,
+} from "../services/voiceCoach.ts";
 import { soundService } from "../services/sound.ts";
 
 interface AudioSettingsModalProps {
@@ -42,11 +46,49 @@ export const AudioSettingsModal: React.FC<AudioSettingsModalProps> = ({ isOpen, 
     }
   };
 
-  const handleVoiceChange = (voiceURI: string) => {
-    const updated = { ...settings, selectedVoiceURI: voiceURI };
-    setSettings(updated);
+  const handleGenderChange = (gender: VoiceGenderPreference) => {
+    // Pick the best matching voice for this gender
+    const voices = voiceCoach.getAvailableVoices();
+    let bestMatchUri: string | undefined;
+
+    if (gender === "male") {
+      const maleVoice = voices.find((v) => v.gender === "male");
+      bestMatchUri = maleVoice?.voiceURI;
+    } else if (gender === "female") {
+      const femaleVoice = voices.find((v) => v.gender === "female");
+      bestMatchUri = femaleVoice?.voiceURI;
+    }
+
+    const updated: Partial<AudioSettings> = {
+      voiceGenderPreference: gender,
+      selectedVoiceURI: bestMatchUri || undefined,
+    };
+
+    const newSettings = { ...settings, ...updated };
+    setSettings(newSettings);
     voiceCoach.saveSettings(updated);
-    // Preview the new voice immediately
+    setAvailableVoices(voiceCoach.getAvailableVoices());
+
+    // Preview
+    voiceCoach.testVoice(
+      gender === "male"
+        ? "Bonjour ! Voici la voix d'homme pour vos séances."
+        : gender === "female"
+        ? "Bonjour ! Voici la voix de femme pour vos séances."
+        : "Bonjour ! Voici la voix sélectionnée."
+    );
+  };
+
+  const handleVoiceChange = (voiceURI: string) => {
+    const matched = availableVoices.find((v) => v.voiceURI === voiceURI);
+    const updated: Partial<AudioSettings> = {
+      selectedVoiceURI: voiceURI,
+      voiceGenderPreference: matched?.gender === "male" ? "male" : matched?.gender === "female" ? "female" : "auto",
+    };
+    const newSettings = { ...settings, ...updated };
+    setSettings(newSettings);
+    voiceCoach.saveSettings(updated);
+    // Preview
     voiceCoach.testVoice("Bonjour ! Voici la voix sélectionnée pour vos séances matinales.");
   };
 
@@ -73,7 +115,7 @@ export const AudioSettingsModal: React.FC<AudioSettingsModalProps> = ({ isOpen, 
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        zIndex: 9999,
+        zIndex: 10000,
         padding: 16,
       }}
       onClick={onClose}
@@ -82,14 +124,14 @@ export const AudioSettingsModal: React.FC<AudioSettingsModalProps> = ({ isOpen, 
         className="animate-slide-up"
         style={{
           backgroundColor: "var(--bg-surface)",
-          borderRadius: "var(--radius-lg)",
+          borderRadius: "var(--radius-xl)",
           padding: "22px 20px",
           width: "100%",
-          maxWidth: 400,
+          maxWidth: 420,
           maxHeight: "90vh",
           overflowY: "auto",
           border: "1px solid var(--border-color)",
-          boxShadow: "0 12px 36px rgba(0,0,0,0.35)",
+          boxShadow: "0 16px 40px rgba(0,0,0,0.35)",
           display: "flex",
           flexDirection: "column",
           gap: 16,
@@ -117,8 +159,8 @@ export const AudioSettingsModal: React.FC<AudioSettingsModalProps> = ({ isOpen, 
               <h3 style={{ fontSize: "1.1rem", fontWeight: 700, margin: 0, color: "var(--text-main)" }}>
                 Audio & Coach Vocal
               </h3>
-              <p style={{ fontSize: "0.75rem", margin: 0, color: "var(--text-muted)" }}>
-                Voix naturelle & guidage sonore
+              <p style={{ fontSize: "0.78rem", margin: 0, color: "var(--text-muted)" }}>
+                Personnalisez la voix de votre entraîneur
               </p>
             </div>
           </div>
@@ -127,7 +169,7 @@ export const AudioSettingsModal: React.FC<AudioSettingsModalProps> = ({ isOpen, 
             type="button"
             onClick={onClose}
             className="btn-ghost"
-            style={{ padding: 6, color: "var(--text-muted)" }}
+            style={{ padding: 6, color: "var(--text-muted)", borderRadius: "50%" }}
             aria-label="Fermer"
           >
             <X size={20} />
@@ -148,18 +190,18 @@ export const AudioSettingsModal: React.FC<AudioSettingsModalProps> = ({ isOpen, 
               : "var(--bg-surface-elevated)",
             cursor: "pointer",
             border: settings.voiceCoachEnabled
-              ? "1px solid var(--color-primary)"
-              : "1px solid transparent",
+              ? "1.5px solid var(--color-primary)"
+              : "1px solid var(--border-subtle)",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <Mic size={18} color="var(--color-primary)" />
             <div>
-              <div style={{ fontWeight: 600, fontSize: "0.92rem", color: "var(--text-main)" }}>
+              <div style={{ fontWeight: 700, fontSize: "0.92rem", color: "var(--text-main)" }}>
                 Coach vocal
               </div>
               <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
-                Commentaires vocaux en temps réel
+                Annonces et guidage parlé en temps réel
               </div>
             </div>
           </div>
@@ -179,23 +221,24 @@ export const AudioSettingsModal: React.FC<AudioSettingsModalProps> = ({ isOpen, 
           </div>
         </div>
 
-        {/* Voice Selection & Quality */}
-        {settings.voiceCoachEnabled && availableVoices.length > 0 && (
+        {/* Voice Gender Preference (Homme / Femme / Auto) */}
+        {settings.voiceCoachEnabled && (
           <div
             style={{
               display: "flex",
               flexDirection: "column",
-              gap: 8,
+              gap: 10,
               padding: "12px 14px",
               backgroundColor: "var(--bg-surface-elevated)",
-              borderRadius: "var(--radius-md)",
+              borderRadius: "var(--radius-lg)",
+              border: "1px solid var(--border-subtle)",
             }}
           >
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <Sparkles size={15} color="var(--color-primary)" />
-                <span style={{ fontSize: "0.82rem", fontWeight: 600, color: "var(--text-main)" }}>
-                  Choix de la voix
+                <User size={15} color="var(--color-primary)" />
+                <span style={{ fontSize: "0.84rem", fontWeight: 700, color: "var(--text-main)" }}>
+                  Type de voix
                 </span>
               </div>
               <button
@@ -209,6 +252,7 @@ export const AudioSettingsModal: React.FC<AudioSettingsModalProps> = ({ isOpen, 
                   display: "flex",
                   alignItems: "center",
                   gap: 4,
+                  fontWeight: 600,
                 }}
               >
                 <Play size={12} fill="currentColor" />
@@ -216,34 +260,74 @@ export const AudioSettingsModal: React.FC<AudioSettingsModalProps> = ({ isOpen, 
               </button>
             </div>
 
-            <select
-              value={settings.selectedVoiceURI || (availableVoices[0]?.voiceURI ?? "")}
-              onChange={(e) => handleVoiceChange(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "8px 10px",
-                borderRadius: "var(--radius-md)",
-                border: "1px solid var(--border-color)",
-                backgroundColor: "var(--bg-surface)",
-                color: "var(--text-main)",
-                fontSize: "0.85rem",
-                fontWeight: 500,
-                cursor: "pointer",
-              }}
-            >
-              {availableVoices.map((v) => (
-                <option key={v.voiceURI} value={v.voiceURI}>
-                  {v.qualityBadge ? `✨ ${v.name} (${v.qualityBadge})` : v.name}
-                </option>
-              ))}
-            </select>
+            {/* Gender Switch Buttons */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6 }}>
+              {[
+                { id: "male" as VoiceGenderPreference, label: "👨 Homme" },
+                { id: "female" as VoiceGenderPreference, label: "👩 Femme" },
+                { id: "auto" as VoiceGenderPreference, label: "✨ Auto" },
+              ].map((item) => {
+                const isSelected = (settings.voiceGenderPreference || "auto") === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => handleGenderChange(item.id)}
+                    style={{
+                      padding: "8px 4px",
+                      borderRadius: "var(--radius-md)",
+                      backgroundColor: isSelected ? "var(--color-primary)" : "var(--bg-surface)",
+                      color: isSelected ? "#FFFFFF" : "var(--text-main)",
+                      fontWeight: isSelected ? 700 : 500,
+                      fontSize: "0.82rem",
+                      border: isSelected ? "none" : "1px solid var(--border-subtle)",
+                      cursor: "pointer",
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    {item.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Individual Voice Select */}
+            {availableVoices.length > 0 && (
+              <div style={{ marginTop: 4 }}>
+                <label style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginBottom: 4, display: "block" }}>
+                  Voix système détectée :
+                </label>
+                <select
+                  value={settings.selectedVoiceURI || (availableVoices[0]?.voiceURI ?? "")}
+                  onChange={(e) => handleVoiceChange(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "8px 10px",
+                    borderRadius: "var(--radius-md)",
+                    border: "1px solid var(--border-color)",
+                    backgroundColor: "var(--bg-surface)",
+                    color: "var(--text-main)",
+                    fontSize: "0.82rem",
+                    fontWeight: 500,
+                    cursor: "pointer",
+                  }}
+                >
+                  {availableVoices.map((v) => (
+                    <option key={v.voiceURI} value={v.voiceURI}>
+                      {v.gender === "male" ? "👨 " : v.gender === "female" ? "👩 " : "🎙️ "}
+                      {v.name} {v.qualityBadge ? `(${v.qualityBadge})` : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             {/* Speech Rate Control */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 4 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 <Gauge size={14} color="var(--text-muted)" />
-                <span style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>
-                  Débit de parole : {settings.speechRate || 0.98}x
+                <span style={{ fontSize: "0.76rem", color: "var(--text-muted)" }}>
+                  Débit : {settings.speechRate || 0.98}x
                 </span>
               </div>
               <div style={{ display: "flex", gap: 4 }}>
@@ -258,18 +342,12 @@ export const AudioSettingsModal: React.FC<AudioSettingsModalProps> = ({ isOpen, 
                       fontSize: "0.72rem",
                       fontWeight: 600,
                       border: "none",
-                      backgroundColor:
-                        (settings.speechRate || 0.98) === rate
-                          ? "var(--color-primary)"
-                          : "var(--bg-surface)",
-                      color:
-                        (settings.speechRate || 0.98) === rate
-                          ? "#FFFFFF"
-                          : "var(--text-muted)",
+                      backgroundColor: settings.speechRate === rate ? "var(--color-primary)" : "var(--bg-surface)",
+                      color: settings.speechRate === rate ? "#FFFFFF" : "var(--text-muted)",
                       cursor: "pointer",
                     }}
                   >
-                    {rate === 0.9 ? "Posé" : rate === 0.98 ? "Naturel" : "Dynamique"}
+                    {rate === 0.9 ? "Calme" : rate === 0.98 ? "Normal" : "Rapide"}
                   </button>
                 ))}
               </div>
@@ -277,93 +355,91 @@ export const AudioSettingsModal: React.FC<AudioSettingsModalProps> = ({ isOpen, 
           </div>
         )}
 
-        {/* Detailed Options List */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 10,
-            opacity: settings.voiceCoachEnabled ? 1 : 0.45,
-            pointerEvents: settings.voiceCoachEnabled ? "auto" : "none",
-          }}
-        >
-          {/* Announce Exercise Names */}
-          <div
-            onClick={() => handleToggle("announceExerciseNames")}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: "8px 10px",
-              cursor: "pointer",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <Bell size={16} color="var(--text-subtle)" />
-              <span style={{ fontSize: "0.85rem", color: "var(--text-main)" }}>
-                Annoncer le nom des exercices
-              </span>
-            </div>
-            <input
-              type="checkbox"
-              checked={settings.announceExerciseNames}
-              onChange={() => {}}
-              style={{ accentColor: "var(--color-primary)", cursor: "pointer" }}
-            />
-          </div>
+        {/* Detailed Guidance Toggles */}
+        {settings.voiceCoachEnabled && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>
+              Éléments vocaux
+            </span>
 
-          {/* 5-second countdown */}
-          <div
-            onClick={() => handleToggle("announceCountdown5s")}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: "8px 10px",
-              cursor: "pointer",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <Clock size={16} color="var(--text-subtle)" />
-              <span style={{ fontSize: "0.85rem", color: "var(--text-main)" }}>
-                Décompte vocal (5 dernières secondes)
-              </span>
+            {/* Announce Exercise Names */}
+            <div
+              onClick={() => handleToggle("announceExerciseNames")}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "8px 10px",
+                borderRadius: "var(--radius-md)",
+                backgroundColor: "var(--bg-surface-elevated)",
+                cursor: "pointer",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.85rem", color: "var(--text-main)" }}>
+                <Bell size={16} color="var(--color-primary)" />
+                <span>Annoncer le nom des exercices</span>
+              </div>
+              <input
+                type="checkbox"
+                checked={settings.announceExerciseNames}
+                onChange={() => {}}
+                style={{ accentColor: "var(--color-primary)", cursor: "pointer" }}
+              />
             </div>
-            <input
-              type="checkbox"
-              checked={settings.announceCountdown5s}
-              onChange={() => {}}
-              style={{ accentColor: "var(--color-primary)", cursor: "pointer" }}
-            />
-          </div>
 
-          {/* Guidance tips */}
-          <div
-            onClick={() => handleToggle("announceGuidance")}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: "8px 10px",
-              cursor: "pointer",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <HelpCircle size={16} color="var(--text-subtle)" />
-              <span style={{ fontSize: "0.85rem", color: "var(--text-main)" }}>
-                Conseils d'exécution & respiration
-              </span>
+            {/* Countdown 5s */}
+            <div
+              onClick={() => handleToggle("announceCountdown5s")}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "8px 10px",
+                borderRadius: "var(--radius-md)",
+                backgroundColor: "var(--bg-surface-elevated)",
+                cursor: "pointer",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.85rem", color: "var(--text-main)" }}>
+                <Clock size={16} color="var(--color-primary)" />
+                <span>Décompte vocal (5, 4, 3, 2, 1)</span>
+              </div>
+              <input
+                type="checkbox"
+                checked={settings.announceCountdown5s}
+                onChange={() => {}}
+                style={{ accentColor: "var(--color-primary)", cursor: "pointer" }}
+              />
             </div>
-            <input
-              type="checkbox"
-              checked={settings.announceGuidance}
-              onChange={() => {}}
-              style={{ accentColor: "var(--color-primary)", cursor: "pointer" }}
-            />
-          </div>
-        </div>
 
-        {/* Sound effects toggle */}
+            {/* Guidance Tips */}
+            <div
+              onClick={() => handleToggle("announceGuidance")}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "8px 10px",
+                borderRadius: "var(--radius-md)",
+                backgroundColor: "var(--bg-surface-elevated)",
+                cursor: "pointer",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.85rem", color: "var(--text-main)" }}>
+                <HelpCircle size={16} color="var(--color-primary)" />
+                <span>Conseils de posture & respiration</span>
+              </div>
+              <input
+                type="checkbox"
+                checked={settings.announceGuidance}
+                onChange={() => {}}
+                style={{ accentColor: "var(--color-primary)", cursor: "pointer" }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Sound Effects Toggle */}
         <div
           onClick={() => handleToggle("soundEffectsEnabled")}
           style={{
@@ -376,15 +452,9 @@ export const AudioSettingsModal: React.FC<AudioSettingsModalProps> = ({ isOpen, 
             cursor: "pointer",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            {settings.soundEffectsEnabled ? (
-              <Volume2 size={16} color="var(--text-subtle)" />
-            ) : (
-              <VolumeX size={16} color="var(--text-muted)" />
-            )}
-            <span style={{ fontSize: "0.85rem", color: "var(--text-main)" }}>
-              Bips et signaux sonores
-            </span>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.88rem", fontWeight: 600, color: "var(--text-main)" }}>
+            <Volume2 size={16} color="var(--color-primary)" />
+            <span>Sons & bips du minuteur</span>
           </div>
           <input
             type="checkbox"
@@ -394,8 +464,8 @@ export const AudioSettingsModal: React.FC<AudioSettingsModalProps> = ({ isOpen, 
           />
         </div>
 
-        {/* Close / Save button */}
-        <button type="button" className="btn-primary" onClick={onClose} style={{ marginTop: 2 }}>
+        {/* Close Button */}
+        <button type="button" className="btn-primary" onClick={onClose} style={{ marginTop: 4 }}>
           <span>Terminé</span>
         </button>
       </div>

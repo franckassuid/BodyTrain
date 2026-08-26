@@ -1,22 +1,27 @@
 // Web Speech API Voice Coach for BodyTrain morning sessions
-// Optimized for natural French voices (Apple Premium/Enhanced, Google Natural, Microsoft Natural)
+// Optimized for natural French voices (Male & Female on Apple, Google, Microsoft, Android, iOS)
+
+export type VoiceGenderPreference = "auto" | "male" | "female";
 
 export interface AudioSettings {
   voiceCoachEnabled: boolean; // Master toggle for spoken voice
+  voiceGenderPreference?: VoiceGenderPreference; // "auto", "male", "female"
   announceExerciseNames: boolean; // Speak "Prochain exercice: ..."
   announceCountdown5s: boolean; // Speak "5, 4, 3, 2, 1" on final seconds
   announceGuidance: boolean; // Speak execution/breathing tips
   soundEffectsEnabled: boolean; // Chimes and beep synthesis
   selectedVoiceURI?: string; // Specific chosen voice URI
   speechRate?: number; // Speed rate (0.8 to 1.2, default 0.98 for warmth)
-  speechPitch?: number; // Pitch (0.9 to 1.1, default 1.0)
+  speechPitch?: number; // Pitch (0.85 to 1.15, default 1.0)
 }
 
 export interface AvailableVoice {
   name: string;
   lang: string;
   voiceURI: string;
-  qualityBadge?: string; // "Naturelle", "Premium", "HD"
+  gender: "male" | "female" | "neutral";
+  genderLabel: string;
+  qualityBadge?: string; // "Naturelle", "Premium HD", "Google HD", "Siri"
   isDefault?: boolean;
 }
 
@@ -24,6 +29,7 @@ const STORAGE_KEY = "bodytrain_audio_settings";
 
 const DEFAULT_SETTINGS: AudioSettings = {
   voiceCoachEnabled: true,
+  voiceGenderPreference: "auto",
   announceExerciseNames: true,
   announceCountdown5s: true,
   announceGuidance: true,
@@ -31,6 +37,69 @@ const DEFAULT_SETTINGS: AudioSettings = {
   speechRate: 0.98,
   speechPitch: 1.0,
 };
+
+export function detectVoiceGender(v: SpeechSynthesisVoice): "male" | "female" | "neutral" {
+  const name = (v.name || "").toLowerCase();
+  const uri = (v.voiceURI || "").toLowerCase();
+
+  // Explicit male indicators across Apple, Google, Microsoft & Android
+  if (
+    name.includes("thomas") ||
+    name.includes("nicolas") ||
+    name.includes("henri") ||
+    name.includes("claude") ||
+    name.includes("jerome") ||
+    name.includes("jérôme") ||
+    name.includes("paul") ||
+    name.includes("alain") ||
+    name.includes("homme") ||
+    name.includes("male") ||
+    name.includes("voix 1") ||
+    uri.includes("fr-fr-x-fra") ||
+    uri.includes("fr-fr-x-frd") ||
+    uri.includes("fr-ca-x-cab") ||
+    uri.includes("fr-ca-x-cad") ||
+    uri.includes("standard-b") ||
+    uri.includes("standard-d") ||
+    uri.includes("neural2-b") ||
+    uri.includes("neural2-d") ||
+    uri.includes("wavenet-b") ||
+    uri.includes("wavenet-d")
+  ) {
+    return "male";
+  }
+
+  // Explicit female indicators across Apple, Google, Microsoft & Android
+  if (
+    name.includes("amélie") ||
+    name.includes("amelie") ||
+    name.includes("audrey") ||
+    name.includes("aurélie") ||
+    name.includes("aurelie") ||
+    name.includes("marie") ||
+    name.includes("denise") ||
+    name.includes("paulina") ||
+    name.includes("brigitte") ||
+    name.includes("celeste") ||
+    name.includes("femme") ||
+    name.includes("female") ||
+    name.includes("voix 2") ||
+    uri.includes("fr-fr-x-frc") ||
+    uri.includes("fr-fr-x-frb") ||
+    uri.includes("fr-ca-x-caa") ||
+    uri.includes("fr-ca-x-cac") ||
+    uri.includes("standard-a") ||
+    uri.includes("standard-c") ||
+    uri.includes("neural2-a") ||
+    uri.includes("neural2-c") ||
+    uri.includes("wavenet-a") ||
+    uri.includes("wavenet-c")
+  ) {
+    return "female";
+  }
+
+  return "neutral";
+}
 
 class VoiceCoachService {
   private settings: AudioSettings = DEFAULT_SETTINGS;
@@ -65,7 +134,7 @@ class VoiceCoachService {
     } catch {
       // ignore localStorage errors
     }
-    // Update voice if selectedVoiceURI changed
+    // Update voice if selectedVoiceURI or gender preference changed
     this.applySelectedVoice();
   }
 
@@ -73,16 +142,27 @@ class VoiceCoachService {
     return { ...this.settings };
   }
 
-  /** Rate French voices by naturalness & quality */
+  /** Rate French voices by naturalness & user gender preference */
   private scoreVoice(v: SpeechSynthesisVoice): number {
     let score = 0;
     const name = (v.name || "").toLowerCase();
     const lang = (v.lang || "").toLowerCase();
+    const gender = detectVoiceGender(v);
+    const pref = this.settings.voiceGenderPreference || "auto";
 
     // Prefer France French, then other French
     if (lang === "fr-fr" || lang === "fr_fr") score += 40;
     else if (lang.startsWith("fr")) score += 25;
     else return -1000; // not French
+
+    // Gender preference matching
+    if (pref === "male") {
+      if (gender === "male") score += 250;
+      else if (gender === "female") score -= 150;
+    } else if (pref === "female") {
+      if (gender === "female") score += 250;
+      else if (gender === "male") score -= 150;
+    }
 
     // Neural / Natural / Premium voices get top priority
     if (name.includes("premium")) score += 100;
@@ -92,18 +172,18 @@ class VoiceCoachService {
     if (name.includes("google")) score += 80;
 
     // Renowned natural voice personas
-    if (name.includes("thomas")) score += 30;
-    if (name.includes("amélie") || name.includes("amelie")) score += 30;
-    if (name.includes("audrey")) score += 25;
-    if (name.includes("aurélie") || name.includes("aurelie")) score += 25;
-    if (name.includes("marie")) score += 25;
-    if (name.includes("denise")) score += 25;
-    if (name.includes("henri")) score += 25;
+    if (name.includes("thomas")) score += 40;
+    if (name.includes("amélie") || name.includes("amelie")) score += 40;
+    if (name.includes("nicolas")) score += 35;
+    if (name.includes("audrey")) score += 35;
+    if (name.includes("aurélie") || name.includes("aurelie")) score += 30;
+    if (name.includes("marie")) score += 30;
+    if (name.includes("henri")) score += 30;
+    if (name.includes("denise")) score += 30;
     if (name.includes("paulina")) score += 25;
-    if (name.includes("nicolas")) score += 20;
 
     // Demote robotic compact legacy voices
-    if (name.includes("compact")) score -= 50;
+    if (name.includes("compact")) score -= 60;
 
     return score;
   }
@@ -136,7 +216,7 @@ class VoiceCoachService {
       }
     }
 
-    // 2. Otherwise pick the highest-scored natural French voice
+    // 2. Otherwise pick the highest-scored natural French voice (respecting gender preference)
     const sorted = [...this.cachedVoices].sort((a, b) => this.scoreVoice(b) - this.scoreVoice(a));
     this.voice = sorted[0] || null;
   }
@@ -153,6 +233,8 @@ class VoiceCoachService {
     return sorted.map((v, idx) => {
       let badge: string | undefined;
       const lower = v.name.toLowerCase();
+      const gender = detectVoiceGender(v);
+
       if (lower.includes("premium") || lower.includes("enhanced") || (v as unknown as { enhanced?: boolean }).enhanced) {
         badge = "Premium HD";
       } else if (lower.includes("natural")) {
@@ -167,6 +249,8 @@ class VoiceCoachService {
         name: v.name,
         lang: v.lang,
         voiceURI: v.voiceURI,
+        gender,
+        genderLabel: gender === "male" ? "Voix d'homme" : gender === "female" ? "Voix de femme" : "Voix système",
         qualityBadge: badge,
         isDefault: idx === 0,
       };
@@ -175,6 +259,11 @@ class VoiceCoachService {
 
   public getCurrentVoiceName(): string {
     return this.voice?.name || "Voix système automatique";
+  }
+
+  public getCurrentVoiceGender(): "male" | "female" | "neutral" {
+    if (!this.voice) return "neutral";
+    return detectVoiceGender(this.voice);
   }
 
   private speak(text: string, options?: { rate?: number; pitch?: number; priority?: boolean }) {
@@ -198,9 +287,16 @@ class VoiceCoachService {
         utterance.voice = this.voice;
       }
 
-      // 0.96 - 1.02 provides a warm, natural human cadence (not robotic rush)
+      // Custom pitch adaptation based on gender preference
+      let pitch = options?.pitch ?? this.settings.speechPitch ?? 1.0;
+      if (this.settings.voiceGenderPreference === "male" && pitch === 1.0) {
+        pitch = 0.90; // Deeper, warm masculine timbre
+      } else if (this.settings.voiceGenderPreference === "female" && pitch === 1.0) {
+        pitch = 1.03; // Gentle, clear feminine timbre
+      }
+
       utterance.rate = options?.rate ?? this.settings.speechRate ?? 0.98;
-      utterance.pitch = options?.pitch ?? this.settings.speechPitch ?? 1.0;
+      utterance.pitch = pitch;
       utterance.volume = 1.0;
 
       window.speechSynthesis.speak(utterance);
@@ -258,9 +354,12 @@ class VoiceCoachService {
 
   /** Test current voice with a sample sentence */
   public testVoice(sampleText?: string) {
+    const isMale = this.settings.voiceGenderPreference === "male" || this.getCurrentVoiceGender() === "male";
     const text =
       sampleText ||
-      "Bonjour ! C'est parti pour votre réveil matinal. Respirez profondément et suivez le rythme.";
+      (isMale
+        ? "Bonjour ! Je serai votre coach pour la séance de ce matin. Respirez profondément et suivez le rythme."
+        : "Bonjour ! C'est parti pour votre réveil matinal. Respirez profondément et suivez le rythme.");
     this.speak(text, { priority: true });
   }
 
