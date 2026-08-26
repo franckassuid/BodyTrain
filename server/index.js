@@ -4,7 +4,9 @@ import fastifyStatic from "@fastify/static";
 import { DatabaseSync } from "node:sqlite";
 import fs from "node:fs";
 import path from "node:path";
+import crypto from "node:crypto";
 import webpush from "web-push";
+import { Communicate } from "edge-tts-universal";
 
 const fastify = Fastify({ logger: true });
 
@@ -40,6 +42,13 @@ try {
       last_notified_date TEXT,
       created_at TEXT NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS tts_cache (
+      hash TEXT PRIMARY KEY,
+      voice TEXT NOT NULL,
+      text TEXT NOT NULL,
+      audio_base64 TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
   `);
 } catch (e) {
   console.error("Could not open SQLite database at", dbPath, e);
@@ -49,7 +58,8 @@ try {
 fastify.get("/health", async () => {
   const count = db ? db.prepare("SELECT count(*) as count FROM exercises WHERE enabled = 1").get().count : 0;
   const subs = db ? db.prepare("SELECT count(*) as count FROM push_subscriptions").get().count : 0;
-  return { status: "ok", activeExercises: count, activeSubscriptions: subs, service: "BodyTrain API v2" };
+  const ttsCached = db ? db.prepare("SELECT count(*) as count FROM tts_cache").get().count : 0;
+  return { status: "ok", activeExercises: count, activeSubscriptions: subs, ttsCachedItems: ttsCached, service: "BodyTrain API v2" };
 });
 
 // Helper to format exercise from DB
@@ -389,6 +399,55 @@ function startPushScheduler() {
 }
 
 startPushScheduler();
+
+// 11. High Quality Neural TTS Synthesis endpoint (Microsoft Edge Neural Voices: Henri & Denise)
+fastify.get("/api/tts", async (request, reply) => {
+  const query = request.query || {};
+  const text = String(query.text || "").trim();
+  const voice = String(query.voice || "fr-FR-HenriNeural").trim();
+
+  if (!text) {
+    return reply.code(400).send({ error: "Missing text parameter" });
+  }
+
+  const hash = crypto.createHash("md5").update(`${voice}:${text}`).digest("hex");
+
+  // Check persistent SQLite cache
+  if (db) {
+    const cached = db.prepare("SELECT audio_base64 FROM tts_cache WHERE hash = ?").get(hash);
+    if (cached && cached.audio_base64) {
+      const buffer = Buffer.from(cached.audio_base64, "base64");
+      reply.header("Content-Type", "audio/mpeg");
+      reply.header("Cache-Control", "public, max-age=31536000, immutable");
+      return reply.send(buffer);
+    }
+  }
+
+  // Synthesize via Edge TTS Neural
+  try {
+    const comm = new Communicate(text, { voice });
+    const chunks = [];
+    for await (const chunk of comm.stream()) {
+      if (chunk.type === "audio") chunks.push(chunk.data);
+    }
+    const buffer = Buffer.concat(chunks);
+
+    // Save to DB cache
+    if (db && buffer.length > 0) {
+      db.prepare(`
+        INSERT OR REPLACE INTO tts_cache (hash, voice, text, audio_base64, created_at)
+        VALUES (?, ?, ?, ?, ?)
+      `).run(hash, voice, text, buffer.toString("base64"), new Date().toISOString());
+    }
+
+    reply.header("Content-Type", "audio/mpeg");
+    reply.header("Cache-Control", "public, max-age=31536000, immutable");
+    return reply.send(buffer);
+  } catch (err) {
+    fastify.log.error(err);
+    return reply.code(500).send({ error: "TTS synthesis failed", details: err.message });
+  }
+});
 
 const PORT = Number(process.env.PORT) || 3000;
 
