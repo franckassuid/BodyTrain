@@ -122,9 +122,9 @@ export const pushNotificationService = {
       });
     }
 
-    // Register subscription on backend server
+    // Register subscription and schedule on backend server
     try {
-      await fetch("/api/push/subscribe", {
+      const res = await fetch("/api/push/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -134,11 +134,43 @@ export const pushNotificationService = {
           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/Paris",
         }),
       });
-    } catch {
-      console.warn("Backend push endpoint unreachable, subscription maintained locally.");
+
+      if (!res.ok) {
+        console.warn("Server subscription registration returned status:", res.status);
+      }
+    } catch (e) {
+      console.warn("Backend push endpoint unreachable, subscription maintained locally.", e);
     }
 
     return subscription;
+  },
+
+  /** Update schedule on backend for active subscription */
+  async updateSchedule(
+    reminderTime: string,
+    activeDays: number[]
+  ): Promise<boolean> {
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      const subscription = await reg.pushManager.getSubscription();
+      if (!subscription) return false;
+
+      const res = await fetch("/api/push/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subscription,
+          reminderTime,
+          activeDays,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/Paris",
+        }),
+      });
+
+      return res.ok;
+    } catch (e) {
+      console.error("Failed to update push schedule:", e);
+      return false;
+    }
   },
 
   /** Unsubscribe from Web Push */
@@ -166,12 +198,12 @@ export const pushNotificationService = {
   },
 
   /** Send a real remote Web Push via the backend server (Apple APNs / Google FCM) */
-  async testServerPush(): Promise<boolean> {
+  async testServerPush(reminderTime = "07:30", activeDays: number[] = [1, 2, 3, 4, 5, 6]): Promise<boolean> {
     const reg = await navigator.serviceWorker.ready;
     let subscription = await reg.pushManager.getSubscription();
 
     if (!subscription) {
-      subscription = await this.subscribe();
+      subscription = await this.subscribe(reminderTime, activeDays);
     }
 
     if (!subscription) {
@@ -188,7 +220,6 @@ export const pushNotificationService = {
       if (!res.ok) throw new Error("Server push test failed");
       return true;
     } catch {
-      // Fallback to local service worker test notification
       return this.showLocalTestNotification();
     }
   },

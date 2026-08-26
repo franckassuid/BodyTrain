@@ -30,6 +30,7 @@ export const SettingsView: React.FC = () => {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [notificationStatus, setNotificationStatus] = useState<string | null>(null);
   const [savedFeedback, setSavedFeedback] = useState(false);
+  const [isSubscribing, setIsSubscribing] = useState(false);
 
   useEffect(() => {
     loadSettings();
@@ -49,8 +50,41 @@ export const SettingsView: React.FC = () => {
     if (updates.soundEnabled !== undefined) soundService.setEnabled(updates.soundEnabled);
     if (updates.vibrationEnabled !== undefined) vibrationService.setEnabled(updates.vibrationEnabled);
 
+    // If notification schedule changed and reminders are enabled, sync with backend server
+    if (updated.reminderEnabled && (updates.reminderTime || updates.activeDays)) {
+      pushNotificationService.updateSchedule(updated.reminderTime, updated.activeDays);
+    }
+
     setSavedFeedback(true);
     setTimeout(() => setSavedFeedback(false), 1500);
+  };
+
+  const handleToggleReminder = async (enabled: boolean) => {
+    if (!settings) return;
+    setIsSubscribing(true);
+    setNotificationStatus(null);
+
+    try {
+      if (enabled) {
+        const sub = await pushNotificationService.subscribe(settings.reminderTime, settings.activeDays);
+        if (sub) {
+          await handleUpdate({ reminderEnabled: true });
+          setNotificationStatus(`Rappels activés à ${settings.reminderTime} !`);
+        } else {
+          setNotificationStatus("Autorisation refusée ou non disponible.");
+        }
+      } else {
+        await pushNotificationService.unsubscribe();
+        await handleUpdate({ reminderEnabled: false });
+        setNotificationStatus("Rappels désactivés.");
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Erreur lors de l'activation.";
+      setNotificationStatus(msg);
+    } finally {
+      setIsSubscribing(false);
+      setTimeout(() => setNotificationStatus(null), 5000);
+    }
   };
 
   const handleToggleDay = (day: DayOfWeek) => {
@@ -63,8 +97,9 @@ export const SettingsView: React.FC = () => {
   };
 
   const handleTestNotification = async () => {
+    if (!settings) return;
     setNotificationStatus("Envoi de la notification de test...");
-    const ok = await pushNotificationService.testServerPush();
+    const ok = await pushNotificationService.testServerPush(settings.reminderTime, settings.activeDays);
     if (ok) {
       setNotificationStatus("Notification envoyée avec succès !");
     } else {
@@ -84,13 +119,14 @@ export const SettingsView: React.FC = () => {
 
   return (
     <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
           <h1 style={{ fontSize: "1.4rem", fontWeight: 700, color: "var(--text-main)" }}>
             Réglages
           </h1>
           <p style={{ fontSize: "0.9rem", color: "var(--text-muted)", marginTop: 2 }}>
-            Personnalise ton expérience quotidienne
+            Personnalisez votre expérience quotidienne
           </p>
         </div>
 
@@ -143,28 +179,91 @@ export const SettingsView: React.FC = () => {
 
       {/* 2. Morning Reminder & Active Days */}
       <div className="card" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        {/* Toggle Switch */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "1rem", fontWeight: 600 }}>
-            <Bell size={18} style={{ color: "var(--color-accent)" }} />
-            <span>Rappel matinal quotidien</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <Bell size={20} style={{ color: settings.reminderEnabled ? "var(--color-primary)" : "var(--text-subtle)" }} />
+            <div>
+              <div style={{ fontSize: "1.02rem", fontWeight: 700, color: "var(--text-main)" }}>
+                Rappel matinal quotidien
+              </div>
+              <div style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>
+                {settings.reminderEnabled ? "🟢 Actif sur cet appareil" : "⚪ Désactivé"}
+              </div>
+            </div>
           </div>
 
+          <label style={{ position: "relative", display: "inline-block", width: 50, height: 28 }}>
+            <input
+              type="checkbox"
+              checked={settings.reminderEnabled}
+              disabled={isSubscribing}
+              onChange={(e) => handleToggleReminder(e.target.checked)}
+              style={{ opacity: 0, width: 0, height: 0 }}
+            />
+            <span
+              style={{
+                position: "absolute",
+                cursor: "pointer",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: settings.reminderEnabled ? "var(--color-primary)" : "var(--border-color)",
+                borderRadius: 34,
+                transition: "0.3s",
+              }}
+            >
+              <span
+                style={{
+                  position: "absolute",
+                  content: '""',
+                  height: 22,
+                  width: 22,
+                  left: settings.reminderEnabled ? 25 : 3,
+                  bottom: 3,
+                  backgroundColor: "white",
+                  borderRadius: "50%",
+                  transition: "0.3s",
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+                }}
+              />
+            </span>
+          </label>
+        </div>
+
+        {/* Reminder Time Picker */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "12px 14px",
+            backgroundColor: "var(--bg-surface-elevated)",
+            borderRadius: "var(--radius-md)",
+            border: "1px solid var(--border-subtle)",
+          }}
+        >
+          <div style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text-main)" }}>
+            Heure du réveil
+          </div>
           <input
             type="time"
             value={settings.reminderTime}
             onChange={(e) => handleUpdate({ reminderTime: e.target.value })}
             style={{
-              padding: "6px 10px",
-              borderRadius: "var(--radius-md)",
-              border: "1px solid var(--border-subtle)",
-              backgroundColor: "var(--bg-surface-elevated)",
+              padding: "6px 12px",
+              borderRadius: "var(--radius-sm)",
+              border: "1.5px solid var(--border-color)",
+              backgroundColor: "#FFFFFF",
               color: "var(--text-main)",
-              fontSize: "0.95rem",
-              fontWeight: 600,
+              fontSize: "1rem",
+              fontWeight: 700,
             }}
           />
         </div>
 
+        {/* Days of week */}
         <div>
           <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text-muted)", marginBottom: 8 }}>
             Jours actifs (par défaut : Lundi au Samedi)
@@ -184,7 +283,8 @@ export const SettingsView: React.FC = () => {
                     color: active ? "var(--color-primary-dark)" : "var(--text-subtle)",
                     fontWeight: active ? 700 : 500,
                     fontSize: "0.85rem",
-                    border: active ? "1px solid var(--color-primary)" : "1px solid var(--border-subtle)",
+                    border: active ? "1.5px solid var(--color-primary)" : "1px solid var(--border-subtle)",
+                    cursor: "pointer",
                   }}
                 >
                   {d.label}
@@ -194,13 +294,25 @@ export const SettingsView: React.FC = () => {
           </div>
         </div>
 
+        {/* Test Notification Button */}
         <button type="button" className="btn-secondary" onClick={handleTestNotification}>
           <Bell size={16} />
           <span>Tester la notification</span>
         </button>
 
         {notificationStatus && (
-          <div style={{ fontSize: "0.85rem", color: "var(--color-primary)", fontWeight: 500, textAlign: "center" }}>
+          <div
+            className="animate-fade-in"
+            style={{
+              fontSize: "0.85rem",
+              color: "var(--color-primary)",
+              fontWeight: 600,
+              textAlign: "center",
+              padding: "6px 10px",
+              backgroundColor: "var(--color-primary-soft)",
+              borderRadius: "var(--radius-sm)",
+            }}
+          >
             {notificationStatus}
           </div>
         )}
@@ -228,7 +340,7 @@ export const SettingsView: React.FC = () => {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "1rem", fontWeight: 600 }}>
             <Vibrate size={18} style={{ color: "var(--color-primary)" }} />
-            <span>Vibrations lors des transitions</span>
+            <span>Vibrations (haptique)</span>
           </div>
           <input
             type="checkbox"
@@ -239,54 +351,85 @@ export const SettingsView: React.FC = () => {
         </div>
       </div>
 
-      {/* 4. Safety Reminder Box */}
+      {/* 4. Safety & Medical Notice */}
       <div
         className="card"
         style={{
-          backgroundColor: "var(--bg-surface-elevated)",
-          borderColor: "var(--border-subtle)",
-          padding: "16px 18px",
           display: "flex",
           flexDirection: "column",
-          gap: 6,
+          gap: 10,
+          backgroundColor: "var(--bg-surface)",
+          border: "1px solid var(--border-color)",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.95rem", fontWeight: 700, color: "var(--text-main)" }}>
-          <ShieldCheck size={18} style={{ color: "var(--color-primary)" }} />
-          <span>Rappels de sécurité</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--color-primary)", fontWeight: 600 }}>
+          <ShieldCheck size={18} />
+          <span>Sécurité et conseils</span>
         </div>
-        <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.45 }}>
-          Arrête le mouvement en cas de douleur vive, croissante ou inhabituelle. Si une gêne persiste,
-          s’aggrave ou limite tes mouvements, demande l’avis d’un professionnel.
+        <p style={{ fontSize: "0.84rem", color: "var(--text-muted)", lineHeight: 1.5, margin: 0 }}>
+          Les séances BodyTrain sont conçues pour un réveil corporel progressif. En cas de douleur aiguë ou inhabituelle, cessez immédiatement le mouvement et consultez un professionnel de santé.
         </p>
       </div>
 
-      {/* 5. Reset History */}
+      {/* 5. Reset & Data Management */}
       <div className="card" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--text-main)", fontWeight: 600 }}>
+          <RotateCcw size={18} />
+          <span>Gestion des données</span>
+        </div>
+
         {!showResetConfirm ? (
           <button
             type="button"
             className="btn-ghost"
             onClick={() => setShowResetConfirm(true)}
-            style={{ color: "var(--color-accent)", justifyContent: "center" }}
+            style={{
+              color: "var(--color-accent)",
+              border: "1px solid rgba(231, 111, 81, 0.3)",
+              alignSelf: "flex-start",
+            }}
           >
-            <RotateCcw size={16} />
-            <span>Réinitialiser l’historique</span>
+            Effacer l'historique des séances
           </button>
         ) : (
-          <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: 12, textAlign: "center" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "var(--color-accent)", fontWeight: 600 }}>
-              <AlertTriangle size={18} />
-              <span>Confirmer la suppression ?</span>
+          <div
+            className="animate-slide-down"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 10,
+              padding: 12,
+              backgroundColor: "rgba(231, 111, 81, 0.08)",
+              borderRadius: "var(--radius-md)",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--color-accent)", fontSize: "0.88rem", fontWeight: 600 }}>
+              <AlertTriangle size={16} />
+              <span>Confirmer la suppression de l'historique ?</span>
             </div>
-            <div style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>
-              Toutes tes séances passées seront effacées de cet appareil.
-            </div>
-            <div style={{ display: "flex", gap: 10 }}>
-              <button type="button" className="btn-accent" onClick={handleResetHistory} style={{ flex: 1 }}>
-                Oui, réinitialiser
+            <div style={{ display: "flex", gap: 8 }}>
+              <button
+                type="button"
+                onClick={handleResetHistory}
+                style={{
+                  backgroundColor: "var(--color-accent)",
+                  color: "#FFFFFF",
+                  border: "none",
+                  padding: "8px 14px",
+                  borderRadius: "var(--radius-sm)",
+                  fontWeight: 600,
+                  fontSize: "0.85rem",
+                  cursor: "pointer",
+                }}
+              >
+                Oui, tout effacer
               </button>
-              <button type="button" className="btn-secondary" onClick={() => setShowResetConfirm(false)} style={{ flex: 1 }}>
+              <button
+                type="button"
+                className="btn-ghost"
+                onClick={() => setShowResetConfirm(false)}
+                style={{ padding: "8px 14px", fontSize: "0.85rem" }}
+              >
                 Annuler
               </button>
             </div>

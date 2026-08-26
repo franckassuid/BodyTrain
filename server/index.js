@@ -40,7 +40,8 @@ try {
 // 1. Health check
 fastify.get("/health", async () => {
   const count = db ? db.prepare("SELECT count(*) as count FROM exercises WHERE enabled = 1").get().count : 0;
-  return { status: "ok", activeExercises: count, service: "BodyTrain API v2" };
+  const subs = db ? db.prepare("SELECT count(*) as count FROM push_subscriptions").get().count : 0;
+  return { status: "ok", activeExercises: count, activeSubscriptions: subs, service: "BodyTrain API v2" };
 });
 
 // Helper to format exercise from DB
@@ -221,12 +222,16 @@ fastify.get("/api/push/vapid-public-key", async () => {
   return { publicKey: VAPID_PUBLIC_KEY };
 });
 
-// 7. Web Push Subscription endpoint
+// 7. Web Push Subscription endpoint (save or update schedule)
 fastify.post("/api/push/subscribe", async (request, reply) => {
   const { subscription, reminderTime, activeDays, timezone } = request.body || {};
   if (!subscription || !subscription.endpoint) {
     return reply.code(400).send({ error: "Missing subscription data" });
   }
+
+  const timeFormatted = String(reminderTime || "07:30").trim();
+  const daysFormatted = JSON.stringify(activeDays || [1, 2, 3, 4, 5, 6]);
+  const tzFormatted = timezone || "Europe/Paris";
 
   if (db) {
     const stmt = db.prepare(`
@@ -242,11 +247,12 @@ fastify.post("/api/push/subscribe", async (request, reply) => {
     stmt.run(
       subscription.endpoint,
       JSON.stringify(subscription),
-      reminderTime || "07:30",
-      JSON.stringify(activeDays || [1, 2, 3, 4, 5, 6]),
-      timezone || "Europe/Paris",
+      timeFormatted,
+      daysFormatted,
+      tzFormatted,
       new Date().toISOString()
     );
+    console.log(`[PushService] Registered/Updated subscription for ${subscription.endpoint.slice(0, 35)}... at ${timeFormatted} (${tzFormatted})`);
   }
 
   return { success: true };
@@ -258,6 +264,7 @@ fastify.post("/api/push/unsubscribe", async (request, reply) => {
   if (!endpoint) return reply.code(400).send({ error: "Missing endpoint" });
   if (db) {
     db.prepare("DELETE FROM push_subscriptions WHERE endpoint = ?").run(endpoint);
+    console.log(`[PushService] Removed subscription for ${endpoint.slice(0, 35)}...`);
   }
   return { success: true };
 });
@@ -271,8 +278,8 @@ fastify.post("/api/push/test", async (request, reply) => {
 
   try {
     const payload = JSON.stringify({
-      title: "BodyTrain • Test Réel Web Push",
-      body: "Bravo ! Les notifications distantes Web Push fonctionnent parfaitement sur votre appareil.",
+      title: "BodyTrain • Notification de rappel",
+      body: "Bravo ! Les notifications programmées fonctionnent parfaitement sur votre appareil.",
       url: "/",
     });
 
@@ -296,35 +303,54 @@ function startPushScheduler() {
       for (const row of rows) {
         try {
           const tz = row.timezone || "Europe/Paris";
-          // Get local time in user's timezone
-          const userLocalString = now.toLocaleTimeString("fr-FR", { timeZone: tz, hour: "2-digit", minute: "2-digit", hour12: false });
-          const userDateString = now.toLocaleDateString("en-CA", { timeZone: tz }); // YYYY-MM-DD
-          
-          // Get day of week (0=Sunday, 1=Monday...) in user's timezone
-          const dayName = now.toLocaleDateString("en-US", { timeZone: tz, weekday: "short" });
+
+          // Strict 24h format HH:MM in user's timezone
+          const timeFormatter = new Intl.DateTimeFormat("en-GB", {
+            timeZone: tz,
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          });
+          const userLocalTime = timeFormatter.format(now); // e.g. "07:30"
+
+          // Strict YYYY-MM-DD in user's timezone
+          const dateFormatter = new Intl.DateTimeFormat("en-CA", {
+            timeZone: tz,
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          });
+          const userLocalDate = dateFormatter.format(now); // e.g. "2026-08-26"
+
+          // Day of week in user's timezone (0=Sunday, 1=Monday... 6=Saturday)
+          const dayFormatter = new Intl.DateTimeFormat("en-US", {
+            timeZone: tz,
+            weekday: "short",
+          });
+          const dayShort = dayFormatter.format(now);
           const dayMap = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
-          const userDay = dayMap[dayName] ?? now.getDay();
+          const userDay = dayMap[dayShort] ?? now.getDay();
 
-          const activeDays = JSON.parse(row.active_days || "[]");
+          const activeDays = JSON.parse(row.active_days || "[1,2,3,4,5,6]");
 
-          // Match day and time (HH:MM)
-          if (activeDays.includes(userDay) && userLocalString === row.reminder_time) {
+          // Check if current day and minute match
+          if (activeDays.includes(userDay) && userLocalTime === row.reminder_time) {
             // Ensure not already sent today
-            if (row.last_notified_date !== userDateString) {
+            if (row.last_notified_date !== userLocalDate) {
               const subscription = JSON.parse(row.subscription_json);
               const payload = JSON.stringify({
-                title: "BodyTrain • C'est l'heure !",
+                title: "BodyTrain • C'est l'heure de bouger !",
                 body: "Bonjour ! Prenez 7 minutes pour réveiller votre corps en douceur.",
                 url: "/",
               });
 
+              console.log(`[PushScheduler] Sending scheduled morning reminder (${userLocalTime} / ${userLocalDate}) to ${row.endpoint.slice(0, 35)}...`);
               await webpush.sendNotification(subscription, payload);
 
               db.prepare("UPDATE push_subscriptions SET last_notified_date = ? WHERE endpoint = ?").run(
-                userDateString,
+                userLocalDate,
                 row.endpoint
               );
-              console.log(`[PushScheduler] Sent morning reminder to ${row.endpoint.slice(0, 30)}...`);
             }
           }
         } catch (pushErr) {
@@ -340,7 +366,7 @@ function startPushScheduler() {
     } catch (e) {
       console.error("[PushScheduler] Global scheduler error:", e);
     }
-  }, 30000); // check every 30 seconds
+  }, 15000); // check every 15 seconds
 }
 
 startPushScheduler();
