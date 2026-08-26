@@ -5,13 +5,14 @@ import {
   SkipForward,
   Shuffle,
   StopCircle,
-  CheckCircle,
-  ChevronRight,
   Info,
+  Volume2,
+  Wind,
 } from "lucide-react";
 import { workoutEngine, type TimerSnapshot } from "../engine/workoutTimer.ts";
 import { ExerciseAnimation } from "./ExerciseAnimation.tsx";
 import { StopModal } from "./StopModal.tsx";
+import { AudioSettingsModal } from "./AudioSettingsModal.tsx";
 import { replaceExerciseInSession } from "../engine/generator.ts";
 import type { GeneratedSession } from "../types/session.ts";
 import { CATEGORY_LABELS } from "../types/enums.ts";
@@ -32,7 +33,9 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
   const [currentSession, setCurrentSession] = useState<GeneratedSession>(initialSession);
   const [snapshot, setSnapshot] = useState<TimerSnapshot>(workoutEngine.getSnapshot());
   const [showStopModal, setShowStopModal] = useState<boolean>(false);
+  const [showAudioModal, setShowAudioModal] = useState<boolean>(false);
   const [showInstructions, setShowInstructions] = useState<boolean>(false);
+  const [breathState, setBreathState] = useState<"inspire" | "expire">("inspire");
 
   useEffect(() => {
     workoutEngine.start(currentSession);
@@ -49,16 +52,21 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
     };
   }, []);
 
+  // Sync breathing rhythm (4s inspire -> 4s expire)
+  useEffect(() => {
+    if (snapshot.phase !== "rest") return;
+    const interval = setInterval(() => {
+      setBreathState((prev) => (prev === "inspire" ? "expire" : "inspire"));
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [snapshot.phase]);
+
   const handleTogglePause = () => {
     workoutEngine.togglePause();
   };
 
   const handleSkip = () => {
     workoutEngine.skip();
-  };
-
-  const handleCompleteReps = () => {
-    workoutEngine.completeRepetitionExercise();
   };
 
   const handleReplaceCurrentExercise = () => {
@@ -97,10 +105,10 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
   const remainingPhase = snapshot.phaseTimeRemainingSeconds;
   const progressRatio = Math.max(0, Math.min(1, 1 - remainingPhase / totalPhase));
 
-  // Circular progress dimensions
-  const circleSize = 100;
+  // Harmonious Unified Circular Gauge Geometry
+  const ringSize = 264;
   const strokeWidth = 8;
-  const radius = (circleSize - strokeWidth) / 2;
+  const radius = (ringSize - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference * (1 - progressRatio);
 
@@ -111,33 +119,70 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
     return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
-  // Phase Title & Badge
+  // Phase Details & Colors
   const getPhaseDetails = () => {
     if (snapshot.phase === "preparation") {
       return {
         label: "Préparation",
-        bg: "var(--bg-surface-elevated)",
-        color: "var(--text-muted)",
+        bg: "rgba(245, 158, 11, 0.12)",
+        color: "#D97706",
+        ringColor: "#F59E0B",
       };
     }
     if (snapshot.phase === "rest") {
       return {
-        label: "Repos & Récupération",
-        bg: "var(--color-primary-soft)",
-        color: "var(--color-primary-dark)",
+        label: "Repos & Souffle",
+        bg: "rgba(2, 132, 199, 0.12)",
+        color: "#0284C7",
+        ringColor: "#0284C7",
       };
     }
-    if (snapshot.currentExercise?.phase === "cooldown") {
+    const sessionPhase = snapshot.currentExercise?.phase;
+    if (sessionPhase === "wakeup") {
       return {
-        label: "Retour au calme",
+        label: "1. Réveil",
         bg: "var(--color-primary-soft)",
         color: "var(--color-primary)",
+        ringColor: "var(--color-primary)",
+      };
+    }
+    if (sessionPhase === "mobility") {
+      return {
+        label: "2. Mobilité",
+        bg: "var(--color-primary-soft)",
+        color: "var(--color-primary)",
+        ringColor: "var(--color-primary)",
+      };
+    }
+    if (sessionPhase === "activation") {
+      return {
+        label: "3. Activation",
+        bg: "var(--color-primary)",
+        color: "#FFFFFF",
+        ringColor: "var(--color-primary)",
+      };
+    }
+    if (sessionPhase === "dynamic") {
+      return {
+        label: "4. Dynamique",
+        bg: "var(--color-accent)",
+        color: "#FFFFFF",
+        ringColor: "var(--color-accent)",
+      };
+    }
+    if (sessionPhase === "finish") {
+      return {
+        label: "5. Fin active",
+        bg: "var(--color-primary-soft)",
+        color: "var(--color-primary)",
+        ringColor: "var(--color-primary)",
       };
     }
     return {
-      label: "Exercice en cours",
+      label: "Exercice",
       bg: "var(--color-primary)",
       color: "#FFFFFF",
+      ringColor: "var(--color-primary)",
     };
   };
 
@@ -147,7 +192,7 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
 
   return (
     <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      {/* Top Header: Session Progress & Stop Button */}
+      {/* Top Header: Phase Badge, Counter, Audio & Stop */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span
@@ -155,288 +200,524 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
             style={{
               backgroundColor: phaseDetails.bg,
               color: phaseDetails.color,
-              padding: "4px 12px",
+              padding: "5px 12px",
+              fontSize: "0.82rem",
+              fontWeight: 700,
             }}
           >
             {phaseDetails.label}
           </span>
-          <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text-subtle)" }}>
+          <span style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--text-subtle)" }}>
             {snapshot.currentExerciseIndex + 1} / {snapshot.totalExercises}
           </span>
         </div>
 
-        <button
-          type="button"
-          onClick={handleOpenStop}
-          className="btn-ghost"
-          style={{ padding: "6px 10px", color: "var(--color-accent)", fontSize: "0.88rem" }}
-          aria-label="Arrêter la séance"
-        >
-          <StopCircle size={18} />
-          <span>Arrêter</span>
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <button
+            type="button"
+            onClick={() => setShowAudioModal(true)}
+            className="btn-ghost"
+            style={{ padding: "6px 10px", color: "var(--text-subtle)", fontSize: "0.88rem" }}
+            aria-label="Options audio & coach vocal"
+            title="Options audio & coach vocal"
+          >
+            <Volume2 size={18} />
+          </button>
+
+          <button
+            type="button"
+            onClick={handleOpenStop}
+            className="btn-ghost"
+            style={{ padding: "6px 10px", color: "var(--color-accent)", fontSize: "0.88rem" }}
+            aria-label="Arrêter la séance"
+          >
+            <StopCircle size={18} />
+            <span>Arrêter</span>
+          </button>
+        </div>
       </div>
 
-      {/* Exercise Name & Short Description */}
+      {/* Main Title & Subtitle Area */}
       <div>
-        <h1 style={{ fontSize: "1.35rem", fontWeight: 700, color: "var(--text-main)", lineHeight: 1.25 }}>
-          {snapshot.phase === "rest" ? "Repos & Souffle" : (currentExercise.nameFr || currentExercise.name)}
+        <h1
+          style={{
+            fontSize: "1.38rem",
+            fontWeight: 800,
+            color: "var(--text-main)",
+            lineHeight: 1.25,
+            letterSpacing: "-0.01em",
+          }}
+        >
+          {snapshot.phase === "rest"
+            ? "Repos & Récupération"
+            : snapshot.phase === "preparation"
+            ? "Préparez-vous..."
+            : currentExercise.nameFr || currentExercise.name}
         </h1>
+
         <div
           style={{
             display: "flex",
             alignItems: "center",
             gap: 6,
             marginTop: 4,
-            fontSize: "0.85rem",
+            fontSize: "0.84rem",
             color: "var(--text-muted)",
           }}
         >
-          <span>{CATEGORY_LABELS[currentExercise.category] || currentExercise.category}</span>
-          <span>•</span>
+          {snapshot.phase === "rest" ? (
+            <span>Respirez calmement avant le prochain mouvement</span>
+          ) : (
+            <>
+              <span>{CATEGORY_LABELS[currentExercise.category] || currentExercise.category}</span>
+              <span>•</span>
+              <span>Intensité {currentExercise.intensity}/5</span>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* ── UNIFIED HARMONIOUS HERO STAGE (Constant Dimensions & Circular Gauge Across All Phases) ── */}
+      <div
+        style={{
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "20px 16px 16px",
+          backgroundColor: "var(--bg-surface)",
+          borderRadius: "var(--radius-xl)",
+          border: "1.5px solid var(--border-color)",
+          boxShadow: "0 8px 30px rgba(0,0,0,0.04)",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        {/* Central Stage: Giant Circular Gauge wrapping the Visual Content */}
+        <div
+          style={{
+            position: "relative",
+            width: ringSize,
+            height: ringSize,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {/* Circular SVG Gauge Track */}
+          <svg
+            width={ringSize}
+            height={ringSize}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              transform: "rotate(-90deg)",
+              pointerEvents: "none",
+              zIndex: 3,
+            }}
+          >
+            {/* Background Ring Track */}
+            <circle
+              cx={ringSize / 2}
+              cy={ringSize / 2}
+              r={radius}
+              fill="transparent"
+              stroke="var(--bg-surface-elevated)"
+              strokeWidth={strokeWidth}
+            />
+            {/* Smooth Animated Progress Arc */}
+            <circle
+              cx={ringSize / 2}
+              cy={ringSize / 2}
+              r={radius}
+              fill="transparent"
+              stroke={phaseDetails.ringColor}
+              strokeWidth={strokeWidth}
+              strokeDasharray={circumference}
+              strokeDashoffset={strokeDashoffset}
+              strokeLinecap="round"
+              style={{
+                transition: "stroke-dashoffset 0.15s linear, stroke 0.3s ease",
+              }}
+            />
+          </svg>
+
+          {/* Interior Viewport (Diameter 224px) */}
+          <div
+            style={{
+              width: 224,
+              height: 224,
+              borderRadius: "50%",
+              overflow: "hidden",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              position: "relative",
+              backgroundColor: "var(--bg-surface-elevated)",
+              zIndex: 1,
+            }}
+          >
+            {snapshot.phase === "rest" ? (
+              /* REST PHASE: Serene Breath Waves & Expanding Sphere */
+              <div
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  position: "relative",
+                }}
+              >
+                {/* Expanding aura */}
+                <div
+                  className="breathe-ripple"
+                  style={{
+                    position: "absolute",
+                    width: 140,
+                    height: 140,
+                    borderRadius: "50%",
+                    backgroundColor: "rgba(2, 132, 199, 0.18)",
+                  }}
+                />
+
+                {/* Pulsing Core Sphere */}
+                <div
+                  className="breathe-sphere"
+                  style={{
+                    width: 110,
+                    height: 110,
+                    borderRadius: "50%",
+                    backgroundColor: "rgba(2, 132, 199, 0.14)",
+                    border: "2px solid #0284C7",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 4,
+                    boxShadow: "0 6px 20px rgba(2, 132, 199, 0.2)",
+                  }}
+                >
+                  <Wind size={30} color="#0284C7" />
+                  <span
+                    style={{
+                      fontSize: "0.76rem",
+                      fontWeight: 800,
+                      color: "#0284C7",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.04em",
+                    }}
+                  >
+                    {breathState === "inspire" ? "Inspirez" : "Expirez"}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              /* WORK & PREPARATION PHASES: Circular Posture Visual Loop */
+              <ExerciseAnimation
+                exercise={currentExercise}
+                nextExercise={nextExercise}
+                phase={snapshot.phase}
+                circularMode={true}
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Big Prominent Countdown Digits Display */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            marginTop: 14,
+          }}
+        >
+          <div
+            style={{
+              fontSize: "2.7rem",
+              fontWeight: 900,
+              color: "var(--text-main)",
+              lineHeight: 1,
+              letterSpacing: "-0.03em",
+            }}
+          >
+            {remainingPhase}
+            <span style={{ fontSize: "1.3rem", fontWeight: 700, color: "var(--text-subtle)", marginLeft: 2 }}>
+              s
+            </span>
+          </div>
+
+          <div
+            style={{
+              fontSize: "0.8rem",
+              fontWeight: 700,
+              color: phaseDetails.color,
+              textTransform: "uppercase",
+              letterSpacing: "0.06em",
+              marginTop: 4,
+            }}
+          >
+            {snapshot.phase === "preparation"
+              ? "Préparez-vous"
+              : snapshot.phase === "rest"
+              ? "Repos en cours"
+              : "En mouvement"}
+          </div>
+        </div>
+      </div>
+
+      {/* ── CONTEXTUAL GUIDANCE / NEXT UP BANNER ── */}
+      {snapshot.phase === "rest" ? (
+        /* Next Exercise Banner during Rest */
+        nextExercise && (
+          <div
+            className="animate-slide-up"
+            style={{
+              width: "100%",
+              padding: "10px 14px",
+              borderRadius: "var(--radius-lg)",
+              backgroundColor: "var(--bg-surface-elevated)",
+              border: "1px solid var(--border-subtle)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: "var(--radius-md)",
+                  backgroundColor: "#FFFFFF",
+                  overflow: "hidden",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  border: "1px solid var(--border-subtle)",
+                  flexShrink: 0,
+                }}
+              >
+                <img
+                  src={`/exercises/${nextExercise.slug || nextExercise.id}/start.webp`}
+                  alt={nextExercise.nameFr || nextExercise.name}
+                  style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                  onError={(e) => {
+                    (e.target as HTMLElement).style.display = "none";
+                  }}
+                />
+              </div>
+              <div>
+                <div
+                  style={{
+                    fontSize: "0.72rem",
+                    fontWeight: 700,
+                    color: "var(--color-primary)",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  À suivre
+                </div>
+                <div style={{ fontSize: "0.94rem", fontWeight: 700, color: "var(--text-main)" }}>
+                  {nextExercise.nameFr || nextExercise.name}
+                </div>
+              </div>
+            </div>
+            <span style={{ fontSize: "0.78rem", color: "var(--text-subtle)", fontWeight: 700 }}>
+              {snapshot.nextExercise?.targetDurationSeconds}s
+            </span>
+          </div>
+        )
+      ) : (
+        /* Instructions Toggle during Work / Prep */
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           <button
             type="button"
             onClick={() => setShowInstructions(!showInstructions)}
             style={{
-              display: "inline-flex",
+              display: "flex",
               alignItems: "center",
-              gap: 3,
+              gap: 6,
+              background: "none",
+              border: "none",
               color: "var(--color-primary)",
-              fontWeight: 500,
-              fontSize: "0.85rem",
+              fontSize: "0.82rem",
+              fontWeight: 700,
+              cursor: "pointer",
+              padding: "2px 0",
+              alignSelf: "flex-start",
             }}
           >
-            <Info size={14} />
-            <span>{showInstructions ? "Masquer consignes" : "Voir consignes"}</span>
+            <Info size={15} />
+            <span>{showInstructions ? "Masquer les consignes" : "Voir les consignes d'exécution"}</span>
           </button>
-        </div>
-      </div>
 
-      {/* Optional Collapsible Instructions */}
-      {showInstructions && (
-        <div
-          className="card animate-fade-in"
-          style={{
-            padding: "12px 16px",
-            backgroundColor: "var(--bg-surface-elevated)",
-            fontSize: "0.85rem",
-            color: "var(--text-muted)",
-            display: "flex",
-            flexDirection: "column",
-            gap: 6,
-          }}
-        >
-          <div style={{ fontWeight: 600, color: "var(--text-main)" }}>Instructions :</div>
-          <ol style={{ paddingLeft: 18, display: "flex", flexDirection: "column", gap: 4 }}>
-            {(currentExercise.instructionsFr || currentExercise.instructions || []).map((inst, i) => (
-              <li key={i}>{inst}</li>
-            ))}
-          </ol>
-          {(currentExercise.breathingGuidanceFr) && (
-            <div style={{ marginTop: 4, fontStyle: "italic", color: "var(--color-primary)" }}>
-              {currentExercise.breathingGuidanceFr}
+          {showInstructions && (
+            <div
+              className="animate-slide-down"
+              style={{
+                padding: "12px 14px",
+                backgroundColor: "var(--bg-surface-elevated)",
+                borderRadius: "var(--radius-md)",
+                fontSize: "0.84rem",
+                lineHeight: 1.5,
+                color: "var(--text-main)",
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
+                border: "1px solid var(--border-subtle)",
+              }}
+            >
+              {currentExercise.shortDescriptionFr && (
+                <p style={{ margin: 0, fontWeight: 500, color: "var(--text-muted)" }}>
+                  {currentExercise.shortDescriptionFr}
+                </p>
+              )}
+              {currentExercise.instructionsFr && currentExercise.instructionsFr.length > 0 && (
+                <ol style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 4 }}>
+                  {currentExercise.instructionsFr.map((step, idx) => (
+                    <li key={idx}>{step}</li>
+                  ))}
+                </ol>
+              )}
+              {currentExercise.breathingGuidanceFr && (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                    color: "var(--color-primary)",
+                    fontSize: "0.8rem",
+                    fontWeight: 700,
+                    marginTop: 2,
+                  }}
+                >
+                  <span>🫁 Respiration :</span>
+                  <span>{currentExercise.breathingGuidanceFr}</span>
+                </div>
+              )}
             </div>
           )}
         </div>
       )}
 
-      {/* Animation or Fallback Box */}
-      <ExerciseAnimation
-        exercise={currentExercise}
-        nextExercise={nextExercise}
-        phase={snapshot.phase}
-      />
-
-      {/* Primary Cue / Short instruction */}
+      {/* ── WORKOUT CONTROLS & OVERALL PROGRESS ── */}
       <div
-        style={{
-          padding: "10px 14px",
-          backgroundColor: "var(--bg-surface)",
-          borderRadius: "var(--radius-lg)",
-          border: "1px solid var(--border-subtle)",
-          textAlign: "center",
-          fontSize: "0.95rem",
-          fontWeight: 500,
-          color: "var(--text-main)",
-        }}
-      >
-        {snapshot.phase === "preparation"
-          ? "Mets-toi en position calmement..."
-          : snapshot.phase === "rest"
-          ? `Prends ton temps avant : ${nextExercise?.nameFr || nextExercise?.name || "la fin"}`
-          : (currentExercise.shortDescriptionFr || currentExercise.shortDescription)}
-      </div>
-
-      {/* Timer & Circular Progress Bar Row */}
-      <div
-        className="card"
         style={{
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-around",
-          padding: "14px 20px",
+          justifyContent: "space-between",
+          padding: "12px 16px",
+          backgroundColor: "var(--bg-surface)",
+          borderRadius: "var(--radius-xl)",
+          border: "1px solid var(--border-color)",
+          boxShadow: "0 4px 16px rgba(0,0,0,0.03)",
         }}
       >
-        {/* Circular Progress Gauge */}
-        <div style={{ position: "relative", width: circleSize, height: circleSize }}>
-          <svg width={circleSize} height={circleSize} style={{ transform: "rotate(-90deg)" }}>
-            {/* Background track */}
-            <circle
-              cx={circleSize / 2}
-              cy={circleSize / 2}
-              r={radius}
-              fill="transparent"
-              stroke="var(--bg-surface-subtle)"
-              strokeWidth={strokeWidth}
-            />
-            {/* Animated progress indicator */}
-            <circle
-              cx={circleSize / 2}
-              cy={circleSize / 2}
-              r={radius}
-              fill="transparent"
-              stroke="var(--color-primary)"
-              strokeWidth={strokeWidth}
-              strokeDasharray={circumference}
-              strokeDashoffset={strokeDashoffset}
-              strokeLinecap="round"
-              style={{ transition: "stroke-dashoffset 0.15s linear" }}
-            />
-          </svg>
-
-          {/* Time Centered in Circle */}
-          <div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <div
-              style={{
-                fontSize: "1.45rem",
-                fontWeight: 800,
-                color: "var(--text-main)",
-                lineHeight: 1,
-              }}
-            >
-              {snapshot.phase === "work" && currentExercise.mode === "repetitions"
-                ? `${snapshot.currentExercise?.targetRepetitions || 10}`
-                : formatTime(remainingPhase)}
-            </div>
-            <div style={{ fontSize: "0.65rem", fontWeight: 600, color: "var(--text-subtle)", marginTop: 2 }}>
-              {snapshot.phase === "work" && currentExercise.mode === "repetitions" ? "REPS" : "RESTANT"}
-            </div>
-          </div>
-        </div>
-
-        {/* Global Workout Progress Stats */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          <div style={{ fontSize: "0.8rem", color: "var(--text-subtle)", fontWeight: 500 }}>
-            Temps écoulé
-          </div>
-          <div style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--text-main)" }}>
-            {formatTime(snapshot.totalElapsedSeconds)}
-          </div>
-          <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
-            sur ~{formatTime(snapshot.totalEstimatedSeconds)}
-          </div>
-        </div>
-      </div>
-
-      {/* Next Exercise Preview */}
-      {nextExercise && (
-        <div
+        {/* Replace Button (during work/prep) */}
+        <button
+          type="button"
+          onClick={handleReplaceCurrentExercise}
+          disabled={snapshot.phase === "rest"}
+          className="btn-ghost"
           style={{
             display: "flex",
+            flexDirection: "column",
             alignItems: "center",
-            justifyContent: "space-between",
-            padding: "8px 12px",
-            backgroundColor: "var(--bg-surface-elevated)",
-            borderRadius: "var(--radius-md)",
-            fontSize: "0.82rem",
+            gap: 2,
+            padding: "6px 10px",
+            fontSize: "0.75rem",
+            color: snapshot.phase === "rest" ? "var(--border-color)" : "var(--text-muted)",
+            cursor: snapshot.phase === "rest" ? "not-allowed" : "pointer",
+          }}
+          aria-label="Changer cet exercice"
+          title="Changer cet exercice"
+        >
+          <Shuffle size={20} />
+          <span>Changer</span>
+        </button>
+
+        {/* Giant Play/Pause Primary Action Button */}
+        <button
+          type="button"
+          onClick={handleTogglePause}
+          style={{
+            width: 66,
+            height: 66,
+            borderRadius: "50%",
+            backgroundColor: "var(--color-primary)",
+            color: "#FFFFFF",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 6px 20px rgba(30, 107, 74, 0.35)",
+            transition: "transform 0.15s ease",
+          }}
+          aria-label={snapshot.isPaused ? "Reprendre" : "Pause"}
+        >
+          {snapshot.isPaused ? (
+            <Play size={32} fill="currentColor" style={{ marginLeft: 3 }} />
+          ) : (
+            <Pause size={30} fill="currentColor" />
+          )}
+        </button>
+
+        {/* Skip Button */}
+        <button
+          type="button"
+          onClick={handleSkip}
+          className="btn-ghost"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 2,
+            padding: "6px 10px",
+            fontSize: "0.75rem",
             color: "var(--text-muted)",
           }}
+          aria-label="Passer au suivant"
+          title="Passer au suivant"
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <span style={{ fontWeight: 600, color: "var(--text-main)" }}>À suivre :</span>
-            <span>{nextExercise.name}</span>
-          </div>
-          <ChevronRight size={16} />
-        </div>
-      )}
-
-      {/* Main Touch Player Controls */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 4 }}>
-        {/* If repetitions mode in work phase, show big "J'ai terminé les reps" button */}
-        {snapshot.phase === "work" && currentExercise.mode === "repetitions" && (
-          <button type="button" className="btn-accent" onClick={handleCompleteReps}>
-            <CheckCircle size={20} />
-            <span>J’ai terminé les {snapshot.currentExercise?.targetRepetitions || 10} répétitions</span>
-          </button>
-        )}
-
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1.4fr 1fr", gap: 10 }}>
-          {/* Replace Exercise Button */}
-          <button
-            type="button"
-            className="btn-secondary"
-            onClick={handleReplaceCurrentExercise}
-            style={{ fontSize: "0.85rem", padding: "10px 8px" }}
-            title="Changer d'exercice"
-          >
-            <Shuffle size={16} />
-            <span>Changer</span>
-          </button>
-
-          {/* Pause / Resume Button */}
-          <button
-            type="button"
-            className="btn-primary"
-            onClick={handleTogglePause}
-            style={{ minHeight: 52 }}
-          >
-            {snapshot.isPaused ? (
-              <>
-                <Play size={20} fill="currentColor" />
-                <span>Reprendre</span>
-              </>
-            ) : (
-              <>
-                <Pause size={20} fill="currentColor" />
-                <span>Pause</span>
-              </>
-            )}
-          </button>
-
-          {/* Skip Button */}
-          <button
-            type="button"
-            className="btn-secondary"
-            onClick={handleSkip}
-            style={{ fontSize: "0.85rem", padding: "10px 8px" }}
-            title="Passer à l'exercice suivant"
-          >
-            <SkipForward size={16} />
-            <span>Passer</span>
-          </button>
-        </div>
+          <SkipForward size={20} />
+          <span>Passer</span>
+        </button>
       </div>
 
-      {/* Stop confirmation modal */}
+      {/* Global Session Elapsed Time Footer */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "4px 8px",
+          fontSize: "0.8rem",
+          color: "var(--text-subtle)",
+          fontWeight: 600,
+        }}
+      >
+        <span>Temps écoulé : {formatTime(snapshot.totalElapsedSeconds)}</span>
+        <span>Durée totale prévue : ~{formatTime(currentSession.estimatedTotalSeconds)}</span>
+      </div>
+
+      {/* Modals */}
       <StopModal
         isOpen={showStopModal}
-        completedExercisesCount={snapshot.completedExerciseIds.length}
         elapsedSeconds={snapshot.totalElapsedSeconds}
+        completedExercisesCount={snapshot.completedExerciseIds.length}
+        onResume={handleResumeFromStop}
         onSavePartial={handleConfirmSavePartial}
         onDiscard={handleConfirmDiscard}
-        onResume={handleResumeFromStop}
+      />
+
+      <AudioSettingsModal
+        isOpen={showAudioModal}
+        onClose={() => setShowAudioModal(false)}
       />
     </div>
   );

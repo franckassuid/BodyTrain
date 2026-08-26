@@ -27,15 +27,22 @@ describe("Workout Engine & Timer", () => {
     assert.equal(snap.state, "preparation");
     assert.equal(snap.isPaused, false);
 
-    // Skip
+    // Skip initial preparation to start work immediately
+    engine.skip();
+    snap = engine.getSnapshot();
+    assert.equal(snap.phase, "work");
+    assert.equal(snap.currentExerciseIndex, 0);
+
+    // Skip exercise 0 to advance to exercise 1
     engine.skip();
     snap = engine.getSnapshot();
     assert.equal(snap.currentExerciseIndex, 1);
+    assert.equal(snap.phase, "work");
 
     engine.destroy();
   });
 
-  it("should record completed exercise IDs when repetitions are completed", () => {
+  it("should record completed exercise IDs when exercise work phase completes", () => {
     const session = generateSession({ energyScore: 5, discomfortZone: "none", seed: 202 });
     const engine = new WorkoutEngine();
 
@@ -47,7 +54,8 @@ describe("Workout Engine & Timer", () => {
     assert.equal(snap.phase, "work");
 
     const firstId = session.exercises[0].exercise.id;
-    engine.completeRepetitionExercise();
+    // Complete work phase
+    (engine as unknown as { onPhaseCompleted: () => void }).onPhaseCompleted();
 
     snap = engine.getSnapshot();
     assert.ok(snap.completedExerciseIds.includes(firstId));

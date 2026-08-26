@@ -1,0 +1,342 @@
+import React, { useState, useMemo } from "react";
+import { Search, Sparkles, ChevronRight } from "lucide-react";
+import { EXERCISES } from "../data/exercisesData.ts";
+import type { Exercise } from "../types/exercise.ts";
+import { CATEGORY_LABELS, type SessionPhase } from "../types/enums.ts";
+import { ExerciseDetailModal } from "./ExerciseDetailModal.tsx";
+
+export const ExerciseLibraryView: React.FC = () => {
+  const [search, setSearch] = useState<string>("");
+  const [selectedPhase, setSelectedPhase] = useState<SessionPhase | "all">("all");
+  const [selectedDiscomfort, setSelectedDiscomfort] = useState<"all" | "upper" | "lower">("all");
+  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
+
+  const phases: { id: SessionPhase | "all"; label: string; emoji: string }[] = [
+    { id: "all", label: "Tous", emoji: "✨" },
+    { id: "wakeup", label: "Réveil", emoji: "🌸" },
+    { id: "mobility", label: "Mobilité", emoji: "🧘" },
+    { id: "activation", label: "Activation", emoji: "💪" },
+    { id: "dynamic", label: "Dynamique", emoji: "⚡" },
+    { id: "finish", label: "Fin active", emoji: "🌿" },
+  ];
+
+  const filteredExercises = useMemo(() => {
+    return EXERCISES.filter((ex) => {
+      // 1. Search text
+      if (search.trim()) {
+        const query = search.toLowerCase();
+        const nameFr = (ex.nameFr || "").toLowerCase();
+        const nameEn = (ex.name || "").toLowerCase();
+        const desc = (ex.shortDescriptionFr || "").toLowerCase();
+        if (!nameFr.includes(query) && !nameEn.includes(query) && !desc.includes(query)) {
+          return false;
+        }
+      }
+
+      // 2. Phase filter
+      if (selectedPhase !== "all") {
+        if (!ex.suitablePhases?.includes(selectedPhase)) {
+          return false;
+        }
+      }
+
+      // 3. Discomfort filter
+      if (selectedDiscomfort === "upper" && !ex.compatibleWithUpperBodyDiscomfort) {
+        return false;
+      }
+      if (selectedDiscomfort === "lower" && !ex.compatibleWithLowerBodyDiscomfort) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [search, selectedPhase, selectedDiscomfort]);
+
+  return (
+    <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      {/* Header */}
+      <div>
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            padding: "4px 12px",
+            borderRadius: "var(--radius-full)",
+            backgroundColor: "var(--color-primary-soft)",
+            color: "var(--color-primary)",
+            fontSize: "0.78rem",
+            fontWeight: 700,
+            textTransform: "uppercase",
+            letterSpacing: "0.05em",
+            marginBottom: 8,
+          }}
+        >
+          <Sparkles size={13} />
+          <span>Bibliothèque BodyTrain</span>
+        </div>
+        <h1 style={{ fontSize: "1.45rem", fontWeight: 800, color: "var(--text-main)", lineHeight: 1.25 }}>
+          Explorez les mouvements
+        </h1>
+        <p style={{ fontSize: "0.88rem", color: "var(--text-muted)", marginTop: 4 }}>
+          {EXERCISES.length} exercices matinaux adaptés pour vous réveiller en pleine forme.
+        </p>
+      </div>
+
+      {/* Search & Filter Bar */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {/* Search input */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            padding: "10px 14px",
+            backgroundColor: "var(--bg-surface)",
+            borderRadius: "var(--radius-lg)",
+            border: "1px solid var(--border-subtle)",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.03)",
+          }}
+        >
+          <Search size={18} color="var(--text-subtle)" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Rechercher un exercice, un muscle..."
+            style={{
+              border: "none",
+              background: "transparent",
+              width: "100%",
+              fontSize: "0.9rem",
+              color: "var(--text-main)",
+              outline: "none",
+            }}
+          />
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch("")}
+              style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: 600 }}
+            >
+              Effacer
+            </button>
+          )}
+        </div>
+
+        {/* Phase Filter Chips */}
+        <div
+          style={{
+            display: "flex",
+            gap: 6,
+            overflowX: "auto",
+            paddingBottom: 4,
+            scrollbarWidth: "none",
+          }}
+        >
+          {phases.map((p) => {
+            const isSelected = selectedPhase === p.id;
+            return (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => setSelectedPhase(p.id)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 5,
+                  padding: "6px 12px",
+                  borderRadius: "var(--radius-full)",
+                  fontSize: "0.8rem",
+                  fontWeight: isSelected ? 700 : 500,
+                  backgroundColor: isSelected ? "var(--color-primary)" : "var(--bg-surface)",
+                  color: isSelected ? "#FFFFFF" : "var(--text-main)",
+                  border: isSelected ? "none" : "1px solid var(--border-subtle)",
+                  whiteSpace: "nowrap",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  flexShrink: 0,
+                }}
+              >
+                <span>{p.emoji}</span>
+                <span>{p.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Discomfort Filter */}
+        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+          <span style={{ fontSize: "0.75rem", color: "var(--text-subtle)", fontWeight: 600, textTransform: "uppercase" }}>
+            Filtre gêne :
+          </span>
+          <button
+            type="button"
+            onClick={() => setSelectedDiscomfort("all")}
+            style={{
+              padding: "3px 8px",
+              borderRadius: "var(--radius-sm)",
+              fontSize: "0.74rem",
+              fontWeight: 600,
+              backgroundColor: selectedDiscomfort === "all" ? "var(--bg-surface-elevated)" : "transparent",
+              color: selectedDiscomfort === "all" ? "var(--text-main)" : "var(--text-muted)",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            Tous
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelectedDiscomfort("upper")}
+            style={{
+              padding: "3px 8px",
+              borderRadius: "var(--radius-sm)",
+              fontSize: "0.74rem",
+              fontWeight: 600,
+              backgroundColor: selectedDiscomfort === "upper" ? "rgba(56, 189, 248, 0.15)" : "transparent",
+              color: selectedDiscomfort === "upper" ? "#0284C7" : "var(--text-muted)",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            Haut OK
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelectedDiscomfort("lower")}
+            style={{
+              padding: "3px 8px",
+              borderRadius: "var(--radius-sm)",
+              fontSize: "0.74rem",
+              fontWeight: 600,
+              backgroundColor: selectedDiscomfort === "lower" ? "rgba(244, 162, 97, 0.18)" : "transparent",
+              color: selectedDiscomfort === "lower" ? "#E76F51" : "var(--text-muted)",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            Bas OK
+          </button>
+        </div>
+      </div>
+
+      {/* Exercises List Grid */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <div style={{ fontSize: "0.82rem", fontWeight: 600, color: "var(--text-subtle)" }}>
+          {filteredExercises.length} exercice{filteredExercises.length > 1 ? "s" : ""} trouvé{filteredExercises.length > 1 ? "s" : ""}
+        </div>
+
+        {filteredExercises.map((ex) => {
+          const slug = ex.slug || ex.id;
+          const photoUrl = `/exercises/${slug}/start.webp`;
+
+          return (
+            <div
+              key={ex.id}
+              onClick={() => setSelectedExercise(ex)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "12px 14px",
+                borderRadius: "var(--radius-lg)",
+                backgroundColor: "var(--bg-surface)",
+                border: "1px solid var(--border-subtle)",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.02)",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                {/* Thumbnail */}
+                <div
+                  style={{
+                    width: 52,
+                    height: 52,
+                    borderRadius: "var(--radius-md)",
+                    backgroundColor: "var(--bg-surface-elevated)",
+                    overflow: "hidden",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                    border: "1px solid var(--border-subtle)",
+                  }}
+                >
+                  <img
+                    src={photoUrl}
+                    alt={ex.nameFr || ex.name}
+                    style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                    onError={(e) => {
+                      (e.target as HTMLElement).style.display = "none";
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <span
+                      style={{
+                        fontSize: "0.72rem",
+                        fontWeight: 700,
+                        padding: "2px 6px",
+                        borderRadius: "var(--radius-sm)",
+                        backgroundColor: "var(--color-primary-soft)",
+                        color: "var(--color-primary-dark)",
+                      }}
+                    >
+                      {CATEGORY_LABELS[ex.category] || ex.category}
+                    </span>
+                    <span style={{ fontSize: "0.72rem", color: "var(--text-subtle)", fontWeight: 500 }}>
+                      Intensité {ex.intensity}/5
+                    </span>
+                  </div>
+
+                  <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--text-main)", marginTop: 3 }}>
+                    {ex.nameFr || ex.name}
+                  </div>
+
+                  <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", marginTop: 2, lineClamp: 1, overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {ex.shortDescriptionFr}
+                  </div>
+                </div>
+              </div>
+
+              <ChevronRight size={18} color="var(--text-subtle)" style={{ flexShrink: 0 }} />
+            </div>
+          );
+        })}
+
+        {filteredExercises.length === 0 && (
+          <div
+            style={{
+              padding: "40px 20px",
+              textAlign: "center",
+              backgroundColor: "var(--bg-surface)",
+              borderRadius: "var(--radius-xl)",
+              border: "1px solid var(--border-subtle)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 10,
+            }}
+          >
+            <span style={{ fontSize: "2rem" }}>🔍</span>
+            <div style={{ fontWeight: 700, color: "var(--text-main)" }}>Aucun exercice trouvé</div>
+            <div style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>
+              Essayez de modifier votre recherche ou vos filtres.
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Detail Modal */}
+      <ExerciseDetailModal
+        exercise={selectedExercise}
+        isOpen={Boolean(selectedExercise)}
+        onClose={() => setSelectedExercise(null)}
+      />
+    </div>
+  );
+};

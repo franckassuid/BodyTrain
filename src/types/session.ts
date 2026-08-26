@@ -1,7 +1,7 @@
-import type { DiscomfortZone } from "./enums.ts";
+import type { DiscomfortZone, SessionPhase } from "./enums.ts";
 import type { Exercise } from "./exercise.ts";
 
-export type SessionPhase = "warmup" | "main" | "cooldown";
+export { SessionPhase };
 
 export interface SessionExercise {
   exercise: Exercise;
@@ -21,6 +21,7 @@ export interface GeneratedSession {
   estimatedTotalSeconds: number;
   intensityLevel: string; // "Très doux", "Doux", "Équilibré", "Dynamique"
   description: string;
+  templateId?: string; // ID of the session template used
   exercises: SessionExercise[];
   seed: number;
 }

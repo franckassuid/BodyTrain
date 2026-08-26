@@ -1,3 +1,5 @@
+// ── Categories ──────────────────────────────────────────────────────────────
+
 export const CATEGORIES = [
   "breathing",
   "gentle_wakeup",
@@ -44,17 +46,27 @@ export const CATEGORY_LABELS: Record<Category, string> = {
   cooldown: "Retour au calme",
 };
 
+// ── Exercise Modes ──────────────────────────────────────────────────────────
+
 export const EXERCISE_MODES = ["timed", "repetitions", "breathing"] as const;
 export type ExerciseMode = (typeof EXERCISE_MODES)[number];
+
+// ── Difficulty ──────────────────────────────────────────────────────────────
 
 export const DIFFICULTIES = ["very_easy", "easy", "medium", "hard"] as const;
 export type Difficulty = (typeof DIFFICULTIES)[number];
 
+// ── Energy Levels ───────────────────────────────────────────────────────────
+
 export const ENERGY_LEVELS = ["very_low", "low", "medium", "high"] as const;
 export type EnergyLevel = (typeof ENERGY_LEVELS)[number];
 
+// ── Impact Levels ───────────────────────────────────────────────────────────
+
 export const IMPACT_LEVELS = ["none", "low", "medium", "high"] as const;
 export type ImpactLevel = (typeof IMPACT_LEVELS)[number];
+
+// ── Positions ───────────────────────────────────────────────────────────────
 
 export const POSITIONS = [
   "standing",
@@ -79,6 +91,8 @@ export const POSITION_LABELS: Record<Position, string> = {
   lying_side: "Au sol sur le côté",
   plank: "En gainage",
 };
+
+// ── Body Areas ──────────────────────────────────────────────────────────────
 
 export const BODY_AREAS = [
   "neck",
@@ -135,6 +149,8 @@ export const LOWER_BODY_AREAS: BodyArea[] = [
   "adductors",
 ];
 
+// ── Joints ──────────────────────────────────────────────────────────────────
+
 export const JOINTS = [
   "neck",
   "shoulder",
@@ -149,6 +165,8 @@ export const JOINTS = [
 
 export type Joint = (typeof JOINTS)[number];
 
+// ── Discomfort Zones ────────────────────────────────────────────────────────
+
 export type DiscomfortZone = "none" | "upper" | "lower";
 
 export const DISCOMFORT_LABELS: Record<DiscomfortZone, string> = {
@@ -156,3 +174,64 @@ export const DISCOMFORT_LABELS: Record<DiscomfortZone, string> = {
   upper: "Haut du corps",
   lower: "Bas du corps",
 };
+
+// ── Session Phases (5 normalized phases) ────────────────────────────────────
+
+export const SESSION_PHASES = [
+  "wakeup",
+  "mobility",
+  "activation",
+  "dynamic",
+  "finish",
+] as const;
+
+export type SessionPhase = (typeof SESSION_PHASES)[number];
+
+export const SESSION_PHASE_LABELS: Record<SessionPhase, string> = {
+  wakeup: "Réveil",
+  mobility: "Mobilité",
+  activation: "Activation",
+  dynamic: "Dynamique",
+  finish: "Fin active",
+};
+
+// ── Movement Patterns ───────────────────────────────────────────────────────
+
+export const MOVEMENT_PATTERNS = [
+  "breathing",
+  "posture",
+  "rotation",
+  "flexion_extension",
+  "lateral_movement",
+  "squat",
+  "lunge",
+  "hinge",
+  "push",
+  "core_stability",
+  "balance",
+  "locomotion",
+  "jump",
+  "stretch",
+] as const;
+
+export type MovementPattern = (typeof MOVEMENT_PATTERNS)[number];
+
+// ── Transition Level (derived from positions, not stored) ───────────────────
+
+export type TransitionLevel = "standing" | "floor";
+
+/** Derive transition level from exercise positions */
+export function getTransitionLevel(positions: Position[]): TransitionLevel {
+  const floorPositions: Position[] = [
+    "lying_back",
+    "lying_front",
+    "lying_side",
+    "all_fours",
+    "kneeling",
+    "plank",
+  ];
+  const hasFloor = positions.some((p) => floorPositions.includes(p));
+  // If any position is floor-based, the exercise requires floor
+  if (hasFloor) return "floor";
+  return "standing";
+}

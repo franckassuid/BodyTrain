@@ -1,7 +1,13 @@
 import { EXERCISES, EXERCISES_MAP } from "../data/exercisesData.ts";
-import type { DiscomfortZone } from "../types/enums.ts";
+import type { DiscomfortZone, SessionPhase, Position } from "../types/enums.ts";
+import { getTransitionLevel } from "../types/enums.ts";
 import type { Exercise } from "../types/exercise.ts";
-import type { GeneratedSession, SessionExercise, SessionPhase } from "../types/session.ts";
+import type { GeneratedSession, SessionExercise } from "../types/session.ts";
+import { selectTemplate } from "./sessionTemplates.ts";
+import type { SessionTemplate, PhaseSlot } from "./sessionTemplates.ts";
+import { calculateRecoverySeconds } from "./recoveryCalculator.ts";
+
+// ── Public API ──────────────────────────────────────────────────────────────
 
 export interface GeneratorOptions {
   energyScore: number; // 0 to 10
@@ -10,6 +16,8 @@ export interface GeneratorOptions {
   recentSessionExerciseIds?: string[][]; // Last sessions arrays of exercise IDs
   seed?: number;
 }
+
+// ── PRNG ────────────────────────────────────────────────────────────────────
 
 /** Pure deterministic pseudo-random number generator (Mulberry32) */
 export function createRng(seed: number) {
@@ -22,7 +30,8 @@ export function createRng(seed: number) {
   };
 }
 
-/** Maps 0-10 user energy score to energy categories and descriptions */
+// ── Energy profile ──────────────────────────────────────────────────────────
+
 export function getEnergyProfile(energyScore: number) {
   const score = Math.max(0, Math.min(10, Math.round(energyScore)));
   if (score <= 2) {
@@ -65,15 +74,18 @@ export function getEnergyProfile(energyScore: number) {
   };
 }
 
-/** Check if position is on the floor */
+// ── Utility ─────────────────────────────────────────────────────────────────
+
 export function isFloorPosition(positions: string[]): boolean {
   return positions.some(
     (p) => p.startsWith("lying_") || p === "all_fours" || p === "kneeling" || p === "plank"
   );
 }
 
+// ── Candidate filtering ─────────────────────────────────────────────────────
+
 /**
- * Filter exercises strictly matching the constraints.
+ * Filter exercises compatible with energy and discomfort constraints.
  */
 export function filterCandidates(
   exercises: Exercise[],
@@ -117,7 +129,25 @@ export function filterCandidates(
   });
 }
 
-/** Fallback safe library for extreme edge cases */
+/**
+ * Filter candidates for a specific phase within a phase slot.
+ */
+function filterPhasePool(
+  candidates: Exercise[],
+  phase: SessionPhase,
+  slot: PhaseSlot
+): Exercise[] {
+  return candidates.filter((ex) => {
+    // Must be suitable for this phase
+    if (!ex.suitablePhases || !ex.suitablePhases.includes(phase)) return false;
+    // Must not exceed the phase's max intensity
+    if (ex.intensity > slot.maxIntensity) return false;
+    return true;
+  });
+}
+
+// ── Fallback pool ───────────────────────────────────────────────────────────
+
 function getSafeFallbackPool(discomfortZone: DiscomfortZone): Exercise[] {
   return EXERCISES.filter((ex) => {
     if (!ex.enabled) return false;
@@ -136,8 +166,11 @@ function getSafeFallbackPool(discomfortZone: DiscomfortZone): Exercise[] {
   });
 }
 
+// ── Session generation ──────────────────────────────────────────────────────
+
 /**
  * Generate a complete, balanced morning session.
+ * Uses template-driven phase composition with scoring-based exercise selection.
  */
 export function generateSession(options: GeneratorOptions): GeneratedSession {
   const {
@@ -151,10 +184,12 @@ export function generateSession(options: GeneratorOptions): GeneratedSession {
   const rng = createRng(seed);
   const targetTotalSeconds = targetDurationMinutes * 60;
   const profile = getEnergyProfile(energyScore);
+  const template = selectTemplate(targetDurationMinutes, energyScore);
 
+  // Build the global candidate pool
   let candidates = filterCandidates(EXERCISES, energyScore, discomfortZone);
 
-  // If too few candidates exist under strict constraints, augment with safe fallbacks
+  // If too few candidates, augment with safe fallbacks
   if (candidates.length < 5) {
     const fallbacks = getSafeFallbackPool(discomfortZone);
     const existingIds = new Set(candidates.map((c) => c.id));
@@ -166,7 +201,7 @@ export function generateSession(options: GeneratorOptions): GeneratedSession {
     }
   }
 
-  // Penalty set for recently practiced exercises
+  // Recency penalty
   const recencyPenalty = new Map<string, number>();
   const recentWeight = [60, 40, 20];
   recentSessionExerciseIds.slice(0, 3).forEach((sessionIds, idx) => {
@@ -176,108 +211,69 @@ export function generateSession(options: GeneratorOptions): GeneratedSession {
     }
   });
 
-  // Target exercise count based on duration
-  let targetCount = targetDurationMinutes === 5 ? 4 : targetDurationMinutes === 10 ? 8 : 6;
-  if (candidates.length < targetCount) {
-    targetCount = Math.max(3, candidates.length);
-  }
-
-  // Categorize for phases in v2 taxonomy
-  const isWarmupCategory = (c: string) =>
-    c === "breathing" ||
-    c === "gentle_wakeup" ||
-    c === "neck_mobility" ||
-    c === "shoulder_mobility" ||
-    c === "spine_mobility" ||
-    c === "hip_mobility" ||
-    c === "knee_mobility" ||
-    c === "ankle_mobility" ||
-    c === "gentle_cardio";
-
-  const isCooldownCategory = (c: string) =>
-    c === "cooldown" || c === "light_stretching" || c === "breathing";
-
-  const warmupCandidates = candidates.filter((e) => e.suitableForWarmup || isWarmupCategory(e.category));
-  const cooldownCandidates = candidates.filter((e) => e.suitableForCooldown || isCooldownCategory(e.category));
-  const mainCandidates = candidates;
-
-  const chosenExercises: Exercise[] = [];
+  const chosenExercises: { exercise: Exercise; phase: SessionPhase }[] = [];
   const chosenIds = new Set<string>();
 
-  function pickCandidate(pool: Exercise[], phase: SessionPhase, prevEx?: Exercise): Exercise | null {
-    const available = pool.filter((e) => !chosenIds.has(e.id));
-    if (available.length === 0) return null;
+  // ── Pick exercises per phase ──────────────────────────────────────────
 
-    const scored = available.map((ex) => {
-      let score = 100;
-      const penalty = recencyPenalty.get(ex.id) || 0;
-      score -= penalty;
+  for (const slot of template.phases) {
+    const phasePool = filterPhasePool(candidates, slot.phase, slot);
+    const availablePool = phasePool.filter((e) => !chosenIds.has(e.id));
 
-      if (phase === "warmup" && ex.suitableForWarmup) score += 30;
-      if (phase === "cooldown" && ex.suitableForCooldown) score += 30;
-      if (profile.preferGentle && ex.suitableForGentleSession) score += 25;
+    if (availablePool.length === 0 && slot.optional) {
+      continue; // Skip optional phase if no candidates
+    }
 
-      if (prevEx && ex.category === prevEx.category) score -= 40;
+    // Determine how many exercises to pick for this phase
+    const targetCount = Math.min(
+      slot.exerciseCount.max,
+      Math.max(slot.exerciseCount.min, availablePool.length)
+    );
 
-      if (prevEx) {
-        const prevIsFloor = isFloorPosition(prevEx.positions);
-        const currIsFloor = isFloorPosition(ex.positions);
-        if (prevIsFloor !== currIsFloor) {
-          score -= 10;
-        }
+    for (let i = 0; i < targetCount; i++) {
+      const prev = chosenExercises.length > 0
+        ? chosenExercises[chosenExercises.length - 1].exercise
+        : undefined;
+
+      const picked = pickBestCandidate(
+        availablePool.filter((e) => !chosenIds.has(e.id)),
+        slot.phase,
+        prev,
+        chosenExercises,
+        profile,
+        recencyPenalty,
+        rng
+      );
+
+      if (picked) {
+        chosenExercises.push({ exercise: picked, phase: slot.phase });
+        chosenIds.add(picked.id);
       }
-
-      return { ex, weight: Math.max(5, score) };
-    });
-
-    const totalWeight = scored.reduce((sum, item) => sum + item.weight, 0);
-    let rand = rng() * totalWeight;
-    for (const item of scored) {
-      if (rand < item.weight) return item.ex;
-      rand -= item.weight;
-    }
-    return scored[scored.length - 1].ex;
-  }
-
-  // 1. Warmup
-  const warmup = pickCandidate(warmupCandidates.length > 0 ? warmupCandidates : candidates, "warmup");
-  if (warmup) {
-    chosenExercises.push(warmup);
-    chosenIds.add(warmup.id);
-  }
-
-  // 2. Main exercises
-  const numMain = Math.max(1, targetCount - 2);
-  for (let i = 0; i < numMain; i++) {
-    const prev = chosenExercises[chosenExercises.length - 1];
-    const next = pickCandidate(mainCandidates, "main", prev);
-    if (next) {
-      chosenExercises.push(next);
-      chosenIds.add(next.id);
     }
   }
 
-  // 3. Cooldown
-  const prevBeforeCooldown = chosenExercises[chosenExercises.length - 1];
-  const cooldown = pickCandidate(
-    cooldownCandidates.length > 0 ? cooldownCandidates : candidates,
-    "cooldown",
-    prevBeforeCooldown
+  // ── Ensure minimum exercise count ─────────────────────────────────────
+
+  const minExercises = targetDurationMinutes === 5 ? 3 : targetDurationMinutes === 10 ? 5 : 4;
+  if (chosenExercises.length < minExercises) {
+    const remaining = candidates.filter((e) => !chosenIds.has(e.id));
+    while (chosenExercises.length < minExercises && remaining.length > 0) {
+      const idx = Math.floor(rng() * remaining.length);
+      const ex = remaining.splice(idx, 1)[0];
+      const phase = (ex.suitablePhases && ex.suitablePhases[0]) || "activation";
+      chosenExercises.push({ exercise: ex, phase: phase as SessionPhase });
+      chosenIds.add(ex.id);
+    }
+  }
+
+  // ── Allocate timings ──────────────────────────────────────────────────
+
+  const sessionExercises = allocateTimings(
+    chosenExercises,
+    targetTotalSeconds,
+    energyScore,
+    template
   );
-  if (cooldown && !chosenIds.has(cooldown.id)) {
-    chosenExercises.push(cooldown);
-    chosenIds.add(cooldown.id);
-  } else if (chosenExercises.length < 3 && candidates.length > chosenExercises.length) {
-    const extra = pickCandidate(candidates, "cooldown", prevBeforeCooldown);
-    if (extra) {
-      chosenExercises.push(extra);
-      chosenIds.add(extra.id);
-    }
-  }
-
-  optimizePositionFlow(chosenExercises);
-
-  const sessionExercises = allocateTimings(chosenExercises, targetTotalSeconds, energyScore);
 
   const estimatedTotalSeconds = sessionExercises.reduce(
     (sum, se) => sum + se.preparationSeconds + se.targetDurationSeconds + se.restSeconds,
@@ -293,61 +289,228 @@ export function generateSession(options: GeneratorOptions): GeneratedSession {
     estimatedTotalSeconds,
     intensityLevel: profile.intensityLabel,
     description: profile.description,
+    templateId: template.id,
     exercises: sessionExercises,
     seed,
   };
 }
 
-function optimizePositionFlow(exercises: Exercise[]) {
-  if (exercises.length <= 2) return;
+// ── Candidate scoring ───────────────────────────────────────────────────────
 
-  const middle = exercises.slice(1, exercises.length - 1);
-  middle.sort((a, b) => {
-    const aFloor = isFloorPosition(a.positions) ? 1 : 0;
-    const bFloor = isFloorPosition(b.positions) ? 1 : 0;
-    return aFloor - bFloor;
+function pickBestCandidate(
+  pool: Exercise[],
+  phase: SessionPhase,
+  prevEx: Exercise | undefined,
+  chosenSoFar: { exercise: Exercise; phase: SessionPhase }[],
+  profile: ReturnType<typeof getEnergyProfile>,
+  recencyPenalty: Map<string, number>,
+  rng: () => number
+): Exercise | null {
+  if (pool.length === 0) return null;
+
+  // Calculate current transitions so far
+  let currentTransitions = 0;
+  for (let i = 1; i < chosenSoFar.length; i++) {
+    const pLevel = getTransitionLevel(chosenSoFar[i - 1].exercise.positions as Position[]);
+    const cLevel = getTransitionLevel(chosenSoFar[i].exercise.positions as Position[]);
+    if (pLevel !== cLevel) currentTransitions++;
+  }
+
+  // Calculate fatigue area frequency
+  const areaCounts = new Map<string, number>();
+  for (const item of chosenSoFar) {
+    for (const area of item.exercise.fatigueAreas || item.exercise.primaryBodyAreas || []) {
+      areaCounts.set(area, (areaCounts.get(area) || 0) + 1);
+    }
+  }
+
+  // Check if eligible standing candidates exist in pool
+  const hasStandingCandidates = pool.some(
+    (e) =>
+      getTransitionLevel(e.positions as Position[]) === "standing" &&
+      (phase !== "wakeup" && phase !== "finish" ? true : e.intensity <= 2)
+  );
+
+  // Determine if we must avoid transitions (already at 2 transitions)
+  const prevLevel = prevEx ? getTransitionLevel(prevEx.positions as Position[]) : undefined;
+  const hasSameLevelCandidates = prevLevel
+    ? pool.some(
+        (e) =>
+          getTransitionLevel(e.positions as Position[]) === prevLevel &&
+          (phase !== "wakeup" && phase !== "finish" ? true : e.intensity <= 2)
+      )
+    : true;
+
+  // Check if non-identical pattern candidates exist
+  const hasDifferentPatternCandidates = prevEx
+    ? pool.some((e) => {
+        const pP = prevEx.movementPatterns || [];
+        const cP = e.movementPatterns || [];
+        const ov = pP.filter((p) => cP.includes(p));
+        return !(ov.length > 0 && ov.length === cP.length && ov.length === pP.length);
+      })
+    : true;
+
+  const scored = pool.map((ex) => {
+    let score = 100;
+    const currLevel = getTransitionLevel(ex.positions as Position[]);
+
+    // Recency penalty
+    const penalty = recencyPenalty.get(ex.id) || 0;
+    score -= penalty;
+
+    // Phase suitability bonus
+    if (phase === "wakeup" && ex.suitableForWarmup) score += 20;
+    if (phase === "finish" && ex.suitableForCooldown) score += 20;
+    if (profile.preferGentle && ex.suitableForGentleSession) score += 25;
+
+    // Wakeup: must be gentle and strictly standing when available
+    if (phase === "wakeup") {
+      if (ex.intensity > 2) return { ex, weight: 0 };
+      if (currLevel === "floor" && hasStandingCandidates) return { ex, weight: 0 };
+      if (ex.intensity <= 1) score += 20;
+    }
+
+    // Finish: must be gentle, calming, and strictly standing when available
+    if (phase === "finish") {
+      if (ex.intensity > 2) return { ex, weight: 0 };
+      if (currLevel === "floor" && hasStandingCandidates) return { ex, weight: 0 };
+      if (ex.intensity <= 1) score += 20;
+    }
+
+    // Dynamic: strictly standing when available
+    if (phase === "dynamic") {
+      if (currLevel === "floor" && hasStandingCandidates) return { ex, weight: 0 };
+      if (ex.intensity >= 3) score += 15;
+    }
+
+    // Category diversity: penalize same category as previous
+    if (prevEx && ex.category === prevEx.category) score -= 40;
+
+    // Pattern diversity: strictly eliminate identical movement patterns if alternatives exist
+    if (prevEx) {
+      const prevPatterns = prevEx.movementPatterns || [];
+      const currPatterns = ex.movementPatterns || [];
+      const overlap = prevPatterns.filter((p) => currPatterns.includes(p));
+      const isIdentical =
+        overlap.length > 0 &&
+        overlap.length === currPatterns.length &&
+        overlap.length === prevPatterns.length;
+
+      if (isIdentical) {
+        if (hasDifferentPatternCandidates) return { ex, weight: 0 };
+        score -= 100;
+      } else if (overlap.length > 0) {
+        score -= 25;
+      }
+    }
+
+    // Position transition management: STRICT limit of 2 transitions
+    if (prevEx && prevLevel) {
+      if (prevLevel !== currLevel) {
+        if (currentTransitions >= 2) {
+          // If we already had 2 transitions, FORBID a 3rd transition if same-level options exist
+          if (hasSameLevelCandidates) return { ex, weight: 0 };
+          score -= 100;
+        } else if (prevLevel === "floor" && currLevel === "standing") {
+          // If on the floor during mobility/activation, finish the floor block before standing
+          if (phase === "mobility" || phase === "activation") {
+            const hasFloorOptions = pool.some(
+              (e) => getTransitionLevel(e.positions as Position[]) === "floor"
+            );
+            if (hasFloorOptions) return { ex, weight: 0 };
+          }
+          score -= 25;
+        } else {
+          score -= 20;
+        }
+      } else {
+        score += 35; // reward staying in the same transition level
+      }
+    }
+
+    // Body area / fatigue balance
+    const exAreas = ex.fatigueAreas || ex.primaryBodyAreas || [];
+    for (const area of exAreas) {
+      const count = areaCounts.get(area) || 0;
+      if (count >= 2) {
+        score -= count * 40;
+      }
+    }
+
+    return { ex, weight: Math.max(1, score) };
   });
 
-  exercises.splice(1, exercises.length - 2, ...middle);
+  const validCandidates = scored.filter((s) => s.weight > 0);
+  if (validCandidates.length === 0) {
+    // If all weights were 0, fallback to uniform random across pool
+    return pool[Math.floor(rng() * pool.length)];
+  }
+
+  // Weighted random selection
+  const totalWeight = validCandidates.reduce((sum, item) => sum + item.weight, 0);
+  let rand = rng() * totalWeight;
+  for (const item of validCandidates) {
+    if (rand < item.weight) return item.ex;
+    rand -= item.weight;
+  }
+  return validCandidates[validCandidates.length - 1].ex;
 }
 
+// ── Timing allocation ───────────────────────────────────────────────────────
+
 function allocateTimings(
-  exercises: Exercise[],
+  exercises: { exercise: Exercise; phase: SessionPhase }[],
   targetTotalSeconds: number,
-  energyScore: number
+  energyScore: number,
+  _template: SessionTemplate
 ): SessionExercise[] {
   const n = exercises.length;
   if (n === 0) return [];
 
-  const prepPerExercise = 5;
-  const totalPrep = n * prepPerExercise;
-  const availableForWorkAndRest = Math.max(60, targetTotalSeconds - totalPrep);
+  const totalPrep = 5; // Only 5s initial prep before workout starts
 
-  const rawSlot = availableForWorkAndRest / n;
-  const restRatio = energyScore <= 3 ? 0.25 : energyScore <= 6 ? 0.2 : 0.15;
+  // 1. Calculate adaptive recovery times between consecutive exercises
+  const restTimes = exercises.map(({ exercise: ex, phase }, index) => {
+    const next = index + 1 < n ? exercises[index + 1].exercise : null;
+    return calculateRecoverySeconds({
+      currentExercise: ex,
+      nextExercise: next,
+      phase,
+      energyScore,
+      isLastExercise: index === n - 1,
+    });
+  });
 
-  let assigned: SessionExercise[] = exercises.map((ex, index) => {
-    const phase: SessionPhase = index === 0 ? "warmup" : index === n - 1 ? "cooldown" : "main";
+  const totalRest = restTimes.reduce((sum, r) => sum + r, 0);
+  const availableForWork = Math.max(n * 20, targetTotalSeconds - totalPrep - totalRest);
+  const rawWorkSlot = Math.floor(availableForWork / n);
 
-    let workSec = Math.round(rawSlot * (1 - restRatio));
-    let restSec = Math.round(rawSlot * restRatio);
+  let assigned: SessionExercise[] = exercises.map(({ exercise: ex, phase }, index) => {
+    let workSec = rawWorkSlot;
 
-    workSec = Math.max(25, Math.min(workSec, 60));
-    restSec = Math.max(5, Math.min(restSec, 20));
+    // Small phase adjustments (dynamic gets slightly more, wakeup/finish slightly less if space)
+    if (phase === "dynamic") workSec += 2;
+    if (phase === "activation") workSec += 1;
+    if (phase === "wakeup") workSec -= 1;
+    if (phase === "finish") workSec -= 2;
 
-    const targetReps = ex.mode === "repetitions" ? ex.defaultRepetitions || 10 : undefined;
+    workSec = Math.max(20, Math.min(workSec, 60));
 
     return {
       exercise: ex,
       phase,
       targetDurationSeconds: workSec,
-      targetRepetitions: targetReps,
-      preparationSeconds: prepPerExercise,
-      restSeconds: index === n - 1 ? 0 : restSec,
+      preparationSeconds: index === 0 ? 5 : 0,
+      restSeconds: restTimes[index],
     };
   });
 
-  let total = assigned.reduce((sum, se) => sum + se.preparationSeconds + se.targetDurationSeconds + se.restSeconds, 0);
+  // 2. Fine-tune work times to match exact targetTotalSeconds
+  let total = assigned.reduce(
+    (sum, se) => sum + se.preparationSeconds + se.targetDurationSeconds + se.restSeconds,
+    0
+  );
   let diff = targetTotalSeconds - total;
   let idx = 0;
   while (diff !== 0 && Math.abs(diff) > 0) {
@@ -356,25 +519,31 @@ function allocateTimings(
     if (diff > 0 && target.targetDurationSeconds < 65) {
       target.targetDurationSeconds += step;
       diff -= step;
-    } else if (diff < 0 && target.targetDurationSeconds > 25) {
+    } else if (diff < 0 && target.targetDurationSeconds > 20) {
       target.targetDurationSeconds += step;
       diff -= step;
     }
     idx++;
-    if (idx > n * 10) break;
+    if (idx > n * 15) break;
   }
 
-  total = assigned.reduce((sum, se) => sum + se.preparationSeconds + se.targetDurationSeconds + se.restSeconds, 0);
+  // Final trim safeguard
+  total = assigned.reduce(
+    (sum, se) => sum + se.preparationSeconds + se.targetDurationSeconds + se.restSeconds,
+    0
+  );
   if (total > targetTotalSeconds + 15) {
     const excess = total - (targetTotalSeconds + 15);
     for (let i = 0; i < n && excess > 0; i++) {
-      const reduce = Math.min(excess, Math.max(0, assigned[i].targetDurationSeconds - 25));
+      const reduce = Math.min(excess, Math.max(0, assigned[i].targetDurationSeconds - 20));
       assigned[i].targetDurationSeconds -= reduce;
     }
   }
 
   return assigned;
 }
+
+// ── Exercise replacement ────────────────────────────────────────────────────
 
 export function replaceExerciseInSession(
   session: GeneratedSession,
@@ -387,10 +556,12 @@ export function replaceExerciseInSession(
 
   const currentSlot = session.exercises[exerciseIndex];
   const currentEx = currentSlot.exercise;
+  const currentPhase = currentSlot.phase;
   const currentSessionIds = new Set(session.exercises.map((e) => e.exercise.id));
   const historyIds = new Set(options?.historyExerciseIds || []);
   const rng = createRng(options?.seed || (session.seed + exerciseIndex + 42));
 
+  // Find direct alternatives
   const directAltIds = currentEx.alternativeExerciseIds || [];
   const easierId = currentEx.easierVariantId;
   const harderId = currentEx.harderVariantId;
@@ -403,13 +574,17 @@ export function replaceExerciseInSession(
       if (session.discomfortZone === "upper" && !ex.compatibleWithUpperBodyDiscomfort) continue;
       if (session.discomfortZone === "lower" && !ex.compatibleWithLowerBodyDiscomfort) continue;
       if (session.discomfortZone !== "none" && (ex.jumping || ex.impactLevel === "high")) continue;
-      directCandidates.push(ex);
+      // Must be suitable for the same phase
+      if (ex.suitablePhases && ex.suitablePhases.includes(currentPhase)) {
+        directCandidates.push(ex);
+      }
     }
   }
 
-  let fallbackCandidates = filterCandidates(EXERCISES, session.energyScore, session.discomfortZone).filter(
-    (ex) => !currentSessionIds.has(ex.id)
-  );
+  // Fallback: all candidates for this phase
+  let fallbackCandidates = filterCandidates(EXERCISES, session.energyScore, session.discomfortZone)
+    .filter((ex) => !currentSessionIds.has(ex.id))
+    .filter((ex) => ex.suitablePhases && ex.suitablePhases.includes(currentPhase));
 
   const allCandidates = [...directCandidates, ...fallbackCandidates];
   const uniqueMap = new Map<string, Exercise>();
@@ -417,7 +592,19 @@ export function replaceExerciseInSession(
   const uniqueCandidates = Array.from(uniqueMap.values());
 
   if (uniqueCandidates.length === 0) {
-    return session;
+    // Broaden: drop phase requirement
+    const broadened = filterCandidates(EXERCISES, session.energyScore, session.discomfortZone)
+      .filter((ex) => !currentSessionIds.has(ex.id));
+    if (broadened.length === 0) return session;
+
+    const idx = Math.floor(rng() * broadened.length);
+    const chosen = broadened[idx];
+    const newExercises = [...session.exercises];
+    newExercises[exerciseIndex] = {
+      ...currentSlot,
+      exercise: chosen,
+    };
+    return { ...session, exercises: newExercises };
   }
 
   const scored = uniqueCandidates.map((candidate) => {
@@ -444,7 +631,6 @@ export function replaceExerciseInSession(
   newExercises[exerciseIndex] = {
     ...currentSlot,
     exercise: chosenEx,
-    targetRepetitions: chosenEx.mode === "repetitions" ? chosenEx.defaultRepetitions || 10 : undefined,
   };
 
   return {

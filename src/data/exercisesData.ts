@@ -96,6 +96,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "lateral_movement"
+    ],
+    "fatigueAreas": [
+      "abductors",
+      "glutes"
+    ],
     "name": "Abduction de hanche sur le côté",
     "shortDescription": "Allongé sur le flanc, la jambe du dessus monte et descend lentement.",
     "instructions": [
@@ -238,6 +248,18 @@ export const EXERCISES: Exercise[] = [
       ]
     },
     "enabled": true,
+    "suitablePhases": [
+      "wakeup",
+      "finish"
+    ],
+    "movementPatterns": [
+      "breathing",
+      "core_stability"
+    ],
+    "fatigueAreas": [
+      "deep_core",
+      "diaphragm"
+    ],
     "name": "Aspiration abdominale",
     "shortDescription": "Expiration complète puis rentrée du ventre, sans forcer.",
     "instructions": [
@@ -352,6 +374,18 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "mobility"
+    ],
+    "movementPatterns": [
+      "flexion_extension",
+      "lateral_movement",
+      "balance"
+    ],
+    "fatigueAreas": [
+      "hip_flexors",
+      "hamstrings"
+    ],
     "name": "Balancement de jambe avant-arrière",
     "shortDescription": "Une jambe balance librement d'avant en arrière, l'autre reste stable.",
     "instructions": [
@@ -463,6 +497,18 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "mobility"
+    ],
+    "movementPatterns": [
+      "flexion_extension",
+      "lateral_movement",
+      "balance"
+    ],
+    "fatigueAreas": [
+      "abductors",
+      "adductors"
+    ],
     "name": "Balancement de jambe latéral",
     "shortDescription": "La jambe libre balance de gauche à droite devant le corps.",
     "instructions": [
@@ -572,6 +618,17 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "wakeup",
+      "finish"
+    ],
+    "movementPatterns": [
+      "posture",
+      "lateral_movement"
+    ],
+    "fatigueAreas": [
+      "hip_flexors"
+    ],
     "name": "Balancement latéral debout",
     "shortDescription": "Transfert de poids d'un pied sur l'autre pour relancer la circulation en douceur.",
     "instructions": [
@@ -682,6 +739,18 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "mobility",
+      "wakeup",
+      "finish"
+    ],
+    "movementPatterns": [
+      "rotation",
+      "flexion_extension"
+    ],
+    "fatigueAreas": [
+      "lower_back"
+    ],
     "name": "Bascule du bassin allongée",
     "shortDescription": "Petit mouvement de bascule avant-arrière du bassin, dos au sol.",
     "instructions": [
@@ -816,6 +885,18 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "mobility",
+      "wakeup",
+      "finish"
+    ],
+    "movementPatterns": [
+      "rotation",
+      "flexion_extension"
+    ],
+    "fatigueAreas": [
+      "lower_back"
+    ],
     "name": "Bascule du bassin debout",
     "shortDescription": "Petite bascule avant-arrière du bassin, sans passer au sol.",
     "instructions": [
@@ -931,6 +1012,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "hinge"
+    ],
+    "fatigueAreas": [
+      "lower_back",
+      "hamstrings"
+    ],
     "name": "Bon matin au poids du corps",
     "shortDescription": "Charnière de hanche debout, dos long, buste qui descend vers l'horizontale.",
     "instructions": [
@@ -1046,6 +1137,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "dynamic"
+    ],
+    "movementPatterns": [
+      "flexion_extension"
+    ],
+    "fatigueAreas": [
+      "shoulders",
+      "obliques"
+    ],
     "name": "Boxe légère sur place",
     "shortDescription": "Directs alternés devant soi, appuis souples, sans impact.",
     "instructions": [
@@ -1163,6 +1264,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "lateral_movement"
+    ],
+    "fatigueAreas": [
+      "lower_back",
+      "deep_core"
+    ],
     "name": "Bras et jambe opposés à quatre pattes",
     "shortDescription": "Depuis la quadrupédie, un bras et la jambe opposée s'allongent à l'horizontale.",
     "instructions": [
@@ -1296,6 +1407,15 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "mobility"
+    ],
+    "movementPatterns": [
+      "rotation"
+    ],
+    "fatigueAreas": [
+      "shoulders"
+    ],
     "name": "Cercles de bras",
     "shortDescription": "Grands cercles des bras tendus pour réveiller les épaules.",
     "instructions": [
@@ -1400,6 +1520,16 @@ export const EXERCISES: Exercise[] = [
       ]
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "rotation",
+      "flexion_extension"
+    ],
+    "fatigueAreas": [
+      "shoulders"
+    ],
     "name": "Cercles de bras tendus",
     "shortDescription": "Petits cercles continus bras tendus à l'horizontale, jusqu'à la fatigue des épaules.",
     "instructions": [
@@ -1502,6 +1632,17 @@ export const EXERCISES: Exercise[] = [
       ]
     },
     "enabled": true,
+    "suitablePhases": [
+      "mobility",
+      "wakeup",
+      "finish"
+    ],
+    "movementPatterns": [
+      "rotation"
+    ],
+    "fatigueAreas": [
+      "ankles"
+    ],
     "name": "Cercles de cheville assis",
     "shortDescription": "Rotations lentes de la cheville sans mise en charge, une jambe après l'autre.",
     "instructions": [
@@ -1636,6 +1777,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "mobility"
+    ],
+    "movementPatterns": [
+      "rotation"
+    ],
+    "fatigueAreas": [
+      "quadriceps",
+      "ankles"
+    ],
     "name": "Cercles de genoux",
     "shortDescription": "Genoux joints et légèrement fléchis, petits cercles pour dérouiller l'articulation.",
     "instructions": [
@@ -1777,6 +1928,15 @@ export const EXERCISES: Exercise[] = [
       "Perform this movement slowly for a number of repetitions, and repeat on the other side."
     ],
     "sourceCategory": "stretching",
+    "suitablePhases": [
+      "mobility"
+    ],
+    "movementPatterns": [
+      "rotation"
+    ],
+    "fatigueAreas": [
+      "hip_flexors"
+    ],
     "name": "Cercles de hanche debout",
     "shortDescription": "Rotations lentes du bassin dans un sens puis dans l'autre, pieds fixes.",
     "instructions": [
@@ -1916,6 +2076,17 @@ export const EXERCISES: Exercise[] = [
       "Reverse direction. You can do this exercise alternating shoulders or both at the same time."
     ],
     "sourceCategory": "stretching",
+    "suitablePhases": [
+      "mobility",
+      "wakeup",
+      "finish"
+    ],
+    "movementPatterns": [
+      "rotation"
+    ],
+    "fatigueAreas": [
+      "shoulders"
+    ],
     "name": "Cercles des épaules",
     "shortDescription": "Rotations continues des épaules vers l'arrière puis vers l'avant, bras relâchés.",
     "instructions": [
@@ -2066,6 +2237,18 @@ export const EXERCISES: Exercise[] = [
       "Hold for 15 seconds."
     ],
     "sourceCategory": "stretching",
+    "suitablePhases": [
+      "mobility",
+      "finish"
+    ],
+    "movementPatterns": [
+      "rotation",
+      "flexion_extension"
+    ],
+    "fatigueAreas": [
+      "mid_back",
+      "lower_back"
+    ],
     "name": "Chat-vache",
     "shortDescription": "Alternance d'arrondi et de creux du dos à quatre pattes, guidée par le souffle.",
     "instructions": [
@@ -2179,6 +2362,19 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "mobility",
+      "wakeup",
+      "finish"
+    ],
+    "movementPatterns": [
+      "rotation",
+      "flexion_extension"
+    ],
+    "fatigueAreas": [
+      "mid_back",
+      "lower_back"
+    ],
     "name": "Chat-vache assis",
     "shortDescription": "Même mobilité de colonne, assis, sans appui sur les mains ni sur les genoux.",
     "instructions": [
@@ -2323,6 +2519,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "mobility"
+    ],
+    "movementPatterns": [
+      "posture"
+    ],
+    "fatigueAreas": [
+      "hamstrings",
+      "deep_core"
+    ],
     "name": "Chenille",
     "shortDescription": "Les mains marchent vers l'avant jusqu'à la planche, puis reviennent.",
     "instructions": [
@@ -2431,6 +2637,17 @@ export const EXERCISES: Exercise[] = [
       ]
     },
     "enabled": true,
+    "suitablePhases": [
+      "dynamic",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "balance"
+    ],
+    "fatigueAreas": [
+      "obliques",
+      "hip_flexors"
+    ],
     "name": "Coordination croisée debout",
     "shortDescription": "Le coude vient chercher le genou opposé, en alternance et sans à-coup.",
     "instructions": [
@@ -2535,6 +2752,16 @@ export const EXERCISES: Exercise[] = [
       ]
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "lateral_movement"
+    ],
+    "fatigueAreas": [
+      "glutes",
+      "abductors"
+    ],
     "name": "Coquillage sur le côté",
     "shortDescription": "Sur le flanc, genoux fléchis, le genou du dessus s'ouvre pieds joints.",
     "instructions": [
@@ -2688,6 +2915,15 @@ export const EXERCISES: Exercise[] = [
       "Continue to alternate legs until all of the recommended repetitions have been performed."
     ],
     "sourceCategory": "strength",
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "lateral_movement"
+    ],
+    "fatigueAreas": [
+      "glutes"
+    ],
     "name": "Coup de pied arrière à quatre pattes",
     "shortDescription": "Depuis la quadrupédie, une jambe pousse vers l'arrière et le haut.",
     "instructions": [
@@ -2843,6 +3079,15 @@ export const EXERCISES: Exercise[] = [
       "Repeat for the recommended amount of repetitions."
     ],
     "sourceCategory": "strength",
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "core_stability"
+    ],
+    "fatigueAreas": [
+      "abdominals"
+    ],
     "name": "Crunch court",
     "shortDescription": "Décollement limité des omoplates, menton dégagé de la poitrine.",
     "instructions": [
@@ -2983,6 +3228,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "core_stability"
+    ],
+    "fatigueAreas": [
+      "obliques",
+      "abdominals"
+    ],
     "name": "Crunch croisé",
     "shortDescription": "Le coude cherche le genou opposé qui remonte, en contrôle.",
     "instructions": [
@@ -3122,6 +3377,15 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "core_stability"
+    ],
+    "fatigueAreas": [
+      "abdominals"
+    ],
     "name": "Crunch inversé",
     "shortDescription": "Les genoux repliés remontent vers la poitrine en décollant le bassin.",
     "instructions": [
@@ -3278,6 +3542,16 @@ export const EXERCISES: Exercise[] = [
       "Repeat on the opposite side, alternating until the set is complete."
     ],
     "sourceCategory": "strength",
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "core_stability"
+    ],
+    "fatigueAreas": [
+      "deep_core",
+      "abdominals"
+    ],
     "name": "Dead bug",
     "shortDescription": "Sur le dos, bras et jambe opposés s'éloignent puis reviennent, dos plaqué.",
     "instructions": [
@@ -3393,6 +3667,18 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "mobility",
+      "finish"
+    ],
+    "movementPatterns": [
+      "rotation",
+      "flexion_extension"
+    ],
+    "fatigueAreas": [
+      "lower_back",
+      "mid_back"
+    ],
     "name": "Déroulé vertébral debout",
     "shortDescription": "Enroulement lent du buste vers le bas puis remontée vertèbre par vertèbre.",
     "instructions": [
@@ -3528,6 +3814,16 @@ export const EXERCISES: Exercise[] = [
       ]
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "lateral_movement",
+      "core_stability"
+    ],
+    "fatigueAreas": [
+      "obliques"
+    ],
     "name": "Élévation latérale du buste",
     "shortDescription": "Sur le flanc, le buste et la jambe du dessus se rapprochent.",
     "instructions": [
@@ -3643,6 +3939,17 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "wakeup",
+      "finish"
+    ],
+    "movementPatterns": [
+      "posture"
+    ],
+    "fatigueAreas": [
+      "mid_back",
+      "shoulders"
+    ],
     "name": "Enchaînement de mobilité debout",
     "shortDescription": "Séquence continue bras, buste et bassin, sur un rythme lent et régulier.",
     "instructions": [
@@ -3757,6 +4064,18 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "dynamic",
+      "finish",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "balance"
+    ],
+    "fatigueAreas": [
+      "ankles",
+      "deep_core"
+    ],
     "name": "Équilibre en tandem",
     "shortDescription": "Pieds alignés l'un devant l'autre, maintien de la position sans bouger.",
     "instructions": [
@@ -3871,6 +4190,18 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "dynamic",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "lateral_movement",
+      "balance"
+    ],
+    "fatigueAreas": [
+      "ankles",
+      "glutes"
+    ],
     "name": "Équilibre sur un pied",
     "shortDescription": "Maintien sur une jambe, l'autre pied décollé du sol.",
     "instructions": [
@@ -3979,6 +4310,17 @@ export const EXERCISES: Exercise[] = [
       ]
     },
     "enabled": true,
+    "suitablePhases": [
+      "dynamic"
+    ],
+    "movementPatterns": [
+      "lateral_movement",
+      "balance"
+    ],
+    "fatigueAreas": [
+      "ankles",
+      "glutes"
+    ],
     "name": "Équilibre sur un pied, yeux fermés",
     "shortDescription": "Même maintien sur une jambe, sans repère visuel.",
     "instructions": [
@@ -4085,6 +4427,18 @@ export const EXERCISES: Exercise[] = [
       ]
     },
     "enabled": true,
+    "suitablePhases": [
+      "wakeup",
+      "finish"
+    ],
+    "movementPatterns": [
+      "posture",
+      "rotation"
+    ],
+    "fatigueAreas": [
+      "obliques",
+      "mid_back"
+    ],
     "name": "Essorage du tronc",
     "shortDescription": "Rotations alternées du buste, bras relâchés qui suivent le mouvement.",
     "instructions": [
@@ -4216,6 +4570,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "finish",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "stretch"
+    ],
+    "fatigueAreas": [
+      "shoulders"
+    ],
     "name": "Étirement de l'épaule",
     "shortDescription": "Un bras passe devant la poitrine, l'autre le maintient en place.",
     "instructions": [
@@ -4349,6 +4713,17 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "finish",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "stretch"
+    ],
+    "fatigueAreas": [
+      "forearms",
+      "wrists"
+    ],
     "name": "Étirement des avant-bras à genoux",
     "shortDescription": "À genoux, paumes au sol doigts vers soi, pour ouvrir les poignets.",
     "instructions": [
@@ -4486,6 +4861,18 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "finish",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "lateral_movement",
+      "balance",
+      "stretch"
+    ],
+    "fatigueAreas": [
+      "hip_flexors"
+    ],
     "name": "Étirement des fléchisseurs debout",
     "shortDescription": "Fente debout, bassin rentré, sans poser le genou arrière au sol.",
     "instructions": [
@@ -4627,6 +5014,16 @@ export const EXERCISES: Exercise[] = [
       "Lean forward from your hips and reach for your ankle until you feel a stretch in your hamstring. Hold for 15 seconds, then repeat for your other side."
     ],
     "sourceCategory": "stretching",
+    "suitablePhases": [
+      "finish",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "stretch"
+    ],
+    "fatigueAreas": [
+      "hamstrings"
+    ],
     "name": "Étirement des ischio-jambiers assis",
     "shortDescription": "Assis, une jambe tendue, le buste s'incline légèrement vers l'avant.",
     "instructions": [
@@ -4763,6 +5160,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "finish",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "stretch"
+    ],
+    "fatigueAreas": [
+      "calves"
+    ],
     "name": "Étirement des mollets assis",
     "shortDescription": "Assis jambe tendue, les orteils sont ramenés vers soi.",
     "instructions": [
@@ -4899,6 +5306,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "finish",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "stretch"
+    ],
+    "fatigueAreas": [
+      "calves"
+    ],
     "name": "Étirement des mollets au mur",
     "shortDescription": "Mains posées au mur, jambe arrière tendue talon au sol.",
     "instructions": [
@@ -5015,6 +5432,19 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "finish",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "lateral_movement",
+      "lunge",
+      "stretch"
+    ],
+    "fatigueAreas": [
+      "calves",
+      "ankles"
+    ],
     "name": "Étirement des mollets en fente",
     "shortDescription": "Pied arrière talon au sol, jambe arrière tendue, poids porté vers l'avant.",
     "instructions": [
@@ -5128,6 +5558,17 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "finish",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "stretch"
+    ],
+    "fatigueAreas": [
+      "neck",
+      "upper_back"
+    ],
     "name": "Étirement des trapèzes assis",
     "shortDescription": "Tête inclinée sur le côté, épaule opposée qui reste basse.",
     "instructions": [
@@ -5261,6 +5702,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "finish",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "stretch"
+    ],
+    "fatigueAreas": [
+      "triceps"
+    ],
     "name": "Étirement des triceps",
     "shortDescription": "Coude pointé vers le plafond, la main descend entre les omoplates.",
     "instructions": [
@@ -5387,6 +5838,16 @@ export const EXERCISES: Exercise[] = [
       ]
     },
     "enabled": true,
+    "suitablePhases": [
+      "finish",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "stretch"
+    ],
+    "fatigueAreas": [
+      "lats"
+    ],
     "name": "Étirement du grand dorsal au mur",
     "shortDescription": "Une main posée haut sur le mur, le buste s'éloigne pour ouvrir le flanc.",
     "instructions": [
@@ -5535,6 +5996,18 @@ export const EXERCISES: Exercise[] = [
       "Shift your weight forward until you feel a stretch in your hip. Hold for 15 seconds, then repeat for your other side."
     ],
     "sourceCategory": "stretching",
+    "suitablePhases": [
+      "finish",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "lateral_movement",
+      "lunge",
+      "stretch"
+    ],
+    "fatigueAreas": [
+      "hip_flexors"
+    ],
     "name": "Étirement du psoas en fente",
     "shortDescription": "Genou arrière au sol, bassin qui avance, avant de la hanche qui s'ouvre.",
     "instructions": [
@@ -5647,6 +6120,19 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "finish",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "lateral_movement",
+      "balance",
+      "stretch"
+    ],
+    "fatigueAreas": [
+      "quadriceps",
+      "hip_flexors"
+    ],
     "name": "Étirement du quadriceps debout",
     "shortDescription": "Talon ramené vers le fessier, genoux côte à côte, bassin dans l'axe.",
     "instructions": [
@@ -5783,6 +6269,18 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "finish",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "lunge",
+      "stretch"
+    ],
+    "fatigueAreas": [
+      "calves",
+      "ankles"
+    ],
     "name": "Étirement du soléaire en fente",
     "shortDescription": "Fente avec le genou arrière fléchi, pour la partie basse du mollet.",
     "instructions": [
@@ -5919,6 +6417,17 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "finish"
+    ],
+    "movementPatterns": [
+      "lateral_movement",
+      "stretch"
+    ],
+    "fatigueAreas": [
+      "glutes",
+      "abductors"
+    ],
     "name": "Étirement fessier allongé",
     "shortDescription": "Sur le dos, une cheville posée sur le genou opposé que l'on ramène vers soi.",
     "instructions": [
@@ -6054,6 +6563,17 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "finish",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "lateral_movement",
+      "stretch"
+    ],
+    "fatigueAreas": [
+      "glutes"
+    ],
     "name": "Étirement fessier assis",
     "shortDescription": "Assis, une jambe croisée par-dessus l'autre, le buste se tourne doucement.",
     "instructions": [
@@ -6188,6 +6708,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "finish",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "stretch"
+    ],
+    "fatigueAreas": [
+      "shoulders"
+    ],
     "name": "Étirement vers le haut",
     "shortDescription": "Bras tendus au-dessus de la tête, doigts croisés, paumes vers le plafond.",
     "instructions": [
@@ -6295,6 +6825,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "mobility",
+      "finish"
+    ],
+    "movementPatterns": [
+      "flexion_extension"
+    ],
+    "fatigueAreas": [
+      "quadriceps"
+    ],
     "name": "Extension de genou assis",
     "shortDescription": "Jambe tendue puis repliée depuis la position assise, sans mise en charge.",
     "instructions": [
@@ -6408,6 +6948,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "flexion_extension"
+    ],
+    "fatigueAreas": [
+      "lower_back",
+      "mid_back"
+    ],
     "name": "Extension dorsale au sol",
     "shortDescription": "À plat ventre, buste légèrement décollé, bras le long du corps.",
     "instructions": [
@@ -6526,6 +7076,18 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "lateral_movement",
+      "lunge",
+      "balance"
+    ],
+    "fatigueAreas": [
+      "quadriceps",
+      "glutes"
+    ],
     "name": "Fente arrière alternée",
     "shortDescription": "Un pas en arrière, genou qui descend vers le sol, puis retour debout.",
     "instructions": [
@@ -6639,6 +7201,18 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "mobility"
+    ],
+    "movementPatterns": [
+      "flexion_extension",
+      "lateral_movement",
+      "lunge"
+    ],
+    "fatigueAreas": [
+      "hip_flexors",
+      "quadriceps"
+    ],
     "name": "Fente basse de mobilité",
     "shortDescription": "Genou arrière au tapis, bassin qui avance et recule pour ouvrir l'avant de la hanche.",
     "instructions": [
@@ -6780,6 +7354,18 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "lateral_movement",
+      "lunge",
+      "balance"
+    ],
+    "fatigueAreas": [
+      "glutes",
+      "quadriceps"
+    ],
     "name": "Fente croisée arrière",
     "shortDescription": "La jambe arrière passe en diagonale derrière l'autre avant de fléchir.",
     "instructions": [
@@ -6896,6 +7482,18 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "lateral_movement",
+      "lunge",
+      "balance"
+    ],
+    "fatigueAreas": [
+      "adductors",
+      "quadriceps"
+    ],
     "name": "Fente latérale",
     "shortDescription": "Pas de côté avec flexion d'une jambe, l'autre restant tendue.",
     "instructions": [
@@ -7039,6 +7637,18 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "lateral_movement",
+      "lunge",
+      "balance"
+    ],
+    "fatigueAreas": [
+      "quadriceps",
+      "glutes"
+    ],
     "name": "Fente statique",
     "shortDescription": "Pieds décalés en fente, montée et descente sur place sans changer d'appui.",
     "instructions": [
@@ -7149,6 +7759,18 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "mobility",
+      "wakeup",
+      "finish"
+    ],
+    "movementPatterns": [
+      "flexion_extension"
+    ],
+    "fatigueAreas": [
+      "ankles",
+      "calves"
+    ],
     "name": "Flexion-extension de cheville",
     "shortDescription": "Pointes de pied tendues puis ramenées vers soi, assis, sans charge.",
     "instructions": [
@@ -7300,6 +7922,16 @@ export const EXERCISES: Exercise[] = [
       "Keep your body straight at all times, and hold this position as long as possible. To increase difficulty, an arm or leg can be raised."
     ],
     "sourceCategory": "strength",
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "core_stability"
+    ],
+    "fatigueAreas": [
+      "deep_core",
+      "abdominals"
+    ],
     "name": "Gainage sur les avant-bras",
     "shortDescription": "Planche complète en appui sur les avant-bras et les pointes de pieds.",
     "instructions": [
@@ -7416,6 +8048,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "core_stability"
+    ],
+    "fatigueAreas": [
+      "deep_core",
+      "abdominals"
+    ],
     "name": "Gainage genoux au sol",
     "shortDescription": "Planche sur les avant-bras avec les genoux posés, corps aligné des épaules aux genoux.",
     "instructions": [
@@ -7558,6 +8200,17 @@ export const EXERCISES: Exercise[] = [
       ]
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "lateral_movement",
+      "core_stability"
+    ],
+    "fatigueAreas": [
+      "obliques",
+      "deep_core"
+    ],
     "name": "Gainage latéral complet",
     "shortDescription": "Planche latérale sur l'avant-bras, jambes tendues et empilées.",
     "instructions": [
@@ -7666,6 +8319,17 @@ export const EXERCISES: Exercise[] = [
       ]
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "lateral_movement",
+      "core_stability"
+    ],
+    "fatigueAreas": [
+      "obliques",
+      "deep_core"
+    ],
     "name": "Gainage latéral genoux fléchis",
     "shortDescription": "Planche latérale en appui sur l'avant-bras et les genoux.",
     "instructions": [
@@ -7807,6 +8471,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "core_stability"
+    ],
+    "fatigueAreas": [
+      "triceps",
+      "shoulders"
+    ],
     "name": "Gainage monté-descendu",
     "shortDescription": "Passage de la planche sur avant-bras à la planche bras tendus, et retour.",
     "instructions": [
@@ -7949,6 +8623,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "core_stability"
+    ],
+    "fatigueAreas": [
+      "deep_core",
+      "abdominals"
+    ],
     "name": "Gainage piqué",
     "shortDescription": "Depuis la planche sur avant-bras, le bassin monte vers le plafond puis redescend.",
     "instructions": [
@@ -8097,6 +8781,18 @@ export const EXERCISES: Exercise[] = [
       "Switch sides. This stretches the buttocks and lower back of the bent leg and the hip flexor of the straight leg."
     ],
     "sourceCategory": "stretching",
+    "suitablePhases": [
+      "mobility",
+      "wakeup",
+      "finish"
+    ],
+    "movementPatterns": [
+      "flexion_extension"
+    ],
+    "fatigueAreas": [
+      "glutes",
+      "hip_flexors"
+    ],
     "name": "Genou-poitrine allongé",
     "shortDescription": "Un genou ramené vers la poitrine, l'autre jambe fléchie au sol.",
     "instructions": [
@@ -8233,6 +8929,15 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "finish"
+    ],
+    "movementPatterns": [
+      "stretch"
+    ],
+    "fatigueAreas": [
+      "lower_back"
+    ],
     "name": "Genoux ramenés à la poitrine",
     "shortDescription": "Allongé sur le dos, les deux genoux sont enlacés contre la poitrine.",
     "instructions": [
@@ -8346,6 +9051,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "core_stability"
+    ],
+    "fatigueAreas": [
+      "deep_core",
+      "abdominals"
+    ],
     "name": "Glissement de talon allongé",
     "shortDescription": "Une jambe se tend en glissant le talon au sol, sans laisser le dos se creuser.",
     "instructions": [
@@ -8489,6 +9204,19 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "mobility"
+    ],
+    "movementPatterns": [
+      "flexion_extension",
+      "lateral_movement",
+      "lunge",
+      "stretch"
+    ],
+    "fatigueAreas": [
+      "hip_flexors",
+      "adductors"
+    ],
     "name": "Grand étirement en fente",
     "shortDescription": "Fente avant, main au sol, puis ouverture du buste vers le plafond.",
     "instructions": [
@@ -8634,6 +9362,18 @@ export const EXERCISES: Exercise[] = [
       "Relax your arms to your sides and raise your shoulders up toward your ears, then back down."
     ],
     "sourceCategory": "stretching",
+    "suitablePhases": [
+      "mobility",
+      "wakeup",
+      "finish"
+    ],
+    "movementPatterns": [
+      "flexion_extension"
+    ],
+    "fatigueAreas": [
+      "shoulders",
+      "upper_back"
+    ],
     "name": "Haussements d'épaules",
     "shortDescription": "Montée franche des épaules vers les oreilles suivie d'un relâchement complet.",
     "instructions": [
@@ -8781,6 +9521,17 @@ export const EXERCISES: Exercise[] = [
       "Keep your weight evenly distributed between both legs (don't lean into your left hip). Switch sides."
     ],
     "sourceCategory": "stretching",
+    "suitablePhases": [
+      "mobility",
+      "finish"
+    ],
+    "movementPatterns": [
+      "lateral_movement"
+    ],
+    "fatigueAreas": [
+      "obliques",
+      "mid_back"
+    ],
     "name": "Inclinaison latérale debout",
     "shortDescription": "Flexion latérale du buste, un bras qui s'allonge au-dessus de la tête.",
     "instructions": [
@@ -8891,6 +9642,17 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "mobility",
+      "wakeup",
+      "finish"
+    ],
+    "movementPatterns": [
+      "lateral_movement"
+    ],
+    "fatigueAreas": [
+      "neck"
+    ],
     "name": "Inclinaison latérale du cou",
     "shortDescription": "L'oreille approche de l'épaule, alternativement à droite et à gauche.",
     "instructions": [
@@ -9031,6 +9793,17 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "finish",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "lateral_movement",
+      "stretch"
+    ],
+    "fatigueAreas": [
+      "hamstrings"
+    ],
     "name": "Ischio-jambiers allongé",
     "shortDescription": "Sur le dos, hanche et genou à 90 degrés, la jambe se tend vers le plafond.",
     "instructions": [
@@ -9170,6 +9943,15 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "mobility"
+    ],
+    "movementPatterns": [
+      "rotation"
+    ],
+    "fatigueAreas": [
+      "neck"
+    ],
     "name": "Isométrie du cou, avant et arrière",
     "shortDescription": "La main résiste à une poussée légère de la tête, sans aucun mouvement.",
     "instructions": [
@@ -9310,6 +10092,15 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "mobility"
+    ],
+    "movementPatterns": [
+      "lateral_movement"
+    ],
+    "fatigueAreas": [
+      "neck"
+    ],
     "name": "Isométrie du cou, sur les côtés",
     "shortDescription": "Même principe de résistance, cette fois sur les côtés de la tête.",
     "instructions": [
@@ -9429,6 +10220,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "dynamic"
+    ],
+    "movementPatterns": [
+      "jump"
+    ],
+    "fatigueAreas": [
+      "calves",
+      "shoulders"
+    ],
     "name": "Jumping jacks",
     "shortDescription": "Saut avec ouverture des jambes et montée simultanée des bras.",
     "instructions": [
@@ -9544,6 +10345,17 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "dynamic",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "flexion_extension"
+    ],
+    "fatigueAreas": [
+      "shoulders",
+      "abductors"
+    ],
     "name": "Jumping jacks sans saut",
     "shortDescription": "Même coordination bras-jambes, un pied posé sur le côté à la fois.",
     "instructions": [
@@ -9659,6 +10471,17 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "dynamic",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "locomotion"
+    ],
+    "fatigueAreas": [
+      "shoulders",
+      "quadriceps"
+    ],
     "name": "Marche avec élévation de bras",
     "shortDescription": "Marche sur place en montant les bras au-dessus de la tête tous les deux pas.",
     "instructions": [
@@ -9773,6 +10596,18 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "dynamic",
+      "finish",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "locomotion"
+    ],
+    "fatigueAreas": [
+      "quadriceps",
+      "calves"
+    ],
     "name": "Marche sur place",
     "shortDescription": "Marche tranquille sans avancer, pieds qui se déroulent normalement.",
     "instructions": [
@@ -9885,6 +10720,18 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "dynamic",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "balance",
+      "locomotion"
+    ],
+    "fatigueAreas": [
+      "ankles",
+      "calves"
+    ],
     "name": "Marche talon-pointe",
     "shortDescription": "Quelques pas en ligne, chaque talon posé juste devant la pointe opposée.",
     "instructions": [
@@ -9998,6 +10845,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "mobility"
+    ],
+    "movementPatterns": [
+      "flexion_extension"
+    ],
+    "fatigueAreas": [
+      "quadriceps",
+      "ankles"
+    ],
     "name": "Mini-flexions de genoux",
     "shortDescription": "Flexions de faible amplitude pour lubrifier les genoux en début de séance.",
     "instructions": [
@@ -10101,6 +10958,18 @@ export const EXERCISES: Exercise[] = [
       ]
     },
     "enabled": true,
+    "suitablePhases": [
+      "mobility",
+      "wakeup",
+      "finish"
+    ],
+    "movementPatterns": [
+      "flexion_extension"
+    ],
+    "fatigueAreas": [
+      "wrists",
+      "ankles"
+    ],
     "name": "Mobilisation des poignets et des chevilles",
     "shortDescription": "Cercles lents des poignets et des chevilles, assis, sans mise en charge.",
     "instructions": [
@@ -10245,6 +11114,17 @@ export const EXERCISES: Exercise[] = [
       "Place both hands at the rear of your head, fingers interlocked, thumbs pointing down and elbows pointing straight ahead. Slowly pull your head down to your chest. Hold for 20-30 seconds."
     ],
     "sourceCategory": "stretching",
+    "suitablePhases": [
+      "mobility",
+      "wakeup",
+      "finish"
+    ],
+    "movementPatterns": [
+      "rotation"
+    ],
+    "fatigueAreas": [
+      "neck"
+    ],
     "name": "Mobilité cervicale avant-arrière",
     "shortDescription": "Flexion et extension douces du cou, avec un temps d'arrêt à chaque extrémité.",
     "instructions": [
@@ -10350,6 +11230,17 @@ export const EXERCISES: Exercise[] = [
       ]
     },
     "enabled": true,
+    "suitablePhases": [
+      "mobility",
+      "finish"
+    ],
+    "movementPatterns": [
+      "rotation"
+    ],
+    "fatigueAreas": [
+      "upper_back",
+      "shoulders"
+    ],
     "name": "Mobilité des omoplates",
     "shortDescription": "Rapprochement puis écartement des omoplates, sans bouger les bras.",
     "instructions": [
@@ -10502,6 +11393,16 @@ export const EXERCISES: Exercise[] = [
       "Explosively reverse the positions of your legs, extending the bent leg until the leg is straight and supported by the toe, and bringing the other foot up with the hip and knee flexed. Repeat in an alternating fashion for 20-30 seconds."
     ],
     "sourceCategory": "plyometrics",
+    "suitablePhases": [
+      "dynamic"
+    ],
+    "movementPatterns": [
+      "core_stability"
+    ],
+    "fatigueAreas": [
+      "deep_core",
+      "hip_flexors"
+    ],
     "name": "Montagnards",
     "shortDescription": "En planche bras tendus, les genoux viennent alternativement vers la poitrine.",
     "instructions": [
@@ -10617,6 +11518,17 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "dynamic",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "flexion_extension"
+    ],
+    "fatigueAreas": [
+      "hip_flexors",
+      "quadriceps"
+    ],
     "name": "Montées de genoux contrôlées",
     "shortDescription": "Genou monté à hauteur de hanche, en marquant chaque appui.",
     "instructions": [
@@ -10725,6 +11637,17 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "mobility"
+    ],
+    "movementPatterns": [
+      "flexion_extension",
+      "balance"
+    ],
+    "fatigueAreas": [
+      "calves",
+      "ankles"
+    ],
     "name": "Montées sur pointes de pieds",
     "shortDescription": "Élévation lente sur la pointe des pieds puis retour contrôlé au sol.",
     "instructions": [
@@ -10842,6 +11765,17 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "lateral_movement",
+      "flexion_extension"
+    ],
+    "fatigueAreas": [
+      "lower_back",
+      "glutes"
+    ],
     "name": "Nage au sol",
     "shortDescription": "À plat ventre, bras et jambes opposés se lèvent en alternance.",
     "instructions": [
@@ -10968,6 +11902,17 @@ export const EXERCISES: Exercise[] = [
       ]
     },
     "enabled": true,
+    "suitablePhases": [
+      "finish",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "stretch"
+    ],
+    "fatigueAreas": [
+      "adductors",
+      "hamstrings"
+    ],
     "name": "Ouverture assise jambes écartées",
     "shortDescription": "Assis jambes écartées, le buste s'incline lentement vers l'avant.",
     "instructions": [
@@ -11109,6 +12054,18 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "mobility"
+    ],
+    "movementPatterns": [
+      "flexion_extension",
+      "lateral_movement",
+      "core_stability"
+    ],
+    "fatigueAreas": [
+      "hip_flexors",
+      "adductors"
+    ],
     "name": "Ouverture de hanche en appui",
     "shortDescription": "Depuis la planche, un pied vient se poser à côté de la main.",
     "instructions": [
@@ -11244,6 +12201,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "mobility"
+    ],
+    "movementPatterns": [
+      "rotation"
+    ],
+    "fatigueAreas": [
+      "chest",
+      "shoulders"
+    ],
     "name": "Ouverture dynamique de la poitrine",
     "shortDescription": "Les bras s'ouvrent et se croisent en alternance pour ouvrir la cage thoracique.",
     "instructions": [
@@ -11353,6 +12320,17 @@ export const EXERCISES: Exercise[] = [
       ]
     },
     "enabled": true,
+    "suitablePhases": [
+      "dynamic"
+    ],
+    "movementPatterns": [
+      "lateral_movement",
+      "locomotion"
+    ],
+    "fatigueAreas": [
+      "glutes",
+      "quadriceps"
+    ],
     "name": "Pas du patineur",
     "shortDescription": "Déplacements latéraux amples d'un pied sur l'autre, sans phase aérienne.",
     "instructions": [
@@ -11467,6 +12445,18 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "dynamic",
+      "finish",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "locomotion"
+    ],
+    "fatigueAreas": [
+      "abductors",
+      "quadriceps"
+    ],
     "name": "Pas latéraux sur place",
     "shortDescription": "Déplacements courts de gauche à droite sur la largeur du tapis.",
     "instructions": [
@@ -11605,6 +12595,17 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "dynamic"
+    ],
+    "movementPatterns": [
+      "locomotion",
+      "jump"
+    ],
+    "fatigueAreas": [
+      "calves",
+      "quadriceps"
+    ],
     "name": "Pas sauté rapide",
     "shortDescription": "Petits pas sautés sur place, genou avant qui monte, bras qui accompagnent.",
     "instructions": [
@@ -11750,6 +12751,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "core_stability"
+    ],
+    "fatigueAreas": [
+      "abdominals",
+      "obliques"
+    ],
     "name": "Pédalage abdominal",
     "shortDescription": "Allongé, le coude vient vers le genou opposé en pédalant lentement.",
     "instructions": [
@@ -11899,6 +12910,20 @@ export const EXERCISES: Exercise[] = [
       ]
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "lateral_movement",
+      "push",
+      "core_stability",
+      "balance"
+    ],
+    "fatigueAreas": [
+      "chest",
+      "shoulders",
+      "triceps"
+    ],
     "name": "Pompe vers gainage latéral",
     "shortDescription": "Une pompe, puis une ouverture en planche latérale bras tendu.",
     "instructions": [
@@ -12054,6 +13079,17 @@ export const EXERCISES: Exercise[] = [
       "After a brief pause at the top contracted position, you can begin to lower yourself downward again for as many repetitions as needed."
     ],
     "sourceCategory": "strength",
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "push"
+    ],
+    "fatigueAreas": [
+      "chest",
+      "triceps",
+      "shoulders"
+    ],
     "name": "Pompes classiques",
     "shortDescription": "Pompes en appui sur les mains et les pointes de pieds, corps gainé.",
     "instructions": [
@@ -12163,6 +13199,16 @@ export const EXERCISES: Exercise[] = [
       ]
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "push"
+    ],
+    "fatigueAreas": [
+      "shoulders",
+      "triceps"
+    ],
     "name": "Pompes en V",
     "shortDescription": "Bassin haut en position de V inversé, la tête descend entre les mains.",
     "instructions": [
@@ -12279,6 +13325,17 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "push"
+    ],
+    "fatigueAreas": [
+      "chest",
+      "triceps",
+      "shoulders"
+    ],
     "name": "Pompes genoux au sol",
     "shortDescription": "Pompes avec appui sur les genoux, corps aligné des épaules aux genoux.",
     "instructions": [
@@ -12421,6 +13478,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "push"
+    ],
+    "fatigueAreas": [
+      "chest",
+      "shoulders"
+    ],
     "name": "Pompes larges",
     "shortDescription": "Pompes mains nettement plus écartées, accent sur la poitrine.",
     "instructions": [
@@ -12533,6 +13600,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "push"
+    ],
+    "fatigueAreas": [
+      "shoulders",
+      "upper_back"
+    ],
     "name": "Pompes scapulaires genoux au sol",
     "shortDescription": "Bras tendus, seules les omoplates bougent : la poitrine descend et remonte de peu.",
     "instructions": [
@@ -12675,6 +13752,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "push"
+    ],
+    "fatigueAreas": [
+      "triceps",
+      "chest"
+    ],
     "name": "Pompes serrées",
     "shortDescription": "Pompes mains rapprochées sous la poitrine, accent sur les triceps.",
     "instructions": [
@@ -12826,6 +13913,16 @@ export const EXERCISES: Exercise[] = [
       "Slowly go back to the starting position as you breathe in."
     ],
     "sourceCategory": "strength",
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "flexion_extension"
+    ],
+    "fatigueAreas": [
+      "glutes",
+      "hamstrings"
+    ],
     "name": "Pont fessier",
     "shortDescription": "Bassin décollé du sol depuis la position allongée, genoux fléchis.",
     "instructions": [
@@ -12978,6 +14075,17 @@ export const EXERCISES: Exercise[] = [
       "Extend as far as possible, pause and then return to the starting position."
     ],
     "sourceCategory": "strength",
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "lateral_movement",
+      "balance"
+    ],
+    "fatigueAreas": [
+      "glutes",
+      "hamstrings"
+    ],
     "name": "Pont fessier sur une jambe",
     "shortDescription": "Même pont, une seule jambe au sol, l'autre tendue ou genou ramené.",
     "instructions": [
@@ -13084,6 +14192,16 @@ export const EXERCISES: Exercise[] = [
       ]
     },
     "enabled": true,
+    "suitablePhases": [
+      "mobility"
+    ],
+    "movementPatterns": [
+      "flexion_extension"
+    ],
+    "fatigueAreas": [
+      "hip_flexors",
+      "glutes"
+    ],
     "name": "Position 90-90 assise",
     "shortDescription": "Assis au sol, jambes fléchies à 90 degrés, passage lent d'un côté à l'autre.",
     "instructions": [
@@ -13237,6 +14355,16 @@ export const EXERCISES: Exercise[] = [
       "Once you settle onto your heels, bring your hands next to your feet and relax. \"breathe\" into your back. Rest your forehead on the floor. Avoid this position if you have knee problems."
     ],
     "sourceCategory": "stretching",
+    "suitablePhases": [
+      "finish"
+    ],
+    "movementPatterns": [
+      "stretch"
+    ],
+    "fatigueAreas": [
+      "lower_back",
+      "mid_back"
+    ],
     "name": "Posture de l'enfant",
     "shortDescription": "Assis sur les talons, buste relâché vers l'avant, bras allongés ou le long du corps.",
     "instructions": [
@@ -13378,6 +14506,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "push"
+    ],
+    "fatigueAreas": [
+      "chest",
+      "shoulders"
+    ],
     "name": "Pression des paumes",
     "shortDescription": "Les paumes se poussent l'une contre l'autre devant la poitrine.",
     "instructions": [
@@ -13516,6 +14654,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "core_stability"
+    ],
+    "fatigueAreas": [
+      "abdominals",
+      "hip_flexors"
+    ],
     "name": "Ramené de genoux allongé",
     "shortDescription": "Allongé, les genoux se ramènent vers la poitrine puis s'éloignent en contrôle.",
     "instructions": [
@@ -13624,6 +14772,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "wakeup",
+      "finish"
+    ],
+    "movementPatterns": [
+      "breathing"
+    ],
+    "fatigueAreas": [
+      "diaphragm"
+    ],
     "name": "Respiration à expiration allongée",
     "shortDescription": "Expiration deux fois plus longue que l'inspiration, sans rétention.",
     "instructions": [
@@ -13737,6 +14895,18 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "wakeup",
+      "finish"
+    ],
+    "movementPatterns": [
+      "breathing",
+      "posture"
+    ],
+    "fatigueAreas": [
+      "diaphragm",
+      "shoulders"
+    ],
     "name": "Respiration avec élévation des bras",
     "shortDescription": "Le souffle guide un mouvement lent des bras, pour réveiller la cage thoracique.",
     "instructions": [
@@ -13848,6 +15018,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "wakeup",
+      "finish"
+    ],
+    "movementPatterns": [
+      "breathing"
+    ],
+    "fatigueAreas": [
+      "diaphragm"
+    ],
     "name": "Respiration carrée",
     "shortDescription": "Cycle en quatre temps égaux : inspiration, rétention, expiration, pause.",
     "instructions": [
@@ -13963,6 +15143,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "wakeup",
+      "finish"
+    ],
+    "movementPatterns": [
+      "breathing"
+    ],
+    "fatigueAreas": [
+      "diaphragm"
+    ],
     "name": "Respiration diaphragmatique allongée",
     "shortDescription": "Respiration lente sur le dos, une main sur le ventre, pour installer le souffle au réveil.",
     "instructions": [
@@ -14076,6 +15266,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "wakeup",
+      "finish"
+    ],
+    "movementPatterns": [
+      "breathing"
+    ],
+    "fatigueAreas": [
+      "diaphragm"
+    ],
     "name": "Respiration diaphragmatique assise",
     "shortDescription": "Même respiration ventrale, en position assise, quand descendre au sol n'est pas souhaité.",
     "instructions": [
@@ -14185,6 +15385,16 @@ export const EXERCISES: Exercise[] = [
       ]
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "flexion_extension"
+    ],
+    "fatigueAreas": [
+      "upper_back",
+      "shoulders"
+    ],
     "name": "Rétractions scapulaires au sol",
     "shortDescription": "À plat ventre, bras en W, les omoplates se serrent et les mains décollent.",
     "instructions": [
@@ -14298,6 +15508,17 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "wakeup",
+      "finish"
+    ],
+    "movementPatterns": [
+      "posture"
+    ],
+    "fatigueAreas": [
+      "shoulders",
+      "neck"
+    ],
     "name": "Réveil articulaire debout",
     "shortDescription": "Mobilisation lente de haut en bas : cou, épaules, bassin, genoux, chevilles.",
     "instructions": [
@@ -14398,6 +15619,17 @@ export const EXERCISES: Exercise[] = [
       ]
     },
     "enabled": true,
+    "suitablePhases": [
+      "mobility",
+      "wakeup",
+      "finish"
+    ],
+    "movementPatterns": [
+      "rotation"
+    ],
+    "fatigueAreas": [
+      "neck"
+    ],
     "name": "Rotation du cou",
     "shortDescription": "Rotations lentes de la tête d'un côté à l'autre, regard qui accompagne.",
     "instructions": [
@@ -14538,6 +15770,17 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "rotation",
+      "core_stability"
+    ],
+    "fatigueAreas": [
+      "obliques",
+      "deep_core"
+    ],
     "name": "Rotation russe",
     "shortDescription": "Assis en équilibre sur les fessiers, le buste tourne d'un côté à l'autre.",
     "instructions": [
@@ -14643,6 +15886,17 @@ export const EXERCISES: Exercise[] = [
       ]
     },
     "enabled": true,
+    "suitablePhases": [
+      "mobility",
+      "finish"
+    ],
+    "movementPatterns": [
+      "rotation"
+    ],
+    "fatigueAreas": [
+      "mid_back",
+      "chest"
+    ],
     "name": "Rotation thoracique allongée",
     "shortDescription": "Sur le côté, le bras du dessus s'ouvre lentement vers l'arrière, genoux joints.",
     "instructions": [
@@ -14786,6 +16040,19 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "dynamic"
+    ],
+    "movementPatterns": [
+      "lateral_movement",
+      "lunge",
+      "balance",
+      "jump"
+    ],
+    "fatigueAreas": [
+      "quadriceps",
+      "glutes"
+    ],
     "name": "Saut en fente alterné",
     "shortDescription": "Depuis la fente, saut pour échanger la position des jambes.",
     "instructions": [
@@ -14926,6 +16193,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "dynamic"
+    ],
+    "movementPatterns": [
+      "jump"
+    ],
+    "fatigueAreas": [
+      "quadriceps",
+      "calves"
+    ],
     "name": "Saut genoux groupés",
     "shortDescription": "Saut vertical sur place en ramenant les genoux vers la poitrine.",
     "instructions": [
@@ -15035,6 +16312,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "wakeup",
+      "finish"
+    ],
+    "movementPatterns": [
+      "breathing"
+    ],
+    "fatigueAreas": [
+      "diaphragm"
+    ],
     "name": "Soupir physiologique",
     "shortDescription": "Double inspiration nasale suivie d'une longue expiration, en quelques cycles seulement.",
     "instructions": [
@@ -15190,6 +16477,16 @@ export const EXERCISES: Exercise[] = [
       "Continue down to full depth if you are able,and quickly reverse the motion until you return to the starting position. As you squat, keep your head and chest up and push your knees out."
     ],
     "sourceCategory": "strength",
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "squat"
+    ],
+    "fatigueAreas": [
+      "quadriceps",
+      "glutes"
+    ],
     "name": "Squat au poids du corps",
     "shortDescription": "Squat complet, cuisses proches de l'horizontale, buste gainé.",
     "instructions": [
@@ -15307,6 +16604,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "squat"
+    ],
+    "fatigueAreas": [
+      "quadriceps",
+      "glutes"
+    ],
     "name": "Squat maintenu",
     "shortDescription": "Position basse de squat tenue en isométrie, sans appui extérieur.",
     "instructions": [
@@ -15424,6 +16731,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "squat"
+    ],
+    "fatigueAreas": [
+      "quadriceps",
+      "glutes"
+    ],
     "name": "Squat partiel",
     "shortDescription": "Descente limitée à mi-course, pour renforcer sans amplitude complète.",
     "instructions": [
@@ -15564,6 +16881,18 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "mobility"
+    ],
+    "movementPatterns": [
+      "flexion_extension",
+      "squat",
+      "balance"
+    ],
+    "fatigueAreas": [
+      "hip_flexors",
+      "adductors"
+    ],
     "name": "Squat profond maintenu",
     "shortDescription": "Position accroupie basse tenue, talons au sol si possible.",
     "instructions": [
@@ -15709,6 +17038,17 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "dynamic"
+    ],
+    "movementPatterns": [
+      "squat",
+      "jump"
+    ],
+    "fatigueAreas": [
+      "quadriceps",
+      "glutes"
+    ],
     "name": "Squat sauté",
     "shortDescription": "Descente en squat puis saut vertical, réception amortie.",
     "instructions": [
@@ -15824,6 +17164,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "squat"
+    ],
+    "fatigueAreas": [
+      "adductors",
+      "quadriceps"
+    ],
     "name": "Squat sumo",
     "shortDescription": "Squat pieds largement écartés et pointes ouvertes, accent sur l'intérieur des cuisses.",
     "instructions": [
@@ -15969,6 +17319,16 @@ export const EXERCISES: Exercise[] = [
       ]
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "flexion_extension"
+    ],
+    "fatigueAreas": [
+      "lower_back",
+      "glutes"
+    ],
     "name": "Superman au sol",
     "shortDescription": "Sur le ventre, bras et jambes se lèvent en même temps.",
     "instructions": [
@@ -16085,6 +17445,16 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "dynamic"
+    ],
+    "movementPatterns": [
+      "flexion_extension"
+    ],
+    "fatigueAreas": [
+      "hamstrings",
+      "calves"
+    ],
     "name": "Talons-fesses",
     "shortDescription": "Course sur place où les talons viennent chercher les fessiers.",
     "instructions": [
@@ -16201,6 +17571,18 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "lateral_movement",
+      "core_stability",
+      "flexion_extension"
+    ],
+    "fatigueAreas": [
+      "shoulders",
+      "deep_core"
+    ],
     "name": "Tape-épaules en gainage",
     "shortDescription": "En planche bras tendus, une main vient toucher l'épaule opposée sans balancer le bassin.",
     "instructions": [
@@ -16309,6 +17691,17 @@ export const EXERCISES: Exercise[] = [
       ]
     },
     "enabled": true,
+    "suitablePhases": [
+      "finish"
+    ],
+    "movementPatterns": [
+      "rotation",
+      "stretch"
+    ],
+    "fatigueAreas": [
+      "lower_back",
+      "obliques"
+    ],
     "name": "Torsion allongée",
     "shortDescription": "Sur le dos, les deux genoux basculent d'un côté, épaules au sol.",
     "instructions": [
@@ -16445,6 +17838,15 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "core_stability"
+    ],
+    "fatigueAreas": [
+      "obliques"
+    ],
     "name": "Touches de talons",
     "shortDescription": "Buste légèrement décollé, la main vient toucher le talon du même côté.",
     "instructions": [
@@ -16582,6 +17984,15 @@ export const EXERCISES: Exercise[] = [
       "mediaReviewed": false
     },
     "enabled": true,
+    "suitablePhases": [
+      "dynamic"
+    ],
+    "movementPatterns": [
+      "balance"
+    ],
+    "fatigueAreas": [
+      "shoulders"
+    ],
     "name": "Travail des bras à genoux",
     "shortDescription": "À genoux, les bras reproduisent le mouvement de course, de plus en plus vite.",
     "instructions": [
@@ -16599,6 +18010,1112 @@ export const EXERCISES: Exercise[] = [
       "Perte d'équilibre",
       "Vertige ou étourdissement",
       "Gêne inhabituelle"
+    ]
+  },
+  {
+    "id": "boxe-en-ombre-assise",
+    "slug": "boxe-en-ombre-assise",
+    "nameFr": "Boxe en ombre assise",
+    "nameEn": "Seated Shadow Boxing",
+    "shortDescriptionFr": "Enchaînements de coups de poing rapides assis, pour activer le haut du corps sans solliciter les jambes.",
+    "instructionsFr": [
+      "Asseyez-vous au bord de la chaise, dos droit, pieds à plat au sol.",
+      "Engagez les abdominaux pour stabiliser le tronc.",
+      "Enchaînez des jabs, crochets et uppercuts alternés à un rythme soutenu.",
+      "Gardez les épaules basses et respirez régulièrement.",
+      "Variez la vitesse et les combinaisons selon votre énergie."
+    ],
+    "breathingGuidanceFr": "Expirez à chaque coup de poing, inspirez entre les enchaînements.",
+    "category": "gentle_cardio",
+    "tags": [
+      "cardio",
+      "bras",
+      "coordination",
+      "assis"
+    ],
+    "mode": "timed",
+    "defaultDurationSeconds": 30,
+    "restAfterSeconds": 10,
+    "difficulty": "easy",
+    "minimumEnergy": "low",
+    "maximumEnergy": "high",
+    "intensity": 3,
+    "impactLevel": "none",
+    "positions": [
+      "seated"
+    ],
+    "primaryBodyAreas": [
+      "shoulders",
+      "chest",
+      "triceps"
+    ],
+    "secondaryBodyAreas": [
+      "abdominals",
+      "obliques",
+      "biceps"
+    ],
+    "jointsUsed": [
+      "shoulder",
+      "elbow"
+    ],
+    "requiresUpperBody": true,
+    "requiresLowerBody": false,
+    "requiresArmSupport": false,
+    "requiresKneeSupport": false,
+    "requiresFloorTransition": false,
+    "unilateral": false,
+    "jumping": false,
+    "balanceRequired": false,
+    "compatibleWithUpperBodyDiscomfort": false,
+    "compatibleWithLowerBodyDiscomfort": true,
+    "suitableForGentleSession": false,
+    "suitableForWarmup": false,
+    "suitableForMainPhase": true,
+    "suitableForCooldown": false,
+    "generalPrecautionsFr": [
+      "Ne lancez pas les bras au maximum de leur extension pour préserver les coudes."
+    ],
+    "stopSignalsFr": [
+      "Douleur à l'épaule ou au coude"
+    ],
+    "alternativeExerciseIds": [],
+    "media": [],
+    "quality": {
+      "status": "review_required",
+      "classificationReviewed": false
+    },
+    "enabled": true,
+    "suitablePhases": [
+      "dynamic"
+    ],
+    "movementPatterns": [
+      "flexion_extension"
+    ],
+    "fatigueAreas": [
+      "shoulders",
+      "chest",
+      "triceps"
+    ],
+    "name": "Boxe en ombre assise",
+    "shortDescription": "Enchaînements de coups de poing rapides assis, pour activer le haut du corps sans solliciter les jambes.",
+    "instructions": [
+      "Asseyez-vous au bord de la chaise, dos droit, pieds à plat au sol.",
+      "Engagez les abdominaux pour stabiliser le tronc.",
+      "Enchaînez des jabs, crochets et uppercuts alternés à un rythme soutenu.",
+      "Gardez les épaules basses et respirez régulièrement.",
+      "Variez la vitesse et les combinaisons selon votre énergie."
+    ],
+    "generalPrecautions": [
+      "Ne lancez pas les bras au maximum de leur extension pour préserver les coudes."
+    ],
+    "stopSignals": [
+      "Douleur à l'épaule ou au coude"
+    ]
+  },
+  {
+    "id": "moulinets-des-bras-debout",
+    "slug": "moulinets-des-bras-debout",
+    "nameFr": "Moulinets des bras debout",
+    "nameEn": "Standing Arm Windmills",
+    "shortDescriptionFr": "Grands moulinets des bras alternés debout, pieds fixes, pour activer la circulation sans solliciter les jambes.",
+    "instructionsFr": [
+      "Debout, pieds écartés à largeur des épaules, genoux légèrement fléchis.",
+      "Faites de grands cercles avec un bras à la fois, comme un moulin.",
+      "Alternez bras droit et bras gauche toutes les 5 rotations.",
+      "Gardez le tronc stable et les pieds ancrés au sol.",
+      "Augmentez progressivement la vitesse."
+    ],
+    "breathingGuidanceFr": "Respirez naturellement, expirez en accélérant.",
+    "category": "gentle_cardio",
+    "tags": [
+      "cardio",
+      "bras",
+      "épaules",
+      "coordination",
+      "debout"
+    ],
+    "mode": "timed",
+    "defaultDurationSeconds": 30,
+    "restAfterSeconds": 10,
+    "difficulty": "very_easy",
+    "minimumEnergy": "low",
+    "maximumEnergy": "high",
+    "intensity": 2,
+    "impactLevel": "none",
+    "positions": [
+      "standing"
+    ],
+    "primaryBodyAreas": [
+      "shoulders",
+      "upper_back"
+    ],
+    "secondaryBodyAreas": [
+      "chest",
+      "lats"
+    ],
+    "jointsUsed": [
+      "shoulder"
+    ],
+    "requiresUpperBody": true,
+    "requiresLowerBody": false,
+    "requiresArmSupport": false,
+    "requiresKneeSupport": false,
+    "requiresFloorTransition": false,
+    "unilateral": true,
+    "jumping": false,
+    "balanceRequired": false,
+    "compatibleWithUpperBodyDiscomfort": false,
+    "compatibleWithLowerBodyDiscomfort": true,
+    "suitableForGentleSession": true,
+    "suitableForWarmup": true,
+    "suitableForMainPhase": true,
+    "suitableForCooldown": false,
+    "generalPrecautionsFr": [
+      "Arrêtez si vous ressentez une gêne à l'épaule."
+    ],
+    "stopSignalsFr": [
+      "Douleur articulaire à l'épaule"
+    ],
+    "alternativeExerciseIds": [],
+    "media": [],
+    "quality": {
+      "status": "review_required",
+      "classificationReviewed": false
+    },
+    "enabled": true,
+    "suitablePhases": [
+      "dynamic",
+      "finish",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "rotation"
+    ],
+    "fatigueAreas": [
+      "shoulders",
+      "upper_back"
+    ],
+    "name": "Moulinets des bras debout",
+    "shortDescription": "Grands moulinets des bras alternés debout, pieds fixes, pour activer la circulation sans solliciter les jambes.",
+    "instructions": [
+      "Debout, pieds écartés à largeur des épaules, genoux légèrement fléchis.",
+      "Faites de grands cercles avec un bras à la fois, comme un moulin.",
+      "Alternez bras droit et bras gauche toutes les 5 rotations.",
+      "Gardez le tronc stable et les pieds ancrés au sol.",
+      "Augmentez progressivement la vitesse."
+    ],
+    "generalPrecautions": [
+      "Arrêtez si vous ressentez une gêne à l'épaule."
+    ],
+    "stopSignals": [
+      "Douleur articulaire à l'épaule"
+    ]
+  },
+  {
+    "id": "applaudissements-rythmes-assis",
+    "slug": "applaudissements-rythmes-assis",
+    "nameFr": "Applaudissements rythmés assis",
+    "nameEn": "Seated Rhythmic Clapping",
+    "shortDescriptionFr": "Applaudissements rapides devant et derrière le dos, assis, pour coordonner et activer le haut du corps.",
+    "instructionsFr": [
+      "Asseyez-vous dos droit, pieds à plat au sol.",
+      "Applaudissez devant vous à hauteur de poitrine.",
+      "Passez les mains derrière le dos et applaudissez.",
+      "Alternez devant/derrière à un rythme régulier.",
+      "Accélérez progressivement tout en restant coordonné."
+    ],
+    "breathingGuidanceFr": "Respirez naturellement, gardez un rythme régulier.",
+    "category": "coordination",
+    "tags": [
+      "coordination",
+      "bras",
+      "rythme",
+      "assis"
+    ],
+    "mode": "timed",
+    "defaultDurationSeconds": 30,
+    "restAfterSeconds": 10,
+    "difficulty": "very_easy",
+    "minimumEnergy": "low",
+    "maximumEnergy": "high",
+    "intensity": 2,
+    "impactLevel": "none",
+    "positions": [
+      "seated"
+    ],
+    "primaryBodyAreas": [
+      "shoulders",
+      "chest"
+    ],
+    "secondaryBodyAreas": [
+      "upper_back",
+      "forearms"
+    ],
+    "jointsUsed": [
+      "shoulder",
+      "elbow"
+    ],
+    "requiresUpperBody": true,
+    "requiresLowerBody": false,
+    "requiresArmSupport": false,
+    "requiresKneeSupport": false,
+    "requiresFloorTransition": false,
+    "unilateral": false,
+    "jumping": false,
+    "balanceRequired": false,
+    "compatibleWithUpperBodyDiscomfort": false,
+    "compatibleWithLowerBodyDiscomfort": true,
+    "suitableForGentleSession": true,
+    "suitableForWarmup": false,
+    "suitableForMainPhase": true,
+    "suitableForCooldown": false,
+    "generalPrecautionsFr": [
+      "Évitez si vous avez des douleurs aux poignets."
+    ],
+    "stopSignalsFr": [
+      "Douleur aux poignets ou aux épaules"
+    ],
+    "alternativeExerciseIds": [],
+    "media": [],
+    "quality": {
+      "status": "review_required",
+      "classificationReviewed": false
+    },
+    "enabled": true,
+    "suitablePhases": [
+      "dynamic"
+    ],
+    "movementPatterns": [
+      "balance"
+    ],
+    "fatigueAreas": [
+      "shoulders",
+      "chest"
+    ],
+    "name": "Applaudissements rythmés assis",
+    "shortDescription": "Applaudissements rapides devant et derrière le dos, assis, pour coordonner et activer le haut du corps.",
+    "instructions": [
+      "Asseyez-vous dos droit, pieds à plat au sol.",
+      "Applaudissez devant vous à hauteur de poitrine.",
+      "Passez les mains derrière le dos et applaudissez.",
+      "Alternez devant/derrière à un rythme régulier.",
+      "Accélérez progressivement tout en restant coordonné."
+    ],
+    "generalPrecautions": [
+      "Évitez si vous avez des douleurs aux poignets."
+    ],
+    "stopSignals": [
+      "Douleur aux poignets ou aux épaules"
+    ]
+  },
+  {
+    "id": "coordination-bras-jambe-croisee",
+    "slug": "coordination-bras-jambe-croisee",
+    "nameFr": "Coordination bras-jambe croisée",
+    "nameEn": "Cross-Body Arm-Leg Coordination",
+    "shortDescriptionFr": "Lever simultanément le bras droit et le genou gauche, puis inverser, pour stimuler la coordination neuromusculaire.",
+    "instructionsFr": [
+      "Debout, pieds écartés à largeur des hanches.",
+      "Levez le bras droit vers le ciel en levant le genou gauche devant vous.",
+      "Redescendez doucement et changez de côté.",
+      "Gardez un rythme lent et contrôlé.",
+      "Cherchez la fluidité, pas la vitesse."
+    ],
+    "breathingGuidanceFr": "Expirez en levant bras et genou, inspirez en redescendant.",
+    "category": "coordination",
+    "tags": [
+      "coordination",
+      "équilibre",
+      "debout",
+      "croisé"
+    ],
+    "mode": "timed",
+    "defaultDurationSeconds": 30,
+    "restAfterSeconds": 10,
+    "difficulty": "easy",
+    "minimumEnergy": "low",
+    "maximumEnergy": "high",
+    "intensity": 2,
+    "impactLevel": "none",
+    "positions": [
+      "standing"
+    ],
+    "primaryBodyAreas": [
+      "hip_flexors",
+      "shoulders",
+      "abdominals"
+    ],
+    "secondaryBodyAreas": [
+      "quadriceps",
+      "deep_core"
+    ],
+    "jointsUsed": [
+      "shoulder",
+      "hip",
+      "knee"
+    ],
+    "requiresUpperBody": false,
+    "requiresLowerBody": true,
+    "requiresArmSupport": false,
+    "requiresKneeSupport": false,
+    "requiresFloorTransition": false,
+    "unilateral": true,
+    "jumping": false,
+    "balanceRequired": true,
+    "compatibleWithUpperBodyDiscomfort": true,
+    "compatibleWithLowerBodyDiscomfort": false,
+    "suitableForGentleSession": true,
+    "suitableForWarmup": true,
+    "suitableForMainPhase": true,
+    "suitableForCooldown": false,
+    "generalPrecautionsFr": [
+      "Allez lentement si vous avez des problèmes d'équilibre."
+    ],
+    "stopSignalsFr": [
+      "Vertiges, perte d'équilibre répétée"
+    ],
+    "alternativeExerciseIds": [
+      "coordination-croisee-debout"
+    ],
+    "media": [],
+    "quality": {
+      "status": "review_required",
+      "classificationReviewed": false
+    },
+    "enabled": true,
+    "suitablePhases": [
+      "dynamic",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "balance"
+    ],
+    "fatigueAreas": [
+      "hip_flexors",
+      "shoulders",
+      "abdominals"
+    ],
+    "name": "Coordination bras-jambe croisée",
+    "shortDescription": "Lever simultanément le bras droit et le genou gauche, puis inverser, pour stimuler la coordination neuromusculaire.",
+    "instructions": [
+      "Debout, pieds écartés à largeur des hanches.",
+      "Levez le bras droit vers le ciel en levant le genou gauche devant vous.",
+      "Redescendez doucement et changez de côté.",
+      "Gardez un rythme lent et contrôlé.",
+      "Cherchez la fluidité, pas la vitesse."
+    ],
+    "generalPrecautions": [
+      "Allez lentement si vous avez des problèmes d'équilibre."
+    ],
+    "stopSignals": [
+      "Vertiges, perte d'équilibre répétée"
+    ]
+  },
+  {
+    "id": "marche-en-rythme-comptee",
+    "slug": "marche-en-rythme-comptee",
+    "nameFr": "Marche en rythme comptée",
+    "nameEn": "Counted Rhythmic Walking",
+    "shortDescriptionFr": "Marche sur place en comptant les pas, avec variations de rythme, pour réveiller le corps et l'esprit.",
+    "instructionsFr": [
+      "Marchez sur place en levant bien les genoux.",
+      "Comptez vos pas à voix haute ou mentalement : 1, 2, 3, 4.",
+      "Tous les 8 pas, changez le rythme : plus lent ou plus rapide.",
+      "Ajoutez des mouvements de bras en rythme si vous êtes à l'aise.",
+      "Gardez le dos droit et le regard devant vous."
+    ],
+    "breathingGuidanceFr": "Respirez au rythme de vos pas.",
+    "category": "gentle_cardio",
+    "tags": [
+      "marche",
+      "rythme",
+      "coordination",
+      "debout"
+    ],
+    "mode": "timed",
+    "defaultDurationSeconds": 30,
+    "restAfterSeconds": 10,
+    "difficulty": "very_easy",
+    "minimumEnergy": "very_low",
+    "maximumEnergy": "high",
+    "intensity": 1,
+    "impactLevel": "none",
+    "positions": [
+      "standing"
+    ],
+    "primaryBodyAreas": [
+      "hip_flexors",
+      "quadriceps",
+      "calves"
+    ],
+    "secondaryBodyAreas": [
+      "abdominals",
+      "shoulders"
+    ],
+    "jointsUsed": [
+      "hip",
+      "knee",
+      "ankle"
+    ],
+    "requiresUpperBody": false,
+    "requiresLowerBody": true,
+    "requiresArmSupport": false,
+    "requiresKneeSupport": false,
+    "requiresFloorTransition": false,
+    "unilateral": true,
+    "jumping": false,
+    "balanceRequired": false,
+    "compatibleWithUpperBodyDiscomfort": true,
+    "compatibleWithLowerBodyDiscomfort": false,
+    "suitableForGentleSession": true,
+    "suitableForWarmup": true,
+    "suitableForMainPhase": true,
+    "suitableForCooldown": true,
+    "generalPrecautionsFr": [
+      "Adaptez le rythme à votre niveau d'énergie."
+    ],
+    "stopSignalsFr": [
+      "Essoufflement excessif"
+    ],
+    "alternativeExerciseIds": [
+      "marche-sur-place"
+    ],
+    "media": [],
+    "quality": {
+      "status": "review_required",
+      "classificationReviewed": false
+    },
+    "enabled": true,
+    "suitablePhases": [
+      "dynamic",
+      "finish",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "locomotion"
+    ],
+    "fatigueAreas": [
+      "hip_flexors",
+      "quadriceps",
+      "calves"
+    ],
+    "name": "Marche en rythme comptée",
+    "shortDescription": "Marche sur place en comptant les pas, avec variations de rythme, pour réveiller le corps et l'esprit.",
+    "instructions": [
+      "Marchez sur place en levant bien les genoux.",
+      "Comptez vos pas à voix haute ou mentalement : 1, 2, 3, 4.",
+      "Tous les 8 pas, changez le rythme : plus lent ou plus rapide.",
+      "Ajoutez des mouvements de bras en rythme si vous êtes à l'aise.",
+      "Gardez le dos droit et le regard devant vous."
+    ],
+    "generalPrecautions": [
+      "Adaptez le rythme à votre niveau d'énergie."
+    ],
+    "stopSignals": [
+      "Essoufflement excessif"
+    ]
+  },
+  {
+    "id": "etirement-epaules-rotation-debout",
+    "slug": "etirement-epaules-rotation-debout",
+    "nameFr": "Étirement actif des épaules avec rotation",
+    "nameEn": "Active Shoulder Stretch with Rotation",
+    "shortDescriptionFr": "Étirement dynamique des épaules avec rotation du tronc debout, pour relâcher les tensions en douceur.",
+    "instructionsFr": [
+      "Debout, pieds écartés à largeur des épaules.",
+      "Tendez le bras droit devant vous et amenez-le vers la gauche en tournant le tronc.",
+      "Maintenez 3 secondes en respirant profondément.",
+      "Revenez au centre et changez de côté.",
+      "Faites le mouvement lentement et avec fluidité."
+    ],
+    "breathingGuidanceFr": "Inspirez au centre, expirez en rotation.",
+    "category": "light_stretching",
+    "tags": [
+      "étirement",
+      "épaules",
+      "rotation",
+      "debout"
+    ],
+    "mode": "timed",
+    "defaultDurationSeconds": 30,
+    "restAfterSeconds": 5,
+    "difficulty": "very_easy",
+    "minimumEnergy": "very_low",
+    "maximumEnergy": "high",
+    "intensity": 1,
+    "impactLevel": "none",
+    "positions": [
+      "standing"
+    ],
+    "primaryBodyAreas": [
+      "shoulders",
+      "upper_back"
+    ],
+    "secondaryBodyAreas": [
+      "obliques",
+      "chest"
+    ],
+    "jointsUsed": [
+      "shoulder",
+      "thoracic_spine"
+    ],
+    "requiresUpperBody": false,
+    "requiresLowerBody": false,
+    "requiresArmSupport": false,
+    "requiresKneeSupport": false,
+    "requiresFloorTransition": false,
+    "unilateral": true,
+    "jumping": false,
+    "balanceRequired": false,
+    "compatibleWithUpperBodyDiscomfort": true,
+    "compatibleWithLowerBodyDiscomfort": true,
+    "suitableForGentleSession": true,
+    "suitableForWarmup": true,
+    "suitableForMainPhase": false,
+    "suitableForCooldown": true,
+    "generalPrecautionsFr": [
+      "Ne forcez pas la rotation au-delà de votre confort."
+    ],
+    "stopSignalsFr": [
+      "Douleur à l'épaule"
+    ],
+    "alternativeExerciseIds": [],
+    "media": [],
+    "quality": {
+      "status": "review_required",
+      "classificationReviewed": false
+    },
+    "enabled": true,
+    "suitablePhases": [
+      "finish",
+      "mobility"
+    ],
+    "movementPatterns": [
+      "rotation",
+      "stretch"
+    ],
+    "fatigueAreas": [
+      "shoulders",
+      "upper_back"
+    ],
+    "name": "Étirement actif des épaules avec rotation",
+    "shortDescription": "Étirement dynamique des épaules avec rotation du tronc debout, pour relâcher les tensions en douceur.",
+    "instructions": [
+      "Debout, pieds écartés à largeur des épaules.",
+      "Tendez le bras droit devant vous et amenez-le vers la gauche en tournant le tronc.",
+      "Maintenez 3 secondes en respirant profondément.",
+      "Revenez au centre et changez de côté.",
+      "Faites le mouvement lentement et avec fluidité."
+    ],
+    "generalPrecautions": [
+      "Ne forcez pas la rotation au-delà de votre confort."
+    ],
+    "stopSignals": [
+      "Douleur à l'épaule"
+    ]
+  },
+  {
+    "id": "balancement-pendulaire-bras",
+    "slug": "balancement-pendulaire-bras",
+    "nameFr": "Balancement pendulaire des bras",
+    "nameEn": "Pendulum Arm Swings",
+    "shortDescriptionFr": "Balancements doux des bras d'avant en arrière debout, pour détendre les épaules et calmer le rythme.",
+    "instructionsFr": [
+      "Debout, pieds écartés à largeur des épaules, genoux souples.",
+      "Laissez vos bras pendre le long du corps.",
+      "Balancez doucement les bras d'avant en arrière comme un pendule.",
+      "Augmentez progressivement l'amplitude.",
+      "Laissez le mouvement être fluide et naturel."
+    ],
+    "breathingGuidanceFr": "Inspirez en balançant vers l'avant, expirez vers l'arrière.",
+    "category": "cooldown",
+    "tags": [
+      "détente",
+      "bras",
+      "épaules",
+      "debout",
+      "doux"
+    ],
+    "mode": "timed",
+    "defaultDurationSeconds": 30,
+    "restAfterSeconds": 0,
+    "difficulty": "very_easy",
+    "minimumEnergy": "very_low",
+    "maximumEnergy": "high",
+    "intensity": 1,
+    "impactLevel": "none",
+    "positions": [
+      "standing"
+    ],
+    "primaryBodyAreas": [
+      "shoulders"
+    ],
+    "secondaryBodyAreas": [
+      "upper_back",
+      "chest"
+    ],
+    "jointsUsed": [
+      "shoulder"
+    ],
+    "requiresUpperBody": false,
+    "requiresLowerBody": false,
+    "requiresArmSupport": false,
+    "requiresKneeSupport": false,
+    "requiresFloorTransition": false,
+    "unilateral": false,
+    "jumping": false,
+    "balanceRequired": false,
+    "compatibleWithUpperBodyDiscomfort": true,
+    "compatibleWithLowerBodyDiscomfort": true,
+    "suitableForGentleSession": true,
+    "suitableForWarmup": false,
+    "suitableForMainPhase": false,
+    "suitableForCooldown": true,
+    "generalPrecautionsFr": [
+      "Mouvement libre, pas de résistance."
+    ],
+    "stopSignalsFr": [
+      "Douleur à l'épaule"
+    ],
+    "alternativeExerciseIds": [],
+    "media": [],
+    "quality": {
+      "status": "review_required",
+      "classificationReviewed": false
+    },
+    "enabled": true,
+    "suitablePhases": [
+      "finish"
+    ],
+    "movementPatterns": [
+      "stretch"
+    ],
+    "fatigueAreas": [
+      "shoulders"
+    ],
+    "name": "Balancement pendulaire des bras",
+    "shortDescription": "Balancements doux des bras d'avant en arrière debout, pour détendre les épaules et calmer le rythme.",
+    "instructions": [
+      "Debout, pieds écartés à largeur des épaules, genoux souples.",
+      "Laissez vos bras pendre le long du corps.",
+      "Balancez doucement les bras d'avant en arrière comme un pendule.",
+      "Augmentez progressivement l'amplitude.",
+      "Laissez le mouvement être fluide et naturel."
+    ],
+    "generalPrecautions": [
+      "Mouvement libre, pas de résistance."
+    ],
+    "stopSignals": [
+      "Douleur à l'épaule"
+    ]
+  },
+  {
+    "id": "marche-lente-consciente",
+    "slug": "marche-lente-consciente",
+    "nameFr": "Marche lente consciente",
+    "nameEn": "Mindful Slow Walking",
+    "shortDescriptionFr": "Marche très lente sur place en portant attention à chaque appui, pour un retour au calme en pleine conscience.",
+    "instructionsFr": [
+      "Debout, pieds joints, mains le long du corps ou sur les hanches.",
+      "Décollez très lentement le pied droit du sol.",
+      "Posez-le devant vous en déroulant le pied : talon, plante, orteils.",
+      "Ressentez chaque phase du pas avant de changer de côté.",
+      "Gardez un rythme très lent et méditatif."
+    ],
+    "breathingGuidanceFr": "Inspirez en levant le pied, expirez en le posant.",
+    "category": "cooldown",
+    "tags": [
+      "marche",
+      "pleine-conscience",
+      "debout",
+      "calme"
+    ],
+    "mode": "timed",
+    "defaultDurationSeconds": 30,
+    "restAfterSeconds": 0,
+    "difficulty": "very_easy",
+    "minimumEnergy": "very_low",
+    "maximumEnergy": "medium",
+    "intensity": 1,
+    "impactLevel": "none",
+    "positions": [
+      "standing"
+    ],
+    "primaryBodyAreas": [
+      "calves",
+      "ankles",
+      "feet"
+    ],
+    "secondaryBodyAreas": [
+      "hip_flexors",
+      "quadriceps"
+    ],
+    "jointsUsed": [
+      "hip",
+      "knee",
+      "ankle"
+    ],
+    "requiresUpperBody": false,
+    "requiresLowerBody": true,
+    "requiresArmSupport": false,
+    "requiresKneeSupport": false,
+    "requiresFloorTransition": false,
+    "unilateral": true,
+    "jumping": false,
+    "balanceRequired": true,
+    "compatibleWithUpperBodyDiscomfort": true,
+    "compatibleWithLowerBodyDiscomfort": false,
+    "suitableForGentleSession": true,
+    "suitableForWarmup": false,
+    "suitableForMainPhase": false,
+    "suitableForCooldown": true,
+    "generalPrecautionsFr": [
+      "Allez à votre propre rythme."
+    ],
+    "stopSignalsFr": [
+      "Perte d'équilibre"
+    ],
+    "alternativeExerciseIds": [
+      "marche-sur-place"
+    ],
+    "media": [],
+    "quality": {
+      "status": "review_required",
+      "classificationReviewed": false
+    },
+    "enabled": true,
+    "suitablePhases": [
+      "finish"
+    ],
+    "movementPatterns": [
+      "balance",
+      "locomotion",
+      "stretch"
+    ],
+    "fatigueAreas": [
+      "calves",
+      "ankles",
+      "feet"
+    ],
+    "name": "Marche lente consciente",
+    "shortDescription": "Marche très lente sur place en portant attention à chaque appui, pour un retour au calme en pleine conscience.",
+    "instructions": [
+      "Debout, pieds joints, mains le long du corps ou sur les hanches.",
+      "Décollez très lentement le pied droit du sol.",
+      "Posez-le devant vous en déroulant le pied : talon, plante, orteils.",
+      "Ressentez chaque phase du pas avant de changer de côté.",
+      "Gardez un rythme très lent et méditatif."
+    ],
+    "generalPrecautions": [
+      "Allez à votre propre rythme."
+    ],
+    "stopSignals": [
+      "Perte d'équilibre"
+    ]
+  },
+  {
+    "id": "tapotements-corps-debout",
+    "slug": "tapotements-corps-debout",
+    "nameFr": "Tapotements doux du corps",
+    "nameEn": "Gentle Body Tapping",
+    "shortDescriptionFr": "Tapotements légers sur tout le corps debout pour éveiller la circulation et les sensations corporelles.",
+    "instructionsFr": [
+      "Debout, pieds à largeur des hanches.",
+      "Tapotez doucement vos bras avec la paume ouverte, du poignet à l'épaule.",
+      "Descendez le long du torse, des côtes, puis des cuisses.",
+      "Remontez par l'arrière des jambes, le bas du dos et les épaules.",
+      "Terminez par des tapotements légers sur le visage et le cuir chevelu."
+    ],
+    "breathingGuidanceFr": "Respirez naturellement, appréciez les sensations.",
+    "category": "gentle_wakeup",
+    "tags": [
+      "réveil",
+      "sensoriel",
+      "circulation",
+      "debout"
+    ],
+    "mode": "timed",
+    "defaultDurationSeconds": 30,
+    "restAfterSeconds": 5,
+    "difficulty": "very_easy",
+    "minimumEnergy": "very_low",
+    "maximumEnergy": "high",
+    "intensity": 1,
+    "impactLevel": "none",
+    "positions": [
+      "standing"
+    ],
+    "primaryBodyAreas": [
+      "shoulders",
+      "chest",
+      "quadriceps"
+    ],
+    "secondaryBodyAreas": [
+      "upper_back",
+      "calves",
+      "forearms"
+    ],
+    "jointsUsed": [
+      "shoulder",
+      "elbow",
+      "wrist"
+    ],
+    "requiresUpperBody": false,
+    "requiresLowerBody": false,
+    "requiresArmSupport": false,
+    "requiresKneeSupport": false,
+    "requiresFloorTransition": false,
+    "unilateral": false,
+    "jumping": false,
+    "balanceRequired": false,
+    "compatibleWithUpperBodyDiscomfort": true,
+    "compatibleWithLowerBodyDiscomfort": true,
+    "suitableForGentleSession": true,
+    "suitableForWarmup": true,
+    "suitableForMainPhase": false,
+    "suitableForCooldown": false,
+    "generalPrecautionsFr": [
+      "Tapotez avec douceur, jamais de coups forts."
+    ],
+    "stopSignalsFr": [
+      "Inconfort sur une zone sensible"
+    ],
+    "alternativeExerciseIds": [],
+    "media": [],
+    "quality": {
+      "status": "review_required",
+      "classificationReviewed": false
+    },
+    "enabled": true,
+    "suitablePhases": [
+      "wakeup",
+      "finish"
+    ],
+    "movementPatterns": [
+      "posture"
+    ],
+    "fatigueAreas": [
+      "shoulders",
+      "chest",
+      "quadriceps"
+    ],
+    "name": "Tapotements doux du corps",
+    "shortDescription": "Tapotements légers sur tout le corps debout pour éveiller la circulation et les sensations corporelles.",
+    "instructions": [
+      "Debout, pieds à largeur des hanches.",
+      "Tapotez doucement vos bras avec la paume ouverte, du poignet à l'épaule.",
+      "Descendez le long du torse, des côtes, puis des cuisses.",
+      "Remontez par l'arrière des jambes, le bas du dos et les épaules.",
+      "Terminez par des tapotements légers sur le visage et le cuir chevelu."
+    ],
+    "generalPrecautions": [
+      "Tapotez avec douceur, jamais de coups forts."
+    ],
+    "stopSignals": [
+      "Inconfort sur une zone sensible"
+    ]
+  },
+  {
+    "id": "baillements-actifs",
+    "slug": "baillements-actifs",
+    "nameFr": "Bâillements actifs avec ouverture des bras",
+    "nameEn": "Active Yawning with Arm Opening",
+    "shortDescriptionFr": "Bâillements volontaires avec grande ouverture des bras pour oxygéner le corps et relâcher les tensions matinales.",
+    "instructionsFr": [
+      "Debout ou assis, prenez une grande inspiration par la bouche en ouvrant grand les bras sur les côtés.",
+      "Simulez un grand bâillement en laissant la mâchoire s'ouvrir largement.",
+      "Expirez lentement en ramenant les bras le long du corps.",
+      "Répétez 5 à 8 fois en prenant votre temps.",
+      "Laissez le bâillement devenir naturel si possible."
+    ],
+    "breathingGuidanceFr": "Grande inspiration par la bouche en ouvrant les bras, expiration lente en fermant.",
+    "category": "breathing",
+    "tags": [
+      "respiration",
+      "réveil",
+      "relaxation",
+      "bâillement"
+    ],
+    "mode": "breathing",
+    "defaultDurationSeconds": 30,
+    "restAfterSeconds": 5,
+    "difficulty": "very_easy",
+    "minimumEnergy": "very_low",
+    "maximumEnergy": "high",
+    "intensity": 1,
+    "impactLevel": "none",
+    "positions": [
+      "standing",
+      "seated"
+    ],
+    "primaryBodyAreas": [
+      "diaphragm",
+      "chest"
+    ],
+    "secondaryBodyAreas": [
+      "shoulders",
+      "neck"
+    ],
+    "jointsUsed": [
+      "shoulder"
+    ],
+    "requiresUpperBody": false,
+    "requiresLowerBody": false,
+    "requiresArmSupport": false,
+    "requiresKneeSupport": false,
+    "requiresFloorTransition": false,
+    "unilateral": false,
+    "jumping": false,
+    "balanceRequired": false,
+    "compatibleWithUpperBodyDiscomfort": true,
+    "compatibleWithLowerBodyDiscomfort": true,
+    "suitableForGentleSession": true,
+    "suitableForWarmup": true,
+    "suitableForMainPhase": false,
+    "suitableForCooldown": true,
+    "generalPrecautionsFr": [
+      "Ne forcez pas l'ouverture de la mâchoire si vous avez des problèmes d'ATM."
+    ],
+    "stopSignalsFr": [
+      "Douleur à la mâchoire"
+    ],
+    "alternativeExerciseIds": [
+      "soupir-physiologique"
+    ],
+    "media": [],
+    "quality": {
+      "status": "review_required",
+      "classificationReviewed": false
+    },
+    "enabled": true,
+    "suitablePhases": [
+      "wakeup",
+      "finish"
+    ],
+    "movementPatterns": [
+      "breathing"
+    ],
+    "fatigueAreas": [
+      "diaphragm",
+      "chest"
+    ],
+    "name": "Bâillements actifs avec ouverture des bras",
+    "shortDescription": "Bâillements volontaires avec grande ouverture des bras pour oxygéner le corps et relâcher les tensions matinales.",
+    "instructions": [
+      "Debout ou assis, prenez une grande inspiration par la bouche en ouvrant grand les bras sur les côtés.",
+      "Simulez un grand bâillement en laissant la mâchoire s'ouvrir largement.",
+      "Expirez lentement en ramenant les bras le long du corps.",
+      "Répétez 5 à 8 fois en prenant votre temps.",
+      "Laissez le bâillement devenir naturel si possible."
+    ],
+    "generalPrecautions": [
+      "Ne forcez pas l'ouverture de la mâchoire si vous avez des problèmes d'ATM."
+    ],
+    "stopSignals": [
+      "Douleur à la mâchoire"
+    ]
+  },
+  {
+    "id": "pompes-lentes-genoux",
+    "slug": "pompes-lentes-genoux",
+    "nameFr": "Pompes lentes sur les genoux",
+    "nameEn": "Slow Knee Push-ups",
+    "shortDescriptionFr": "Pompes contrôlées sur les genoux en tempo lent pour renforcer la poitrine et les bras sans solliciter les jambes.",
+    "instructionsFr": [
+      "Placez-vous à quatre pattes, mains sous les épaules, genoux au sol.",
+      "Croisez les chevilles derrière vous et engagez les abdominaux.",
+      "Descendez le torse vers le sol en 3 secondes.",
+      "Remontez en 3 secondes en poussant dans les paumes.",
+      "Gardez le corps aligné des genoux aux épaules."
+    ],
+    "breathingGuidanceFr": "Inspirez en descendant, expirez en remontant.",
+    "category": "upper_body_strength",
+    "tags": [
+      "pompes",
+      "push",
+      "poitrine",
+      "bras",
+      "lent"
+    ],
+    "mode": "repetitions",
+    "defaultDurationSeconds": 30,
+    "defaultRepetitions": 8,
+    "restAfterSeconds": 10,
+    "difficulty": "easy",
+    "minimumEnergy": "low",
+    "maximumEnergy": "high",
+    "intensity": 3,
+    "impactLevel": "none",
+    "positions": [
+      "kneeling"
+    ],
+    "primaryBodyAreas": [
+      "chest",
+      "triceps",
+      "shoulders"
+    ],
+    "secondaryBodyAreas": [
+      "abdominals",
+      "deep_core"
+    ],
+    "jointsUsed": [
+      "shoulder",
+      "elbow",
+      "wrist"
+    ],
+    "requiresUpperBody": true,
+    "requiresLowerBody": false,
+    "requiresArmSupport": true,
+    "requiresWristSupport": true,
+    "requiresKneeSupport": true,
+    "requiresFloorTransition": true,
+    "unilateral": false,
+    "jumping": false,
+    "balanceRequired": false,
+    "compatibleWithUpperBodyDiscomfort": false,
+    "compatibleWithLowerBodyDiscomfort": true,
+    "suitableForGentleSession": false,
+    "suitableForWarmup": false,
+    "suitableForMainPhase": true,
+    "suitableForCooldown": false,
+    "generalPrecautionsFr": [
+      "Arrêtez si douleur aux poignets. Utilisez un tapis sous les genoux."
+    ],
+    "stopSignalsFr": [
+      "Douleur aux poignets, aux épaules ou aux genoux"
+    ],
+    "alternativeExerciseIds": [],
+    "media": [],
+    "quality": {
+      "status": "review_required",
+      "classificationReviewed": false
+    },
+    "enabled": true,
+    "suitablePhases": [
+      "activation"
+    ],
+    "movementPatterns": [
+      "push"
+    ],
+    "fatigueAreas": [
+      "chest",
+      "triceps",
+      "shoulders"
+    ],
+    "name": "Pompes lentes sur les genoux",
+    "shortDescription": "Pompes contrôlées sur les genoux en tempo lent pour renforcer la poitrine et les bras sans solliciter les jambes.",
+    "instructions": [
+      "Placez-vous à quatre pattes, mains sous les épaules, genoux au sol.",
+      "Croisez les chevilles derrière vous et engagez les abdominaux.",
+      "Descendez le torse vers le sol en 3 secondes.",
+      "Remontez en 3 secondes en poussant dans les paumes.",
+      "Gardez le corps aligné des genoux aux épaules."
+    ],
+    "generalPrecautions": [
+      "Arrêtez si douleur aux poignets. Utilisez un tapis sous les genoux."
+    ],
+    "stopSignals": [
+      "Douleur aux poignets, aux épaules ou aux genoux"
     ]
   }
 ];

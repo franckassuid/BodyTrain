@@ -14250,5 +14250,820 @@
       "mediaReviewed": false
     },
     "enabled": true
+  },
+  {
+    "id": "boxe-en-ombre-assise",
+    "slug": "boxe-en-ombre-assise",
+    "nameFr": "Boxe en ombre assise",
+    "nameEn": "Seated Shadow Boxing",
+    "shortDescriptionFr": "Enchaînements de coups de poing rapides assis, pour activer le haut du corps sans solliciter les jambes.",
+    "instructionsFr": [
+      "Asseyez-vous au bord de la chaise, dos droit, pieds à plat au sol.",
+      "Engagez les abdominaux pour stabiliser le tronc.",
+      "Enchaînez des jabs, crochets et uppercuts alternés à un rythme soutenu.",
+      "Gardez les épaules basses et respirez régulièrement.",
+      "Variez la vitesse et les combinaisons selon votre énergie."
+    ],
+    "breathingGuidanceFr": "Expirez à chaque coup de poing, inspirez entre les enchaînements.",
+    "category": "gentle_cardio",
+    "tags": [
+      "cardio",
+      "bras",
+      "coordination",
+      "assis"
+    ],
+    "mode": "timed",
+    "defaultDurationSeconds": 30,
+    "restAfterSeconds": 10,
+    "difficulty": "easy",
+    "minimumEnergy": "low",
+    "maximumEnergy": "high",
+    "intensity": 3,
+    "impactLevel": "none",
+    "positions": [
+      "seated"
+    ],
+    "primaryBodyAreas": [
+      "shoulders",
+      "chest",
+      "triceps"
+    ],
+    "secondaryBodyAreas": [
+      "abdominals",
+      "obliques",
+      "biceps"
+    ],
+    "jointsUsed": [
+      "shoulder",
+      "elbow"
+    ],
+    "requiresUpperBody": true,
+    "requiresLowerBody": false,
+    "requiresArmSupport": false,
+    "requiresKneeSupport": false,
+    "requiresFloorTransition": false,
+    "unilateral": false,
+    "jumping": false,
+    "balanceRequired": false,
+    "compatibleWithUpperBodyDiscomfort": false,
+    "compatibleWithLowerBodyDiscomfort": true,
+    "suitableForGentleSession": false,
+    "suitableForWarmup": false,
+    "suitableForMainPhase": true,
+    "suitableForCooldown": false,
+    "generalPrecautionsFr": [
+      "Ne lancez pas les bras au maximum de leur extension pour préserver les coudes."
+    ],
+    "stopSignalsFr": [
+      "Douleur à l'épaule ou au coude"
+    ],
+    "alternativeExerciseIds": [],
+    "media": [],
+    "quality": {
+      "status": "review_required",
+      "classificationReviewed": false
+    },
+    "enabled": true
+  },
+  {
+    "id": "moulinets-des-bras-debout",
+    "slug": "moulinets-des-bras-debout",
+    "nameFr": "Moulinets des bras debout",
+    "nameEn": "Standing Arm Windmills",
+    "shortDescriptionFr": "Grands moulinets des bras alternés debout, pieds fixes, pour activer la circulation sans solliciter les jambes.",
+    "instructionsFr": [
+      "Debout, pieds écartés à largeur des épaules, genoux légèrement fléchis.",
+      "Faites de grands cercles avec un bras à la fois, comme un moulin.",
+      "Alternez bras droit et bras gauche toutes les 5 rotations.",
+      "Gardez le tronc stable et les pieds ancrés au sol.",
+      "Augmentez progressivement la vitesse."
+    ],
+    "breathingGuidanceFr": "Respirez naturellement, expirez en accélérant.",
+    "category": "gentle_cardio",
+    "tags": [
+      "cardio",
+      "bras",
+      "épaules",
+      "coordination",
+      "debout"
+    ],
+    "mode": "timed",
+    "defaultDurationSeconds": 30,
+    "restAfterSeconds": 10,
+    "difficulty": "very_easy",
+    "minimumEnergy": "low",
+    "maximumEnergy": "high",
+    "intensity": 2,
+    "impactLevel": "none",
+    "positions": [
+      "standing"
+    ],
+    "primaryBodyAreas": [
+      "shoulders",
+      "upper_back"
+    ],
+    "secondaryBodyAreas": [
+      "chest",
+      "lats"
+    ],
+    "jointsUsed": [
+      "shoulder"
+    ],
+    "requiresUpperBody": true,
+    "requiresLowerBody": false,
+    "requiresArmSupport": false,
+    "requiresKneeSupport": false,
+    "requiresFloorTransition": false,
+    "unilateral": true,
+    "jumping": false,
+    "balanceRequired": false,
+    "compatibleWithUpperBodyDiscomfort": false,
+    "compatibleWithLowerBodyDiscomfort": true,
+    "suitableForGentleSession": true,
+    "suitableForWarmup": true,
+    "suitableForMainPhase": true,
+    "suitableForCooldown": false,
+    "generalPrecautionsFr": [
+      "Arrêtez si vous ressentez une gêne à l'épaule."
+    ],
+    "stopSignalsFr": [
+      "Douleur articulaire à l'épaule"
+    ],
+    "alternativeExerciseIds": [],
+    "media": [],
+    "quality": {
+      "status": "review_required",
+      "classificationReviewed": false
+    },
+    "enabled": true
+  },
+  {
+    "id": "applaudissements-rythmes-assis",
+    "slug": "applaudissements-rythmes-assis",
+    "nameFr": "Applaudissements rythmés assis",
+    "nameEn": "Seated Rhythmic Clapping",
+    "shortDescriptionFr": "Applaudissements rapides devant et derrière le dos, assis, pour coordonner et activer le haut du corps.",
+    "instructionsFr": [
+      "Asseyez-vous dos droit, pieds à plat au sol.",
+      "Applaudissez devant vous à hauteur de poitrine.",
+      "Passez les mains derrière le dos et applaudissez.",
+      "Alternez devant/derrière à un rythme régulier.",
+      "Accélérez progressivement tout en restant coordonné."
+    ],
+    "breathingGuidanceFr": "Respirez naturellement, gardez un rythme régulier.",
+    "category": "coordination",
+    "tags": [
+      "coordination",
+      "bras",
+      "rythme",
+      "assis"
+    ],
+    "mode": "timed",
+    "defaultDurationSeconds": 30,
+    "restAfterSeconds": 10,
+    "difficulty": "very_easy",
+    "minimumEnergy": "low",
+    "maximumEnergy": "high",
+    "intensity": 2,
+    "impactLevel": "none",
+    "positions": [
+      "seated"
+    ],
+    "primaryBodyAreas": [
+      "shoulders",
+      "chest"
+    ],
+    "secondaryBodyAreas": [
+      "upper_back",
+      "forearms"
+    ],
+    "jointsUsed": [
+      "shoulder",
+      "elbow"
+    ],
+    "requiresUpperBody": true,
+    "requiresLowerBody": false,
+    "requiresArmSupport": false,
+    "requiresKneeSupport": false,
+    "requiresFloorTransition": false,
+    "unilateral": false,
+    "jumping": false,
+    "balanceRequired": false,
+    "compatibleWithUpperBodyDiscomfort": false,
+    "compatibleWithLowerBodyDiscomfort": true,
+    "suitableForGentleSession": true,
+    "suitableForWarmup": false,
+    "suitableForMainPhase": true,
+    "suitableForCooldown": false,
+    "generalPrecautionsFr": [
+      "Évitez si vous avez des douleurs aux poignets."
+    ],
+    "stopSignalsFr": [
+      "Douleur aux poignets ou aux épaules"
+    ],
+    "alternativeExerciseIds": [],
+    "media": [],
+    "quality": {
+      "status": "review_required",
+      "classificationReviewed": false
+    },
+    "enabled": true
+  },
+  {
+    "id": "coordination-bras-jambe-croisee",
+    "slug": "coordination-bras-jambe-croisee",
+    "nameFr": "Coordination bras-jambe croisée",
+    "nameEn": "Cross-Body Arm-Leg Coordination",
+    "shortDescriptionFr": "Lever simultanément le bras droit et le genou gauche, puis inverser, pour stimuler la coordination neuromusculaire.",
+    "instructionsFr": [
+      "Debout, pieds écartés à largeur des hanches.",
+      "Levez le bras droit vers le ciel en levant le genou gauche devant vous.",
+      "Redescendez doucement et changez de côté.",
+      "Gardez un rythme lent et contrôlé.",
+      "Cherchez la fluidité, pas la vitesse."
+    ],
+    "breathingGuidanceFr": "Expirez en levant bras et genou, inspirez en redescendant.",
+    "category": "coordination",
+    "tags": [
+      "coordination",
+      "équilibre",
+      "debout",
+      "croisé"
+    ],
+    "mode": "timed",
+    "defaultDurationSeconds": 30,
+    "restAfterSeconds": 10,
+    "difficulty": "easy",
+    "minimumEnergy": "low",
+    "maximumEnergy": "high",
+    "intensity": 2,
+    "impactLevel": "none",
+    "positions": [
+      "standing"
+    ],
+    "primaryBodyAreas": [
+      "hip_flexors",
+      "shoulders",
+      "abdominals"
+    ],
+    "secondaryBodyAreas": [
+      "quadriceps",
+      "deep_core"
+    ],
+    "jointsUsed": [
+      "shoulder",
+      "hip",
+      "knee"
+    ],
+    "requiresUpperBody": false,
+    "requiresLowerBody": true,
+    "requiresArmSupport": false,
+    "requiresKneeSupport": false,
+    "requiresFloorTransition": false,
+    "unilateral": true,
+    "jumping": false,
+    "balanceRequired": true,
+    "compatibleWithUpperBodyDiscomfort": true,
+    "compatibleWithLowerBodyDiscomfort": false,
+    "suitableForGentleSession": true,
+    "suitableForWarmup": true,
+    "suitableForMainPhase": true,
+    "suitableForCooldown": false,
+    "generalPrecautionsFr": [
+      "Allez lentement si vous avez des problèmes d'équilibre."
+    ],
+    "stopSignalsFr": [
+      "Vertiges, perte d'équilibre répétée"
+    ],
+    "alternativeExerciseIds": [
+      "coordination-croisee-debout"
+    ],
+    "media": [],
+    "quality": {
+      "status": "review_required",
+      "classificationReviewed": false
+    },
+    "enabled": true
+  },
+  {
+    "id": "marche-en-rythme-comptee",
+    "slug": "marche-en-rythme-comptee",
+    "nameFr": "Marche en rythme comptée",
+    "nameEn": "Counted Rhythmic Walking",
+    "shortDescriptionFr": "Marche sur place en comptant les pas, avec variations de rythme, pour réveiller le corps et l'esprit.",
+    "instructionsFr": [
+      "Marchez sur place en levant bien les genoux.",
+      "Comptez vos pas à voix haute ou mentalement : 1, 2, 3, 4.",
+      "Tous les 8 pas, changez le rythme : plus lent ou plus rapide.",
+      "Ajoutez des mouvements de bras en rythme si vous êtes à l'aise.",
+      "Gardez le dos droit et le regard devant vous."
+    ],
+    "breathingGuidanceFr": "Respirez au rythme de vos pas.",
+    "category": "gentle_cardio",
+    "tags": [
+      "marche",
+      "rythme",
+      "coordination",
+      "debout"
+    ],
+    "mode": "timed",
+    "defaultDurationSeconds": 30,
+    "restAfterSeconds": 10,
+    "difficulty": "very_easy",
+    "minimumEnergy": "very_low",
+    "maximumEnergy": "high",
+    "intensity": 1,
+    "impactLevel": "none",
+    "positions": [
+      "standing"
+    ],
+    "primaryBodyAreas": [
+      "hip_flexors",
+      "quadriceps",
+      "calves"
+    ],
+    "secondaryBodyAreas": [
+      "abdominals",
+      "shoulders"
+    ],
+    "jointsUsed": [
+      "hip",
+      "knee",
+      "ankle"
+    ],
+    "requiresUpperBody": false,
+    "requiresLowerBody": true,
+    "requiresArmSupport": false,
+    "requiresKneeSupport": false,
+    "requiresFloorTransition": false,
+    "unilateral": true,
+    "jumping": false,
+    "balanceRequired": false,
+    "compatibleWithUpperBodyDiscomfort": true,
+    "compatibleWithLowerBodyDiscomfort": false,
+    "suitableForGentleSession": true,
+    "suitableForWarmup": true,
+    "suitableForMainPhase": true,
+    "suitableForCooldown": true,
+    "generalPrecautionsFr": [
+      "Adaptez le rythme à votre niveau d'énergie."
+    ],
+    "stopSignalsFr": [
+      "Essoufflement excessif"
+    ],
+    "alternativeExerciseIds": [
+      "marche-sur-place"
+    ],
+    "media": [],
+    "quality": {
+      "status": "review_required",
+      "classificationReviewed": false
+    },
+    "enabled": true
+  },
+  {
+    "id": "etirement-epaules-rotation-debout",
+    "slug": "etirement-epaules-rotation-debout",
+    "nameFr": "Étirement actif des épaules avec rotation",
+    "nameEn": "Active Shoulder Stretch with Rotation",
+    "shortDescriptionFr": "Étirement dynamique des épaules avec rotation du tronc debout, pour relâcher les tensions en douceur.",
+    "instructionsFr": [
+      "Debout, pieds écartés à largeur des épaules.",
+      "Tendez le bras droit devant vous et amenez-le vers la gauche en tournant le tronc.",
+      "Maintenez 3 secondes en respirant profondément.",
+      "Revenez au centre et changez de côté.",
+      "Faites le mouvement lentement et avec fluidité."
+    ],
+    "breathingGuidanceFr": "Inspirez au centre, expirez en rotation.",
+    "category": "light_stretching",
+    "tags": [
+      "étirement",
+      "épaules",
+      "rotation",
+      "debout"
+    ],
+    "mode": "timed",
+    "defaultDurationSeconds": 30,
+    "restAfterSeconds": 5,
+    "difficulty": "very_easy",
+    "minimumEnergy": "very_low",
+    "maximumEnergy": "high",
+    "intensity": 1,
+    "impactLevel": "none",
+    "positions": [
+      "standing"
+    ],
+    "primaryBodyAreas": [
+      "shoulders",
+      "upper_back"
+    ],
+    "secondaryBodyAreas": [
+      "obliques",
+      "chest"
+    ],
+    "jointsUsed": [
+      "shoulder",
+      "thoracic_spine"
+    ],
+    "requiresUpperBody": false,
+    "requiresLowerBody": false,
+    "requiresArmSupport": false,
+    "requiresKneeSupport": false,
+    "requiresFloorTransition": false,
+    "unilateral": true,
+    "jumping": false,
+    "balanceRequired": false,
+    "compatibleWithUpperBodyDiscomfort": true,
+    "compatibleWithLowerBodyDiscomfort": true,
+    "suitableForGentleSession": true,
+    "suitableForWarmup": true,
+    "suitableForMainPhase": false,
+    "suitableForCooldown": true,
+    "generalPrecautionsFr": [
+      "Ne forcez pas la rotation au-delà de votre confort."
+    ],
+    "stopSignalsFr": [
+      "Douleur à l'épaule"
+    ],
+    "alternativeExerciseIds": [],
+    "media": [],
+    "quality": {
+      "status": "review_required",
+      "classificationReviewed": false
+    },
+    "enabled": true
+  },
+  {
+    "id": "balancement-pendulaire-bras",
+    "slug": "balancement-pendulaire-bras",
+    "nameFr": "Balancement pendulaire des bras",
+    "nameEn": "Pendulum Arm Swings",
+    "shortDescriptionFr": "Balancements doux des bras d'avant en arrière debout, pour détendre les épaules et calmer le rythme.",
+    "instructionsFr": [
+      "Debout, pieds écartés à largeur des épaules, genoux souples.",
+      "Laissez vos bras pendre le long du corps.",
+      "Balancez doucement les bras d'avant en arrière comme un pendule.",
+      "Augmentez progressivement l'amplitude.",
+      "Laissez le mouvement être fluide et naturel."
+    ],
+    "breathingGuidanceFr": "Inspirez en balançant vers l'avant, expirez vers l'arrière.",
+    "category": "cooldown",
+    "tags": [
+      "détente",
+      "bras",
+      "épaules",
+      "debout",
+      "doux"
+    ],
+    "mode": "timed",
+    "defaultDurationSeconds": 30,
+    "restAfterSeconds": 0,
+    "difficulty": "very_easy",
+    "minimumEnergy": "very_low",
+    "maximumEnergy": "high",
+    "intensity": 1,
+    "impactLevel": "none",
+    "positions": [
+      "standing"
+    ],
+    "primaryBodyAreas": [
+      "shoulders"
+    ],
+    "secondaryBodyAreas": [
+      "upper_back",
+      "chest"
+    ],
+    "jointsUsed": [
+      "shoulder"
+    ],
+    "requiresUpperBody": false,
+    "requiresLowerBody": false,
+    "requiresArmSupport": false,
+    "requiresKneeSupport": false,
+    "requiresFloorTransition": false,
+    "unilateral": false,
+    "jumping": false,
+    "balanceRequired": false,
+    "compatibleWithUpperBodyDiscomfort": true,
+    "compatibleWithLowerBodyDiscomfort": true,
+    "suitableForGentleSession": true,
+    "suitableForWarmup": false,
+    "suitableForMainPhase": false,
+    "suitableForCooldown": true,
+    "generalPrecautionsFr": [
+      "Mouvement libre, pas de résistance."
+    ],
+    "stopSignalsFr": [
+      "Douleur à l'épaule"
+    ],
+    "alternativeExerciseIds": [],
+    "media": [],
+    "quality": {
+      "status": "review_required",
+      "classificationReviewed": false
+    },
+    "enabled": true
+  },
+  {
+    "id": "marche-lente-consciente",
+    "slug": "marche-lente-consciente",
+    "nameFr": "Marche lente consciente",
+    "nameEn": "Mindful Slow Walking",
+    "shortDescriptionFr": "Marche très lente sur place en portant attention à chaque appui, pour un retour au calme en pleine conscience.",
+    "instructionsFr": [
+      "Debout, pieds joints, mains le long du corps ou sur les hanches.",
+      "Décollez très lentement le pied droit du sol.",
+      "Posez-le devant vous en déroulant le pied : talon, plante, orteils.",
+      "Ressentez chaque phase du pas avant de changer de côté.",
+      "Gardez un rythme très lent et méditatif."
+    ],
+    "breathingGuidanceFr": "Inspirez en levant le pied, expirez en le posant.",
+    "category": "cooldown",
+    "tags": [
+      "marche",
+      "pleine-conscience",
+      "debout",
+      "calme"
+    ],
+    "mode": "timed",
+    "defaultDurationSeconds": 30,
+    "restAfterSeconds": 0,
+    "difficulty": "very_easy",
+    "minimumEnergy": "very_low",
+    "maximumEnergy": "medium",
+    "intensity": 1,
+    "impactLevel": "none",
+    "positions": [
+      "standing"
+    ],
+    "primaryBodyAreas": [
+      "calves",
+      "ankles",
+      "feet"
+    ],
+    "secondaryBodyAreas": [
+      "hip_flexors",
+      "quadriceps"
+    ],
+    "jointsUsed": [
+      "hip",
+      "knee",
+      "ankle"
+    ],
+    "requiresUpperBody": false,
+    "requiresLowerBody": true,
+    "requiresArmSupport": false,
+    "requiresKneeSupport": false,
+    "requiresFloorTransition": false,
+    "unilateral": true,
+    "jumping": false,
+    "balanceRequired": true,
+    "compatibleWithUpperBodyDiscomfort": true,
+    "compatibleWithLowerBodyDiscomfort": false,
+    "suitableForGentleSession": true,
+    "suitableForWarmup": false,
+    "suitableForMainPhase": false,
+    "suitableForCooldown": true,
+    "generalPrecautionsFr": [
+      "Allez à votre propre rythme."
+    ],
+    "stopSignalsFr": [
+      "Perte d'équilibre"
+    ],
+    "alternativeExerciseIds": [
+      "marche-sur-place"
+    ],
+    "media": [],
+    "quality": {
+      "status": "review_required",
+      "classificationReviewed": false
+    },
+    "enabled": true
+  },
+  {
+    "id": "tapotements-corps-debout",
+    "slug": "tapotements-corps-debout",
+    "nameFr": "Tapotements doux du corps",
+    "nameEn": "Gentle Body Tapping",
+    "shortDescriptionFr": "Tapotements légers sur tout le corps debout pour éveiller la circulation et les sensations corporelles.",
+    "instructionsFr": [
+      "Debout, pieds à largeur des hanches.",
+      "Tapotez doucement vos bras avec la paume ouverte, du poignet à l'épaule.",
+      "Descendez le long du torse, des côtes, puis des cuisses.",
+      "Remontez par l'arrière des jambes, le bas du dos et les épaules.",
+      "Terminez par des tapotements légers sur le visage et le cuir chevelu."
+    ],
+    "breathingGuidanceFr": "Respirez naturellement, appréciez les sensations.",
+    "category": "gentle_wakeup",
+    "tags": [
+      "réveil",
+      "sensoriel",
+      "circulation",
+      "debout"
+    ],
+    "mode": "timed",
+    "defaultDurationSeconds": 30,
+    "restAfterSeconds": 5,
+    "difficulty": "very_easy",
+    "minimumEnergy": "very_low",
+    "maximumEnergy": "high",
+    "intensity": 1,
+    "impactLevel": "none",
+    "positions": [
+      "standing"
+    ],
+    "primaryBodyAreas": [
+      "shoulders",
+      "chest",
+      "quadriceps"
+    ],
+    "secondaryBodyAreas": [
+      "upper_back",
+      "calves",
+      "forearms"
+    ],
+    "jointsUsed": [
+      "shoulder",
+      "elbow",
+      "wrist"
+    ],
+    "requiresUpperBody": false,
+    "requiresLowerBody": false,
+    "requiresArmSupport": false,
+    "requiresKneeSupport": false,
+    "requiresFloorTransition": false,
+    "unilateral": false,
+    "jumping": false,
+    "balanceRequired": false,
+    "compatibleWithUpperBodyDiscomfort": true,
+    "compatibleWithLowerBodyDiscomfort": true,
+    "suitableForGentleSession": true,
+    "suitableForWarmup": true,
+    "suitableForMainPhase": false,
+    "suitableForCooldown": false,
+    "generalPrecautionsFr": [
+      "Tapotez avec douceur, jamais de coups forts."
+    ],
+    "stopSignalsFr": [
+      "Inconfort sur une zone sensible"
+    ],
+    "alternativeExerciseIds": [],
+    "media": [],
+    "quality": {
+      "status": "review_required",
+      "classificationReviewed": false
+    },
+    "enabled": true
+  },
+  {
+    "id": "baillements-actifs",
+    "slug": "baillements-actifs",
+    "nameFr": "Bâillements actifs avec ouverture des bras",
+    "nameEn": "Active Yawning with Arm Opening",
+    "shortDescriptionFr": "Bâillements volontaires avec grande ouverture des bras pour oxygéner le corps et relâcher les tensions matinales.",
+    "instructionsFr": [
+      "Debout ou assis, prenez une grande inspiration par la bouche en ouvrant grand les bras sur les côtés.",
+      "Simulez un grand bâillement en laissant la mâchoire s'ouvrir largement.",
+      "Expirez lentement en ramenant les bras le long du corps.",
+      "Répétez 5 à 8 fois en prenant votre temps.",
+      "Laissez le bâillement devenir naturel si possible."
+    ],
+    "breathingGuidanceFr": "Grande inspiration par la bouche en ouvrant les bras, expiration lente en fermant.",
+    "category": "breathing",
+    "tags": [
+      "respiration",
+      "réveil",
+      "relaxation",
+      "bâillement"
+    ],
+    "mode": "breathing",
+    "defaultDurationSeconds": 30,
+    "restAfterSeconds": 5,
+    "difficulty": "very_easy",
+    "minimumEnergy": "very_low",
+    "maximumEnergy": "high",
+    "intensity": 1,
+    "impactLevel": "none",
+    "positions": [
+      "standing",
+      "seated"
+    ],
+    "primaryBodyAreas": [
+      "diaphragm",
+      "chest"
+    ],
+    "secondaryBodyAreas": [
+      "shoulders",
+      "neck"
+    ],
+    "jointsUsed": [
+      "shoulder"
+    ],
+    "requiresUpperBody": false,
+    "requiresLowerBody": false,
+    "requiresArmSupport": false,
+    "requiresKneeSupport": false,
+    "requiresFloorTransition": false,
+    "unilateral": false,
+    "jumping": false,
+    "balanceRequired": false,
+    "compatibleWithUpperBodyDiscomfort": true,
+    "compatibleWithLowerBodyDiscomfort": true,
+    "suitableForGentleSession": true,
+    "suitableForWarmup": true,
+    "suitableForMainPhase": false,
+    "suitableForCooldown": true,
+    "generalPrecautionsFr": [
+      "Ne forcez pas l'ouverture de la mâchoire si vous avez des problèmes d'ATM."
+    ],
+    "stopSignalsFr": [
+      "Douleur à la mâchoire"
+    ],
+    "alternativeExerciseIds": [
+      "soupir-physiologique"
+    ],
+    "media": [],
+    "quality": {
+      "status": "review_required",
+      "classificationReviewed": false
+    },
+    "enabled": true
+  },
+  {
+    "id": "pompes-lentes-genoux",
+    "slug": "pompes-lentes-genoux",
+    "nameFr": "Pompes lentes sur les genoux",
+    "nameEn": "Slow Knee Push-ups",
+    "shortDescriptionFr": "Pompes contrôlées sur les genoux en tempo lent pour renforcer la poitrine et les bras sans solliciter les jambes.",
+    "instructionsFr": [
+      "Placez-vous à quatre pattes, mains sous les épaules, genoux au sol.",
+      "Croisez les chevilles derrière vous et engagez les abdominaux.",
+      "Descendez le torse vers le sol en 3 secondes.",
+      "Remontez en 3 secondes en poussant dans les paumes.",
+      "Gardez le corps aligné des genoux aux épaules."
+    ],
+    "breathingGuidanceFr": "Inspirez en descendant, expirez en remontant.",
+    "category": "upper_body_strength",
+    "tags": [
+      "pompes",
+      "push",
+      "poitrine",
+      "bras",
+      "lent"
+    ],
+    "mode": "repetitions",
+    "defaultDurationSeconds": 30,
+    "defaultRepetitions": 8,
+    "restAfterSeconds": 10,
+    "difficulty": "easy",
+    "minimumEnergy": "low",
+    "maximumEnergy": "high",
+    "intensity": 3,
+    "impactLevel": "none",
+    "positions": [
+      "kneeling"
+    ],
+    "primaryBodyAreas": [
+      "chest",
+      "triceps",
+      "shoulders"
+    ],
+    "secondaryBodyAreas": [
+      "abdominals",
+      "deep_core"
+    ],
+    "jointsUsed": [
+      "shoulder",
+      "elbow",
+      "wrist"
+    ],
+    "requiresUpperBody": true,
+    "requiresLowerBody": false,
+    "requiresArmSupport": true,
+    "requiresWristSupport": true,
+    "requiresKneeSupport": true,
+    "requiresFloorTransition": true,
+    "unilateral": false,
+    "jumping": false,
+    "balanceRequired": false,
+    "compatibleWithUpperBodyDiscomfort": false,
+    "compatibleWithLowerBodyDiscomfort": true,
+    "suitableForGentleSession": false,
+    "suitableForWarmup": false,
+    "suitableForMainPhase": true,
+    "suitableForCooldown": false,
+    "generalPrecautionsFr": [
+      "Arrêtez si douleur aux poignets. Utilisez un tapis sous les genoux."
+    ],
+    "stopSignalsFr": [
+      "Douleur aux poignets, aux épaules ou aux genoux"
+    ],
+    "alternativeExerciseIds": [],
+    "media": [],
+    "quality": {
+      "status": "review_required",
+      "classificationReviewed": false
+    },
+    "enabled": true
   }
 ]

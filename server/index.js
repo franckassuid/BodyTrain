@@ -2,20 +2,40 @@ import Fastify from "fastify";
 import { DatabaseSync } from "node:sqlite";
 import fs from "node:fs";
 import path from "node:path";
+import webpush from "web-push";
 
 const fastify = Fastify({ logger: true });
+
+// VAPID Keys configuration for Web Push Protocol (Apple APNs & Google FCM)
+const VAPID_PUBLIC_KEY =
+  process.env.VAPID_PUBLIC_KEY ||
+  "BMAA1nSAHdlaE3pOrNvVOMK6qys9akFfaJwoK5qiJFpd0lpK_nFfZZNLkKiHeArjRKD5IB2E8mvr1KckFgpwBbk";
+const VAPID_PRIVATE_KEY =
+  process.env.VAPID_PRIVATE_KEY || "-z90C-6PLqVbu0U-INkC1UNOE40WpEhE1lavEAwWhfQ";
+const VAPID_SUBJECT = process.env.VAPID_SUBJECT || "mailto:contact@bodytrain.app";
+
+webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
 
 // Open database
 const dbPath = path.resolve("files/bodytrain.db");
 let db;
 try {
   db = new DatabaseSync(dbPath);
+  // Ensure persistent push subscriptions table exists
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS push_subscriptions (
+      endpoint TEXT PRIMARY KEY,
+      subscription_json TEXT NOT NULL,
+      reminder_time TEXT NOT NULL,
+      active_days TEXT NOT NULL,
+      timezone TEXT NOT NULL,
+      last_notified_date TEXT,
+      created_at TEXT NOT NULL
+    );
+  `);
 } catch (e) {
   console.error("Could not open SQLite database at", dbPath, e);
 }
-
-// In-memory anonymous push subscriptions store
-const pushSubscriptions = new Map();
 
 // 1. Health check
 fastify.get("/health", async () => {
@@ -196,31 +216,134 @@ const getSingleExerciseHandler = async (request, reply) => {
 fastify.get("/exercises/:idOrSlug", getSingleExerciseHandler);
 fastify.get("/api/exercises/:idOrSlug", getSingleExerciseHandler);
 
-// 6. Web Push Subscription endpoint
+// 6. Web Push VAPID Public Key
+fastify.get("/api/push/vapid-public-key", async () => {
+  return { publicKey: VAPID_PUBLIC_KEY };
+});
+
+// 7. Web Push Subscription endpoint
 fastify.post("/api/push/subscribe", async (request, reply) => {
   const { subscription, reminderTime, activeDays, timezone } = request.body || {};
   if (!subscription || !subscription.endpoint) {
     return reply.code(400).send({ error: "Missing subscription data" });
   }
 
-  pushSubscriptions.set(subscription.endpoint, {
-    subscription,
-    reminderTime: reminderTime || "07:30",
-    activeDays: activeDays || [1, 2, 3, 4, 5, 6],
-    timezone: timezone || "UTC",
-    registeredAt: new Date().toISOString(),
-  });
+  if (db) {
+    const stmt = db.prepare(`
+      INSERT INTO push_subscriptions (endpoint, subscription_json, reminder_time, active_days, timezone, created_at)
+      VALUES (?, ?, ?, ?, ?, ?)
+      ON CONFLICT(endpoint) DO UPDATE SET
+        subscription_json = excluded.subscription_json,
+        reminder_time = excluded.reminder_time,
+        active_days = excluded.active_days,
+        timezone = excluded.timezone
+    `);
 
-  return { success: true, count: pushSubscriptions.size };
+    stmt.run(
+      subscription.endpoint,
+      JSON.stringify(subscription),
+      reminderTime || "07:30",
+      JSON.stringify(activeDays || [1, 2, 3, 4, 5, 6]),
+      timezone || "Europe/Paris",
+      new Date().toISOString()
+    );
+  }
+
+  return { success: true };
 });
 
-// 7. Web Push Unsubscribe endpoint
+// 8. Web Push Unsubscribe endpoint
 fastify.post("/api/push/unsubscribe", async (request, reply) => {
   const { endpoint } = request.body || {};
   if (!endpoint) return reply.code(400).send({ error: "Missing endpoint" });
-  pushSubscriptions.delete(endpoint);
+  if (db) {
+    db.prepare("DELETE FROM push_subscriptions WHERE endpoint = ?").run(endpoint);
+  }
   return { success: true };
 });
+
+// 9. Real Remote Server Push Test (sends an actual Web Push via Apple/Google servers)
+fastify.post("/api/push/test", async (request, reply) => {
+  const { subscription } = request.body || {};
+  if (!subscription || !subscription.endpoint) {
+    return reply.code(400).send({ error: "Missing subscription" });
+  }
+
+  try {
+    const payload = JSON.stringify({
+      title: "BodyTrain • Test Réel Web Push",
+      body: "Bravo ! Les notifications distantes Web Push fonctionnent parfaitement sur votre appareil.",
+      url: "/",
+    });
+
+    await webpush.sendNotification(subscription, payload);
+    return { success: true, message: "Notification Web Push envoyée avec succès !" };
+  } catch (err) {
+    fastify.log.error(err);
+    return reply.code(500).send({ error: "Échec de l'envoi Web Push", details: err.message });
+  }
+});
+
+// 10. Background Cron Job for Scheduled Morning Push Notifications
+function startPushScheduler() {
+  if (!db) return;
+
+  setInterval(async () => {
+    try {
+      const now = new Date();
+      const rows = db.prepare("SELECT * FROM push_subscriptions").all();
+
+      for (const row of rows) {
+        try {
+          const tz = row.timezone || "Europe/Paris";
+          // Get local time in user's timezone
+          const userLocalString = now.toLocaleTimeString("fr-FR", { timeZone: tz, hour: "2-digit", minute: "2-digit", hour12: false });
+          const userDateString = now.toLocaleDateString("en-CA", { timeZone: tz }); // YYYY-MM-DD
+          
+          // Get day of week (0=Sunday, 1=Monday...) in user's timezone
+          const dayName = now.toLocaleDateString("en-US", { timeZone: tz, weekday: "short" });
+          const dayMap = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+          const userDay = dayMap[dayName] ?? now.getDay();
+
+          const activeDays = JSON.parse(row.active_days || "[]");
+
+          // Match day and time (HH:MM)
+          if (activeDays.includes(userDay) && userLocalString === row.reminder_time) {
+            // Ensure not already sent today
+            if (row.last_notified_date !== userDateString) {
+              const subscription = JSON.parse(row.subscription_json);
+              const payload = JSON.stringify({
+                title: "BodyTrain • C'est l'heure !",
+                body: "Bonjour ! Prenez 7 minutes pour réveiller votre corps en douceur.",
+                url: "/",
+              });
+
+              await webpush.sendNotification(subscription, payload);
+
+              db.prepare("UPDATE push_subscriptions SET last_notified_date = ? WHERE endpoint = ?").run(
+                userDateString,
+                row.endpoint
+              );
+              console.log(`[PushScheduler] Sent morning reminder to ${row.endpoint.slice(0, 30)}...`);
+            }
+          }
+        } catch (pushErr) {
+          // If subscription expired / 410 Gone / 404, clean it up
+          if (pushErr.statusCode === 410 || pushErr.statusCode === 404) {
+            db.prepare("DELETE FROM push_subscriptions WHERE endpoint = ?").run(row.endpoint);
+            console.log(`[PushScheduler] Removed expired subscription ${row.endpoint.slice(0, 30)}...`);
+          } else {
+            console.error("[PushScheduler] Error sending push:", pushErr.message);
+          }
+        }
+      }
+    } catch (e) {
+      console.error("[PushScheduler] Global scheduler error:", e);
+    }
+  }, 30000); // check every 30 seconds
+}
+
+startPushScheduler();
 
 const PORT = Number(process.env.PORT) || 3000;
 

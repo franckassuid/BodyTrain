@@ -8,6 +8,7 @@ import { WorkoutPlayer } from "./components/WorkoutPlayer.tsx";
 import { SessionComplete } from "./components/SessionComplete.tsx";
 import { HistoryView } from "./components/HistoryView.tsx";
 import { SettingsView } from "./components/SettingsView.tsx";
+import { ExerciseLibraryView } from "./components/ExerciseLibraryView.tsx";
 
 import { generateSession } from "./engine/generator.ts";
 import { storageService } from "./services/storage.ts";
@@ -210,10 +211,13 @@ export const App: React.FC = () => {
           </>
         )}
 
-        {/* TAB 2: HISTORY */}
+        {/* TAB 2: LIBRARY */}
+        {activeTab === "library" && <ExerciseLibraryView />}
+
+        {/* TAB 3: HISTORY */}
         {activeTab === "history" && <HistoryView />}
 
-        {/* TAB 3: SETTINGS */}
+        {/* TAB 4: SETTINGS */}
         {activeTab === "settings" && <SettingsView />}
       </main>
 

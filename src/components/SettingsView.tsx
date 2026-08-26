@@ -64,7 +64,7 @@ export const SettingsView: React.FC = () => {
 
   const handleTestNotification = async () => {
     setNotificationStatus("Envoi de la notification de test...");
-    const ok = await pushNotificationService.showTestNotification();
+    const ok = await pushNotificationService.testServerPush();
     if (ok) {
       setNotificationStatus("Notification envoyée avec succès !");
     } else {

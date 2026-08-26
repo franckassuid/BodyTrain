@@ -1,4 +1,4 @@
-// Web Push API service and subscription manager
+// Web Push API service and subscription manager for PWA (iOS 16.4+ standalone & Android/Desktop)
 
 export interface PushSubscriptionState {
   isSupported: boolean;
@@ -10,9 +10,9 @@ export interface PushSubscriptionState {
   error?: string;
 }
 
-// Public VAPID key (demo key for local and client-side setup)
+// Real VAPID Public Key configured on server
 const PUBLIC_VAPID_KEY =
-  "BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIhbQFLXYp5Nksh8U";
+  "BMAA1nSAHdlaE3pOrNvVOMK6qys9akFfaJwoK5qiJFpd0lpK_nFfZZNLkKiHeArjRKD5IB2E8mvr1KckFgpwBbk";
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -36,11 +36,15 @@ export const pushNotificationService = {
       return { isSupported: false, isIos: false, isStandalone: false, canUsePush: false };
     }
 
-    const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-    const isStandalone = window.matchMedia("(display-mode: standalone)").matches || (window.navigator as unknown as { standalone?: boolean }).standalone === true;
+    const isIos =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    const isStandalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      (window.navigator as unknown as { standalone?: boolean }).standalone === true;
     const isSupported = "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
 
-    // On iOS Safari, Web Push is only possible when installed as PWA on Home Screen (iOS 16.4+)
+    // On iOS Safari, Web Push is strictly enabled only when added to Home Screen as standalone PWA
     const canUsePush = isSupported && (!isIos || isStandalone);
 
     return {
@@ -73,7 +77,7 @@ export const pushNotificationService = {
         isIos: env.isIos,
         isStandalone: env.isStandalone,
         permission,
-        isSubscribed: !!sub,
+        isSubscribed: Boolean(sub),
         subscription: sub,
       };
     } catch {
@@ -89,12 +93,15 @@ export const pushNotificationService = {
   },
 
   /** Request notification permission and subscribe to Web Push */
-  async subscribe(reminderTime = "07:30", activeDays: number[] = [1, 2, 3, 4, 5, 6]): Promise<PushSubscription | null> {
+  async subscribe(
+    reminderTime = "07:30",
+    activeDays: number[] = [1, 2, 3, 4, 5, 6]
+  ): Promise<PushSubscription | null> {
     const env = this.checkEnvironment();
     if (!env.canUsePush) {
       throw new Error(
         env.isIos && !env.isStandalone
-          ? "Sur iOS, vous devez d'abord ajouter BodyTrain à l'écran d'accueil pour activer les notifications de rappel."
+          ? "Sur iPhone/iPad (iOS), vous devez ajouter l'application à l'écran d'accueil (« Sur l'écran d'accueil ») pour activer les notifications de rappel."
           : "Les notifications Web Push ne sont pas supportées sur ce navigateur."
       );
     }
@@ -115,7 +122,7 @@ export const pushNotificationService = {
       });
     }
 
-    // Register anonymous subscription on backend endpoint
+    // Register subscription on backend server
     try {
       await fetch("/api/push/subscribe", {
         method: "POST",
@@ -124,11 +131,10 @@ export const pushNotificationService = {
           subscription,
           reminderTime,
           activeDays,
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/Paris",
         }),
       });
     } catch {
-      // Backend may be offline, subscription still exists locally
       console.warn("Backend push endpoint unreachable, subscription maintained locally.");
     }
 
@@ -141,7 +147,6 @@ export const pushNotificationService = {
       const reg = await navigator.serviceWorker.ready;
       const subscription = await reg.pushManager.getSubscription();
       if (subscription) {
-        // Notify backend to remove anonymous subscription
         try {
           await fetch("/api/push/unsubscribe", {
             method: "POST",
@@ -160,8 +165,36 @@ export const pushNotificationService = {
     }
   },
 
-  /** Show a direct test notification via Service Worker */
-  async showTestNotification(): Promise<boolean> {
+  /** Send a real remote Web Push via the backend server (Apple APNs / Google FCM) */
+  async testServerPush(): Promise<boolean> {
+    const reg = await navigator.serviceWorker.ready;
+    let subscription = await reg.pushManager.getSubscription();
+
+    if (!subscription) {
+      subscription = await this.subscribe();
+    }
+
+    if (!subscription) {
+      return this.showLocalTestNotification();
+    }
+
+    try {
+      const res = await fetch("/api/push/test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subscription }),
+      });
+
+      if (!res.ok) throw new Error("Server push test failed");
+      return true;
+    } catch {
+      // Fallback to local service worker test notification
+      return this.showLocalTestNotification();
+    }
+  },
+
+  /** Show a direct local test notification via Service Worker */
+  async showLocalTestNotification(): Promise<boolean> {
     if (!("Notification" in window)) return false;
 
     if (Notification.permission !== "granted") {
@@ -172,24 +205,15 @@ export const pushNotificationService = {
     try {
       const reg = await navigator.serviceWorker.ready;
       await reg.showNotification("BodyTrain • Séance matinale", {
-        body: "Bonjour ! Prêt pour ton réveil en mouvement de 7 minutes ?",
+        body: "Bonjour ! Prêt pour votre réveil en mouvement de 7 minutes ?",
         icon: "/icons/icon-192.png",
         badge: "/icons/icon-192.png",
         data: { url: "/" },
         tag: "morning-reminder",
       });
       return true;
-    } catch (e) {
-      console.warn("ServiceWorker notification failed, using window Notification", e);
-      try {
-        new Notification("BodyTrain • Séance matinale", {
-          body: "Bonjour ! Prêt pour ton réveil en mouvement de 7 minutes ?",
-          icon: "/icons/icon-192.png",
-        });
-        return true;
-      } catch {
-        return false;
-      }
+    } catch {
+      return false;
     }
   },
 };

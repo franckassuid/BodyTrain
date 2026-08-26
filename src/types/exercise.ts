@@ -6,7 +6,9 @@ import type {
   ExerciseMode,
   ImpactLevel,
   Joint,
+  MovementPattern,
   Position,
+  SessionPhase,
 } from "./enums.ts";
 
 export type MediaType = "animation" | "start_position" | "end_position";
@@ -93,6 +95,11 @@ export interface Exercise {
   suitableForMainPhase?: boolean;
   suitableForCooldown: boolean;
 
+  // ── New composition metadata ──────────────────────────────────────────
+  suitablePhases: SessionPhase[];
+  movementPatterns: MovementPattern[];
+  fatigueAreas: BodyArea[];
+
   generalPrecautionsFr: string[];
   stopSignalsFr: string[];
 
@@ -105,7 +112,7 @@ export interface Exercise {
   quality?: ExerciseQuality;
   enabled: boolean;
 
-  // Compatibility aliases
+  // Compatibility aliases (from export script)
   name?: string;
   shortDescription?: string;
   instructions?: string[];

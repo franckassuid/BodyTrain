@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { Activity, Wind, Sparkles, Image as ImageIcon, Play, Pause } from "lucide-react";
+import { Activity, Wind, Sparkles, Image as ImageIcon } from "lucide-react";
 import type { Exercise } from "../types/exercise.ts";
 
 interface ExerciseAnimationProps {
   exercise: Exercise;
   nextExercise?: Exercise | null;
   phase: "preparation" | "work" | "rest" | "finished";
+  circularMode?: boolean;
 }
 
 export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
   exercise,
   nextExercise,
   phase,
+  circularMode = false,
 }) => {
   const slug = exercise.slug || exercise.id;
 
@@ -21,7 +23,7 @@ export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
   const hasEndPhoto = exercise.media?.some((m) => m.type === "end_position");
   const hasPhotos = hasStartPhoto || hasEndPhoto;
 
-  // View mode: 'photos' | 'svg' | 'breathing'
+  // View mode: 'photos' | 'svg'
   const [viewMode, setViewMode] = useState<"photos" | "svg">(() => {
     if (hasPhotos) return "photos";
     return "svg";
@@ -30,7 +32,6 @@ export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
   const [svgContent, setSvgContent] = useState<string | null>(null);
   const [loadingSvg, setLoadingSvg] = useState<boolean>(false);
   const [activePhotoStep, setActivePhotoStep] = useState<"start" | "end">("start");
-  const [isPhotoLooping, setIsPhotoLooping] = useState<boolean>(true);
   const [photoError, setPhotoError] = useState<boolean>(false);
 
   // Sync default view mode when exercise changes
@@ -48,10 +49,8 @@ export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
   useEffect(() => {
     if (nextExercise) {
       const nextSlug = nextExercise.slug || nextExercise.id;
-      // Preload next SVG
       const imgSvg = new Image();
       imgSvg.src = `/animations/${nextSlug}.svg`;
-      // Preload next Photos
       const imgPhoto1 = new Image();
       imgPhoto1.src = `/exercises/${nextSlug}/start.webp`;
       const imgPhoto2 = new Image();
@@ -73,7 +72,11 @@ export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
       .then((svgText) => {
         if (!isCancelled) {
           if (svgText.includes("<svg") && svgText.includes("</svg>")) {
-            setSvgContent(svgText);
+            let cleanSvg = svgText;
+            if (!cleanSvg.includes("preserveAspectRatio")) {
+              cleanSvg = cleanSvg.replace("<svg", '<svg preserveAspectRatio="xMidYMid meet"');
+            }
+            setSvgContent(cleanSvg);
           } else {
             setSvgContent(null);
           }
@@ -92,44 +95,49 @@ export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
     };
   }, [slug]);
 
-  // Photo alternating animation loop (e.g. 1.8s per posture)
+  // Alternating photo postures loop (1.7s per posture)
   useEffect(() => {
-    if (viewMode !== "photos" || !hasPhotos || !isPhotoLooping || !hasEndPhoto) return;
+    if (viewMode !== "photos" || !hasPhotos || !hasEndPhoto) return;
 
     const interval = setInterval(() => {
       setActivePhotoStep((prev) => (prev === "start" ? "end" : "start"));
     }, 1700);
 
     return () => clearInterval(interval);
-  }, [viewMode, hasPhotos, isPhotoLooping, hasEndPhoto, slug]);
+  }, [viewMode, hasPhotos, hasEndPhoto, slug]);
 
   const isBreathing = exercise.category === "breathing" || exercise.mode === "breathing";
   const startPhotoUrl = `/exercises/${slug}/start.webp`;
   const endPhotoUrl = hasEndPhoto ? `/exercises/${slug}/end.webp` : startPhotoUrl;
 
+  const frameWidth = circularMode ? 224 : "100%";
+  const frameHeight = circularMode ? 224 : 250;
+  const frameRadius = circularMode ? "50%" : "var(--radius-xl)";
+
   return (
     <div
       style={{
-        width: "100%",
+        width: circularMode ? "auto" : "100%",
         display: "flex",
         flexDirection: "column",
+        alignItems: "center",
         gap: 8,
       }}
     >
       {/* Visual Frame Container */}
       <div
         style={{
-          width: "100%",
-          height: 250,
-          backgroundColor: "var(--bg-surface-elevated)",
-          borderRadius: "var(--radius-xl)",
+          width: frameWidth,
+          height: frameHeight,
+          background: "linear-gradient(145deg, var(--bg-surface-elevated), var(--bg-surface))",
+          borderRadius: frameRadius,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           overflow: "hidden",
-          border: "1px solid var(--border-subtle)",
+          border: circularMode ? "none" : "1.5px solid var(--border-subtle)",
           position: "relative",
-          boxShadow: "var(--shadow-sm)",
+          boxShadow: circularMode ? "inset 0 2px 10px rgba(0,0,0,0.04)" : "0 6px 20px rgba(0,0,0,0.06)",
         }}
       >
         {/* MODE 1: High Quality Photo Demonstration with Live Loop */}
@@ -142,7 +150,7 @@ export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              backgroundColor: "#18181B",
+              backgroundColor: "rgba(0, 0, 0, 0.02)",
             }}
           >
             {/* Start Photo */}
@@ -183,65 +191,42 @@ export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
               />
             )}
 
-            {/* Step Badge Overlay */}
+            {/* Posture Step Tag */}
             {hasEndPhoto && (
               <div
                 style={{
                   position: "absolute",
-                  bottom: 10,
-                  left: 10,
-                  padding: "4px 10px",
-                  borderRadius: "var(--radius-full)",
-                  backgroundColor: "rgba(0, 0, 0, 0.65)",
+                  bottom: circularMode ? 14 : 10,
+                  left: circularMode ? "50%" : 12,
+                  transform: circularMode ? "translateX(-50%)" : "none",
+                  backgroundColor: "rgba(20, 36, 27, 0.75)",
                   backdropFilter: "blur(6px)",
                   color: "#FFFFFF",
-                  fontSize: "0.75rem",
-                  fontWeight: 600,
+                  padding: "3px 8px",
+                  borderRadius: "var(--radius-full)",
+                  fontSize: "0.72rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.02em",
                   display: "flex",
                   alignItems: "center",
-                  gap: 6,
+                  gap: 4,
+                  zIndex: 4,
                 }}
               >
                 <span
                   style={{
-                    width: 8,
-                    height: 8,
+                    width: 6,
+                    height: 6,
                     borderRadius: "50%",
-                    backgroundColor: activePhotoStep === "start" ? "var(--color-primary)" : "#38BDF8",
-                    display: "inline-block",
+                    backgroundColor: activePhotoStep === "start" ? "#52B788" : "#E76F51",
                   }}
                 />
-                <span>{activePhotoStep === "start" ? "1. Position de départ" : "2. Position d'arrivée"}</span>
+                <span>{activePhotoStep === "start" ? "1. Départ" : "2. Arrivée"}</span>
               </div>
-            )}
-
-            {/* Manual Toggle Play/Pause Loop */}
-            {hasEndPhoto && (
-              <button
-                type="button"
-                onClick={() => setIsPhotoLooping(!isPhotoLooping)}
-                aria-label={isPhotoLooping ? "Mettre en pause l'animation photo" : "Lancer l'animation photo"}
-                style={{
-                  position: "absolute",
-                  bottom: 10,
-                  right: 10,
-                  width: 32,
-                  height: 32,
-                  borderRadius: "50%",
-                  backgroundColor: "rgba(0, 0, 0, 0.65)",
-                  backdropFilter: "blur(6px)",
-                  color: "#FFFFFF",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                {isPhotoLooping ? <Pause size={14} /> : <Play size={14} />}
-              </button>
             )}
           </div>
         ) : viewMode === "svg" && svgContent && !loadingSvg ? (
-          /* MODE 2: SVG Animation */
+          /* MODE 2: Clean Animated SVG */
           <div
             className="animation-container"
             style={{
@@ -255,7 +240,7 @@ export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
             dangerouslySetInnerHTML={{ __html: svgContent }}
           />
         ) : (
-          /* MODE 3: Calm Breathing & Mobility Fallback */
+          /* MODE 3: Calming Harmony & Breath Bloom */
           <div
             style={{
               width: "100%",
@@ -264,46 +249,48 @@ export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              gap: 12,
+              gap: 10,
             }}
           >
             <div
               className="pulse-ring"
               style={{
-                width: 90,
-                height: 90,
+                width: circularMode ? 70 : 84,
+                height: circularMode ? 70 : 84,
                 borderRadius: "50%",
-                backgroundColor: isBreathing ? "var(--color-primary-soft)" : "var(--bg-surface)",
+                backgroundColor: isBreathing ? "var(--color-primary-soft)" : "rgba(231, 111, 81, 0.12)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                color: "var(--color-primary)",
-                border: "2px solid var(--color-primary-light)",
+                color: isBreathing ? "var(--color-primary)" : "var(--color-accent)",
+                border: `2px solid ${isBreathing ? "var(--color-primary-light)" : "var(--color-accent)"}`,
+                boxShadow: "0 6px 18px rgba(0,0,0,0.06)",
               }}
             >
-              {isBreathing ? <Wind size={40} /> : <Activity size={40} />}
+              {isBreathing ? <Wind size={circularMode ? 32 : 40} /> : <Activity size={circularMode ? 32 : 40} />}
             </div>
 
             <div
               style={{
-                fontSize: "0.82rem",
-                fontWeight: 500,
-                color: "var(--text-subtle)",
+                fontSize: "0.78rem",
+                fontWeight: 600,
+                color: "var(--text-muted)",
                 textAlign: "center",
-                padding: "0 16px",
+                padding: "0 14px",
+                lineHeight: 1.35,
               }}
             >
               {isBreathing
-                ? "Respiration guidée • Inspire et expire profondément"
+                ? "Respiration guidée"
                 : phase === "rest"
-                ? "Prends une profonde inspiration et relâche"
-                : "Maintiens un mouvement continu et maîtrisé"}
+                ? "Repos • Respirez calmement"
+                : "Mouvement fluide"}
             </div>
           </div>
         )}
       </div>
 
-      {/* Media Type Switcher (when both Photos & SVG or Multiple views available) */}
+      {/* Mode switcher (Photos / Schéma) */}
       {hasPhotos && (hasAnimationMedia || svgContent) && (
         <div
           style={{
@@ -316,8 +303,9 @@ export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
           <div
             style={{
               display: "inline-flex",
-              backgroundColor: "var(--bg-surface)",
-              padding: 3,
+              alignItems: "center",
+              backgroundColor: "var(--bg-surface-elevated)",
+              padding: 2,
               borderRadius: "var(--radius-full)",
               border: "1px solid var(--border-subtle)",
             }}
@@ -326,39 +314,46 @@ export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
               type="button"
               onClick={() => setViewMode("photos")}
               style={{
-                padding: "4px 12px",
-                borderRadius: "var(--radius-full)",
-                fontSize: "0.78rem",
-                fontWeight: 600,
                 display: "flex",
                 alignItems: "center",
-                gap: 5,
-                backgroundColor: viewMode === "photos" ? "var(--color-primary)" : "transparent",
-                color: viewMode === "photos" ? "#FFFFFF" : "var(--text-muted)",
-                transition: "all 0.2s ease",
+                gap: 4,
+                padding: "3px 10px",
+                borderRadius: "var(--radius-full)",
+                border: "none",
+                fontSize: "0.74rem",
+                fontWeight: 700,
+                cursor: "pointer",
+                backgroundColor: viewMode === "photos" ? "var(--bg-surface)" : "transparent",
+                color: viewMode === "photos" ? "var(--color-primary)" : "var(--text-muted)",
+                boxShadow: viewMode === "photos" ? "0 2px 6px rgba(0,0,0,0.06)" : "none",
+                transition: "all var(--transition-fast)",
               }}
             >
-              <ImageIcon size={13} />
-              <span>Photos ({hasEndPhoto ? "Animées" : "1 pose"})</span>
+              <ImageIcon size={12} />
+              <span>Photos</span>
             </button>
+
             <button
               type="button"
               onClick={() => setViewMode("svg")}
               style={{
-                padding: "4px 12px",
-                borderRadius: "var(--radius-full)",
-                fontSize: "0.78rem",
-                fontWeight: 600,
                 display: "flex",
                 alignItems: "center",
-                gap: 5,
-                backgroundColor: viewMode === "svg" ? "var(--color-primary)" : "transparent",
-                color: viewMode === "svg" ? "#FFFFFF" : "var(--text-muted)",
-                transition: "all 0.2s ease",
+                gap: 4,
+                padding: "3px 10px",
+                borderRadius: "var(--radius-full)",
+                border: "none",
+                fontSize: "0.74rem",
+                fontWeight: 700,
+                cursor: "pointer",
+                backgroundColor: viewMode === "svg" ? "var(--bg-surface)" : "transparent",
+                color: viewMode === "svg" ? "var(--color-primary)" : "var(--text-muted)",
+                boxShadow: viewMode === "svg" ? "0 2px 6px rgba(0,0,0,0.06)" : "none",
+                transition: "all var(--transition-fast)",
               }}
             >
-              <Sparkles size={13} />
-              <span>Schéma filaire</span>
+              <Sparkles size={12} />
+              <span>Schéma</span>
             </button>
           </div>
         </div>
