@@ -33,10 +33,14 @@ export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
   const [loadingSvg, setLoadingSvg] = useState<boolean>(false);
   const [activePhotoStep, setActivePhotoStep] = useState<"start" | "end">("start");
   const [photoError, setPhotoError] = useState<boolean>(false);
+  const [gifError, setGifError] = useState<boolean>(false);
+
+  const gifUrl = `/animations/${slug}.gif`;
 
   // Sync default view mode when exercise changes
   useEffect(() => {
     setPhotoError(false);
+    setGifError(false);
     setActivePhotoStep("start");
     if (hasPhotos) {
       setViewMode("photos");
@@ -49,6 +53,8 @@ export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
   useEffect(() => {
     if (nextExercise) {
       const nextSlug = nextExercise.slug || nextExercise.id;
+      const imgGif = new Image();
+      imgGif.src = `/animations/${nextSlug}.gif`;
       const imgSvg = new Image();
       imgSvg.src = `/animations/${nextSlug}.svg`;
       const imgPhoto1 = new Image();
@@ -225,20 +231,34 @@ export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
               </div>
             )}
           </div>
-        ) : viewMode === "svg" && svgContent && !loadingSvg ? (
-          /* MODE 2: Clean Animated SVG */
-          <div
-            className="animation-container"
-            style={{
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              overflow: "hidden",
-            }}
-            dangerouslySetInnerHTML={{ __html: svgContent }}
-          />
+        ) : viewMode === "svg" && (!gifError || (svgContent && !loadingSvg)) ? (
+          /* MODE 2: Clean Animated GIF (or SVG fallback) */
+          !gifError ? (
+            <img
+              src={gifUrl}
+              alt={exercise.nameFr || exercise.name}
+              onError={() => setGifError(true)}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                display: "block",
+              }}
+            />
+          ) : svgContent ? (
+            <div
+              className="animation-container"
+              style={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                overflow: "hidden",
+              }}
+              dangerouslySetInnerHTML={{ __html: svgContent }}
+            />
+          ) : null
         ) : (
           /* MODE 3: Calming Harmony & Breath Bloom */
           <div
