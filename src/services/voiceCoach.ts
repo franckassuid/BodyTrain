@@ -108,6 +108,7 @@ class VoiceCoachService {
   private voice: SpeechSynthesisVoice | null = null;
   private cachedVoices: SpeechSynthesisVoice[] = [];
   private currentAudio: HTMLAudioElement | null = null;
+  private activeRequestId: number = 0;
 
   constructor() {
     this.loadSettings();
@@ -185,11 +186,13 @@ class VoiceCoachService {
     });
   }
 
-  /** Play pre-rendered studio cue with 0ms latency */
+  /** Play pre-rendered studio cue with 0ms latency and strict single-audio exclusivity */
   private playStudioCue(cueId: string): Promise<boolean> {
     if (!this.settings.voiceCoachEnabled) return Promise.resolve(false);
     if (typeof window === "undefined" || typeof Audio === "undefined") return Promise.resolve(false);
+
     this.stop();
+    const reqId = ++this.activeRequestId;
 
     const gender = this.getGenderDir();
     const src = `/audio/cues/${gender}/${cueId}.mp3`;
@@ -210,7 +213,15 @@ class VoiceCoachService {
           resolve(false);
         };
 
-        audio.play().catch(() => resolve(false));
+        audio
+          .play()
+          .then(() => {
+            if (this.activeRequestId !== reqId) {
+              audio.pause();
+              resolve(false);
+            }
+          })
+          .catch(() => resolve(false));
       } catch {
         resolve(false);
       }
@@ -218,10 +229,9 @@ class VoiceCoachService {
   }
 
   /** Stream or fetch studio Neural voice from Edge TTS backend */
-  private playNeuralTts(text: string): Promise<boolean> {
+  private playNeuralTts(text: string, reqId: number): Promise<boolean> {
     if (!this.settings.voiceCoachEnabled) return Promise.resolve(false);
     if (typeof window === "undefined" || typeof Audio === "undefined") return Promise.resolve(false);
-    this.stop();
 
     const voice = this.getNeuralVoiceName();
     const url = `/api/tts?text=${encodeURIComponent(text)}&voice=${encodeURIComponent(voice)}`;
@@ -242,28 +252,43 @@ class VoiceCoachService {
           resolve(false);
         };
 
-        audio.play().catch(() => resolve(false));
+        audio
+          .play()
+          .then(() => {
+            if (this.activeRequestId !== reqId) {
+              audio.pause();
+              resolve(false);
+            } else {
+              // Successfully started playing neural audio
+              resolve(true);
+            }
+          })
+          .catch(() => resolve(false));
       } catch {
         resolve(false);
       }
     });
   }
 
-  /** Synthesize voice using Neural TTS with seamless Web Speech fallback */
+  /** Synthesize voice using Neural TTS with strict fallback guard (never simultaneous) */
   private async speak(text: string, options?: { rate?: number; pitch?: number; priority?: boolean }) {
     if (!this.settings.voiceCoachEnabled) return;
 
-    // Try Neural Studio TTS first
-    const played = await this.playNeuralTts(text);
-    if (played) return;
+    this.stop();
+    const reqId = ++this.activeRequestId;
 
-    // Fallback to browser SpeechSynthesis
+    // 1. Try Neural Studio TTS first
+    const played = await this.playNeuralTts(text, reqId);
+    if (played || this.activeRequestId !== reqId) {
+      return; // Neural audio is playing or was cancelled by a newer command -> DO NOT trigger SpeechSynthesis!
+    }
+
+    // 2. Fallback to browser SpeechSynthesis ONLY if Neural TTS completely failed AND request is still active
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    if (this.activeRequestId !== reqId) return;
 
     try {
-      if (options?.priority || window.speechSynthesis.speaking) {
-        window.speechSynthesis.cancel();
-      }
+      window.speechSynthesis.cancel();
 
       const naturalText = text.trim();
       const utterance = new SpeechSynthesisUtterance(naturalText);
@@ -283,7 +308,9 @@ class VoiceCoachService {
       utterance.pitch = pitch;
       utterance.volume = 1.0;
 
-      window.speechSynthesis.speak(utterance);
+      if (this.activeRequestId === reqId) {
+        window.speechSynthesis.speak(utterance);
+      }
     } catch {
       // ignore
     }
@@ -475,13 +502,23 @@ class VoiceCoachService {
 
   /** Stop all speech immediately */
   public stop() {
+    this.activeRequestId++;
     if (this.currentAudio) {
-      this.currentAudio.pause();
-      this.currentAudio.currentTime = 0;
+      try {
+        this.currentAudio.pause();
+        this.currentAudio.currentTime = 0;
+        this.currentAudio.src = "";
+      } catch {
+        // ignore
+      }
       this.currentAudio = null;
     }
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
+      try {
+        window.speechSynthesis.cancel();
+      } catch {
+        // ignore
+      }
     }
   }
 }
