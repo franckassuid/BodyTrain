@@ -18,6 +18,7 @@ import type { DiscomfortZone } from "./types/enums.ts";
 import type { GeneratedSession } from "./types/session.ts";
 import type { SessionHistoryRecord } from "./types/history.ts";
 import type { AppSettings } from "./types/settings.ts";
+import type { Exercise } from "./types/exercise.ts";
 
 type WorkoutScreenState = "checkin" | "preview" | "player" | "complete";
 
@@ -28,6 +29,7 @@ export const App: React.FC = () => {
   const [settings, setSettings] = useState<AppSettings | null>(null);
   const [showSafetyBanner, setShowSafetyBanner] = useState<boolean>(true);
   const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
+  const [returnTabAfterWorkout, setReturnTabAfterWorkout] = useState<NavTab>("workout");
 
   // Last finished session stats
   const [finishedStats, setFinishedStats] = useState<{
@@ -96,6 +98,36 @@ export const App: React.FC = () => {
   };
 
   const handleStartWorkout = () => {
+    setReturnTabAfterWorkout("workout");
+    setWorkoutScreen("player");
+  };
+
+  // Launch a single exercise directly from library
+  const handlePlaySingleExercise = (exercise: Exercise, durationSeconds = 45) => {
+    const singleSession: GeneratedSession = {
+      id: `single-${exercise.id}-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      energyScore: 6,
+      discomfortZone: "none",
+      targetDurationMinutes: 1,
+      estimatedTotalSeconds: durationSeconds + 5,
+      intensityLevel: `Niveau ${exercise.intensity}/5`,
+      description: `Mouvement guidé : ${exercise.nameFr || exercise.name}`,
+      exercises: [
+        {
+          exercise,
+          phase: exercise.suitablePhases?.[0] || "activation",
+          targetDurationSeconds: durationSeconds,
+          preparationSeconds: 5,
+          restSeconds: 0,
+        },
+      ],
+      seed: Date.now(),
+    };
+
+    setReturnTabAfterWorkout(activeTab);
+    setCurrentSession(singleSession);
+    setActiveTab("workout");
     setWorkoutScreen("player");
   };
 
@@ -152,14 +184,23 @@ export const App: React.FC = () => {
   };
 
   const handleDiscard = () => {
+    if (returnTabAfterWorkout !== "workout") {
+      setActiveTab(returnTabAfterWorkout);
+      setReturnTabAfterWorkout("workout");
+    }
     setWorkoutScreen("checkin");
     setCurrentSession(null);
   };
 
   const handleFinishScreen = () => {
+    if (returnTabAfterWorkout !== "workout") {
+      setActiveTab(returnTabAfterWorkout);
+      setReturnTabAfterWorkout("workout");
+    } else {
+      setActiveTab("history");
+    }
     setWorkoutScreen("checkin");
     setCurrentSession(null);
-    setActiveTab("history");
   };
 
   return (
@@ -212,7 +253,7 @@ export const App: React.FC = () => {
         )}
 
         {/* TAB 2: LIBRARY */}
-        {activeTab === "library" && <ExerciseLibraryView />}
+        {activeTab === "library" && <ExerciseLibraryView onPlayExercise={handlePlaySingleExercise} />}
 
         {/* TAB 3: HISTORY */}
         {activeTab === "history" && <HistoryView />}

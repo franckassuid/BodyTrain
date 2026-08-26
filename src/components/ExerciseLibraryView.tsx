@@ -1,11 +1,15 @@
 import React, { useState, useMemo } from "react";
-import { Search, Sparkles, ChevronRight } from "lucide-react";
+import { Search, Sparkles, Play, ChevronRight } from "lucide-react";
 import { EXERCISES } from "../data/exercisesData.ts";
 import type { Exercise } from "../types/exercise.ts";
 import { CATEGORY_LABELS, type SessionPhase } from "../types/enums.ts";
 import { ExerciseDetailModal } from "./ExerciseDetailModal.tsx";
 
-export const ExerciseLibraryView: React.FC = () => {
+interface ExerciseLibraryViewProps {
+  onPlayExercise?: (exercise: Exercise, durationSeconds: number) => void;
+}
+
+export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({ onPlayExercise }) => {
   const [search, setSearch] = useState<string>("");
   const [selectedPhase, setSelectedPhase] = useState<SessionPhase | "all">("all");
   const [selectedDiscomfort, setSelectedDiscomfort] = useState<"all" | "upper" | "lower">("all");
@@ -76,10 +80,10 @@ export const ExerciseLibraryView: React.FC = () => {
           <span>Bibliothèque BodyTrain</span>
         </div>
         <h1 style={{ fontSize: "1.45rem", fontWeight: 800, color: "var(--text-main)", lineHeight: 1.25 }}>
-          Explorez les mouvements
+          Explorez & lancez un mouvement
         </h1>
         <p style={{ fontSize: "0.88rem", color: "var(--text-muted)", marginTop: 4 }}>
-          {EXERCISES.length} exercices matinaux adaptés pour vous réveiller en pleine forme.
+          {EXERCISES.length} mouvements guidés. Touchez un exercice pour voir le détail ou le lancer directement.
         </p>
       </div>
 
@@ -239,7 +243,7 @@ export const ExerciseLibraryView: React.FC = () => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                padding: "12px 14px",
+                padding: "10px 12px",
                 borderRadius: "var(--radius-lg)",
                 backgroundColor: "var(--bg-surface)",
                 border: "1px solid var(--border-subtle)",
@@ -248,12 +252,12 @@ export const ExerciseLibraryView: React.FC = () => {
                 transition: "all 0.2s ease",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0 }}>
                 {/* Thumbnail */}
                 <div
                   style={{
-                    width: 52,
-                    height: 52,
+                    width: 48,
+                    height: 48,
                     borderRadius: "var(--radius-md)",
                     backgroundColor: "var(--bg-surface-elevated)",
                     overflow: "hidden",
@@ -274,11 +278,11 @@ export const ExerciseLibraryView: React.FC = () => {
                   />
                 </div>
 
-                <div>
+                <div style={{ minWidth: 0, flex: 1 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                     <span
                       style={{
-                        fontSize: "0.72rem",
+                        fontSize: "0.7rem",
                         fontWeight: 700,
                         padding: "2px 6px",
                         borderRadius: "var(--radius-sm)",
@@ -293,17 +297,47 @@ export const ExerciseLibraryView: React.FC = () => {
                     </span>
                   </div>
 
-                  <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--text-main)", marginTop: 3 }}>
+                  <div style={{ fontWeight: 700, fontSize: "0.92rem", color: "var(--text-main)", marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                     {ex.nameFr || ex.name}
                   </div>
 
-                  <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", marginTop: 2, lineClamp: 1, overflow: "hidden", textOverflow: "ellipsis" }}>
+                  <div style={{ fontSize: "0.76rem", color: "var(--text-muted)", marginTop: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                     {ex.shortDescriptionFr}
                   </div>
                 </div>
               </div>
 
-              <ChevronRight size={18} color="var(--text-subtle)" style={{ flexShrink: 0 }} />
+              {/* Quick Launch & Arrow Buttons */}
+              <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0, marginLeft: 8 }}>
+                {onPlayExercise && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPlayExercise(ex, 45);
+                    }}
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: "var(--radius-full)",
+                      backgroundColor: "var(--color-primary)",
+                      color: "#FFFFFF",
+                      border: "none",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      boxShadow: "0 3px 10px rgba(30, 107, 74, 0.3)",
+                      transition: "transform 0.15s ease",
+                    }}
+                    aria-label={`Lancer ${ex.nameFr || ex.name}`}
+                  >
+                    <Play size={15} fill="currentColor" />
+                  </button>
+                )}
+
+                <ChevronRight size={18} color="var(--text-subtle)" />
+              </div>
             </div>
           );
         })}
@@ -331,11 +365,12 @@ export const ExerciseLibraryView: React.FC = () => {
         )}
       </div>
 
-      {/* Detail Modal */}
+      {/* Detail Modal with launch support */}
       <ExerciseDetailModal
         exercise={selectedExercise}
         isOpen={Boolean(selectedExercise)}
         onClose={() => setSelectedExercise(null)}
+        onPlayExercise={onPlayExercise}
       />
     </div>
   );
