@@ -6,7 +6,6 @@ import {
   Clock,
   RotateCcw,
   ShieldCheck,
-  Check,
   AlertTriangle,
 } from "lucide-react";
 import { storageService } from "../services/storage.ts";
@@ -29,7 +28,6 @@ export const SettingsView: React.FC = () => {
   const [settings, setSettings] = useState<AppSettings | null>(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [notificationStatus, setNotificationStatus] = useState<string | null>(null);
-  const [savedFeedback, setSavedFeedback] = useState(false);
   const [isSubscribing, setIsSubscribing] = useState(false);
 
   useEffect(() => {
@@ -54,9 +52,6 @@ export const SettingsView: React.FC = () => {
     if (updated.reminderEnabled && (updates.reminderTime || updates.activeDays)) {
       pushNotificationService.updateSchedule(updated.reminderTime, updated.activeDays);
     }
-
-    setSavedFeedback(true);
-    setTimeout(() => setSavedFeedback(false), 1500);
   };
 
   const handleToggleReminder = async (enabled: boolean) => {
@@ -111,8 +106,6 @@ export const SettingsView: React.FC = () => {
   const handleResetHistory = async () => {
     await storageService.clearHistory();
     setShowResetConfirm(false);
-    setSavedFeedback(true);
-    setTimeout(() => setSavedFeedback(false), 1500);
   };
 
   if (!settings) return null;
@@ -120,25 +113,13 @@ export const SettingsView: React.FC = () => {
   return (
     <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div>
-          <h1 style={{ fontSize: "1.4rem", fontWeight: 700, color: "var(--text-main)" }}>
-            Réglages
-          </h1>
-          <p style={{ fontSize: "0.9rem", color: "var(--text-muted)", marginTop: 2 }}>
-            Personnalisez votre expérience quotidienne
-          </p>
-        </div>
-
-        {savedFeedback && (
-          <span
-            className="badge animate-fade-in"
-            style={{ backgroundColor: "var(--color-primary-soft)", color: "var(--color-primary-dark)" }}
-          >
-            <Check size={14} />
-            <span>Enregistré</span>
-          </span>
-        )}
+      <div>
+        <h1 style={{ fontSize: "1.4rem", fontWeight: 700, color: "var(--text-main)" }}>
+          Réglages
+        </h1>
+        <p style={{ fontSize: "0.9rem", color: "var(--text-muted)", marginTop: 2 }}>
+          Personnalisez votre expérience quotidienne
+        </p>
       </div>
 
       {/* 1. Default Duration (5, 7, 10 minutes) */}
