@@ -159,174 +159,359 @@ export const SettingsView: React.FC = () => {
         </p>
       </div>
 
-      {/* 1. Workout Flow & Durations (Sliders: Warmup -> Workout -> Cooldown) */}
-      <div className="card" style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "1rem", fontWeight: 700, color: "var(--text-main)" }}>
-            <Clock size={18} style={{ color: "var(--color-primary)" }} />
-            <span>Déroulement & Durées de séance</span>
-          </div>
-          <span
-            style={{
-              fontSize: "0.78rem",
-              fontWeight: 700,
-              padding: "3px 10px",
-              borderRadius: "var(--radius-full)",
-              backgroundColor: "var(--color-primary-soft)",
-              color: "var(--color-primary-dark)",
-            }}
-          >
-            Total : {(settings.warmupExtraMinutes || 0) + settings.defaultDurationMinutes + (settings.cooldownExtraMinutes || 0)} min
-          </span>
-        </div>
+      {/* 1. Workout Flow & Durations: Premium Routine Flow UI */}
+      {(() => {
+        const warmup = settings.warmupExtraMinutes || 0;
+        const main = settings.defaultDurationMinutes || 7;
+        const cooldown = settings.cooldownExtraMinutes || 0;
+        const total = warmup + main + cooldown;
 
-        {/* SLIDER 1: Échauffement & étirements avant séance */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div>
-              <div style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--text-main)" }}>
-                🧘 1. Échauffement & étirements avant
-              </div>
-              <div style={{ fontSize: "0.76rem", color: "var(--text-muted)" }}>
-                Mobilité douce et déverrouillage articulaire
-              </div>
-            </div>
-            <span
-              style={{
-                fontSize: "0.85rem",
-                fontWeight: 800,
-                padding: "2px 8px",
-                borderRadius: "var(--radius-sm)",
-                backgroundColor: (settings.warmupExtraMinutes || 0) > 0 ? "var(--color-primary-soft)" : "var(--bg-surface-elevated)",
-                color: (settings.warmupExtraMinutes || 0) > 0 ? "var(--color-primary-dark)" : "var(--text-subtle)",
-              }}
-            >
-              {(settings.warmupExtraMinutes || 0) === 0 ? "Désactivé" : `+${settings.warmupExtraMinutes} min`}
-            </span>
-          </div>
+        const warmupPct = total > 0 ? (warmup / total) * 100 : 0;
+        const mainPct = total > 0 ? (main / total) * 100 : 100;
+        const cooldownPct = total > 0 ? (cooldown / total) * 100 : 0;
 
-          <input
-            type="range"
-            min={0}
-            max={5}
-            step={1}
-            value={settings.warmupExtraMinutes || 0}
-            onChange={(e) => handleUpdate({ warmupExtraMinutes: Number(e.target.value) })}
-            style={{
-              width: "100%",
-              accentColor: "var(--color-primary)",
-              cursor: "pointer",
-              height: 6,
-            }}
-          />
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.7rem", color: "var(--text-subtle)", fontWeight: 600 }}>
-            <span>Off</span>
-            <span>+1 min</span>
-            <span>+2 min</span>
-            <span>+3 min</span>
-            <span>+4 min</span>
-            <span>+5 min</span>
-          </div>
-        </div>
-
-        {/* SLIDER 2: Durée de la séance principale */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 8, paddingTop: 12, borderTop: "1px solid var(--border-subtle)" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div>
-              <div style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--text-main)" }}>
-                ⏱️ 2. Durée de la séance
+        return (
+          <div className="card" style={{ display: "flex", flexDirection: "column", gap: 18, padding: "20px 18px" }}>
+            {/* Header & Total Badge */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <div
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: "var(--radius-md)",
+                    backgroundColor: "var(--color-primary-soft)",
+                    color: "var(--color-primary-dark)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Clock size={18} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: "1.05rem", fontWeight: 700, margin: 0, color: "var(--text-main)" }}>
+                    Déroulement de la séance
+                  </h3>
+                  <p style={{ fontSize: "0.76rem", color: "var(--text-muted)", margin: 0 }}>
+                    Structure quotidienne personnalisée
+                  </p>
+                </div>
               </div>
-              <div style={{ fontSize: "0.76rem", color: "var(--text-muted)" }}>
-                Corps de séance actif du matin
+
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-end",
+                  backgroundColor: "var(--color-primary-soft)",
+                  padding: "4px 10px",
+                  borderRadius: "var(--radius-md)",
+                  border: "1px solid rgba(27, 67, 50, 0.12)",
+                }}
+              >
+                <span style={{ fontSize: "0.68rem", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase" }}>
+                  Durée totale
+                </span>
+                <span style={{ fontSize: "1rem", fontWeight: 800, color: "var(--color-primary-dark)", lineHeight: 1.1 }}>
+                  {total} min
+                </span>
               </div>
             </div>
-            <span
-              style={{
-                fontSize: "0.85rem",
-                fontWeight: 800,
-                padding: "2px 8px",
-                borderRadius: "var(--radius-sm)",
-                backgroundColor: "var(--color-primary-soft)",
-                color: "var(--color-primary-dark)",
-              }}
-            >
-              {settings.defaultDurationMinutes} min
-            </span>
-          </div>
 
-          <input
-            type="range"
-            min={3}
-            max={15}
-            step={1}
-            value={settings.defaultDurationMinutes}
-            onChange={(e) => handleUpdate({ defaultDurationMinutes: Number(e.target.value) })}
-            style={{
-              width: "100%",
-              accentColor: "var(--color-primary)",
-              cursor: "pointer",
-              height: 6,
-            }}
-          />
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.7rem", color: "var(--text-subtle)", fontWeight: 600 }}>
-            <span>3 min</span>
-            <span>5 min</span>
-            <span>7 min</span>
-            <span>10 min</span>
-            <span>12 min</span>
-            <span>15 min</span>
-          </div>
-        </div>
-
-        {/* SLIDER 3: Étirements après la séance */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 8, paddingTop: 12, borderTop: "1px solid var(--border-subtle)" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div>
-              <div style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--text-main)" }}>
-                ✨ 3. Étirements après séance
+            {/* Visual Multi-Segment Routine Timeline Bar */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <div
+                style={{
+                  width: "100%",
+                  height: 10,
+                  borderRadius: 99,
+                  backgroundColor: "var(--bg-surface-elevated)",
+                  overflow: "hidden",
+                  display: "flex",
+                  gap: 2,
+                  padding: 1,
+                  boxShadow: "inset 0 1px 2px rgba(0,0,0,0.06)",
+                }}
+              >
+                {warmup > 0 && (
+                  <div
+                    style={{
+                      width: `${warmupPct}%`,
+                      height: "100%",
+                      borderRadius: 99,
+                      backgroundColor: "#2A9D8F",
+                      transition: "width 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+                    }}
+                    title={`Échauffement: +${warmup} min`}
+                  />
+                )}
+                <div
+                  style={{
+                    width: `${mainPct}%`,
+                    height: "100%",
+                    borderRadius: 99,
+                    backgroundColor: "var(--color-primary)",
+                    transition: "width 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+                  }}
+                  title={`Séance: ${main} min`}
+                />
+                {cooldown > 0 && (
+                  <div
+                    style={{
+                      width: `${cooldownPct}%`,
+                      height: "100%",
+                      borderRadius: 99,
+                      backgroundColor: "#E76F51",
+                      transition: "width 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+                    }}
+                    title={`Étirements: +${cooldown} min`}
+                  />
+                )}
               </div>
-              <div style={{ fontSize: "0.76rem", color: "var(--text-muted)" }}>
-                Assouplissements de fin & retour au calme
+
+              {/* Timeline Micro Legend */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.72rem", color: "var(--text-muted)" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                  <span style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: warmup > 0 ? "#2A9D8F" : "var(--border-color)" }} />
+                  <span>1. Avant ({warmup > 0 ? `+${warmup}m` : "Off"})</span>
+                </span>
+                <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                  <span style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: "var(--color-primary)" }} />
+                  <span>2. Séance ({main}m)</span>
+                </span>
+                <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                  <span style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: cooldown > 0 ? "#E76F51" : "var(--border-color)" }} />
+                  <span>3. Après ({cooldown > 0 ? `+${cooldown}m` : "Off"})</span>
+                </span>
               </div>
             </div>
-            <span
-              style={{
-                fontSize: "0.85rem",
-                fontWeight: 800,
-                padding: "2px 8px",
-                borderRadius: "var(--radius-sm)",
-                backgroundColor: (settings.cooldownExtraMinutes || 0) > 0 ? "var(--color-primary-soft)" : "var(--bg-surface-elevated)",
-                color: (settings.cooldownExtraMinutes || 0) > 0 ? "var(--color-primary-dark)" : "var(--text-subtle)",
-              }}
-            >
-              {(settings.cooldownExtraMinutes || 0) === 0 ? "Désactivé" : `+${settings.cooldownExtraMinutes} min`}
-            </span>
-          </div>
 
-          <input
-            type="range"
-            min={0}
-            max={5}
-            step={1}
-            value={settings.cooldownExtraMinutes || 0}
-            onChange={(e) => handleUpdate({ cooldownExtraMinutes: Number(e.target.value) })}
-            style={{
-              width: "100%",
-              accentColor: "var(--color-primary)",
-              cursor: "pointer",
-              height: 6,
-            }}
-          />
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.7rem", color: "var(--text-subtle)", fontWeight: 600 }}>
-            <span>Off</span>
-            <span>+1 min</span>
-            <span>+2 min</span>
-            <span>+3 min</span>
-            <span>+4 min</span>
-            <span>+5 min</span>
+            {/* 3 Sequential Stage Cards */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 4 }}>
+              {/* STAGE 1: Échauffement préparatoire */}
+              <div
+                style={{
+                  padding: "12px 14px",
+                  borderRadius: "var(--radius-lg)",
+                  backgroundColor: warmup > 0 ? "rgba(42, 157, 143, 0.07)" : "var(--bg-surface-elevated)",
+                  border: warmup > 0 ? "1.5px solid rgba(42, 157, 143, 0.35)" : "1px solid var(--border-subtle)",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 10,
+                  transition: "all 0.2s ease",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ fontSize: "1.2rem" }}>🧘</span>
+                    <div>
+                      <div style={{ fontSize: "0.88rem", fontWeight: 700, color: "var(--text-main)" }}>
+                        1. Échauffement & étirements avant
+                      </div>
+                      <div style={{ fontSize: "0.74rem", color: "var(--text-muted)" }}>
+                        Mobilité douce et déverrouillage articulaire
+                      </div>
+                    </div>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: "0.78rem",
+                      fontWeight: 800,
+                      padding: "2px 8px",
+                      borderRadius: "var(--radius-sm)",
+                      backgroundColor: warmup > 0 ? "#2A9D8F" : "transparent",
+                      color: warmup > 0 ? "#FFFFFF" : "var(--text-subtle)",
+                    }}
+                  >
+                    {warmup === 0 ? "Off" : `+${warmup} min`}
+                  </span>
+                </div>
+
+                {/* Segmented Options */}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
+                  {[
+                    { label: "Désactivé", val: 0 },
+                    { label: "+2 min", val: 2 },
+                    { label: "+3 min", val: 3 },
+                    { label: "+5 min", val: 5 },
+                  ].map((opt) => {
+                    const active = warmup === opt.val;
+                    return (
+                      <button
+                        key={opt.val}
+                        type="button"
+                        onClick={() => handleUpdate({ warmupExtraMinutes: opt.val })}
+                        style={{
+                          padding: "8px 4px",
+                          borderRadius: "var(--radius-md)",
+                          fontSize: "0.78rem",
+                          fontWeight: active ? 800 : 500,
+                          backgroundColor: active ? "#2A9D8F" : "var(--bg-surface)",
+                          color: active ? "#FFFFFF" : "var(--text-main)",
+                          border: active ? "none" : "1px solid var(--border-subtle)",
+                          boxShadow: active ? "0 2px 8px rgba(42, 157, 143, 0.3)" : "none",
+                          cursor: "pointer",
+                          transition: "all 0.15s ease",
+                        }}
+                      >
+                        {opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* STAGE 2: Séance Principale */}
+              <div
+                style={{
+                  padding: "12px 14px",
+                  borderRadius: "var(--radius-lg)",
+                  backgroundColor: "var(--color-primary-soft)",
+                  border: "1.5px solid var(--color-primary)",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 10,
+                  transition: "all 0.2s ease",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ fontSize: "1.2rem" }}>⏱️</span>
+                    <div>
+                      <div style={{ fontSize: "0.88rem", fontWeight: 700, color: "var(--text-main)" }}>
+                        2. Corps de la séance
+                      </div>
+                      <div style={{ fontSize: "0.74rem", color: "var(--text-muted)" }}>
+                        Entraînement actif adapté à votre état du jour
+                      </div>
+                    </div>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: "0.78rem",
+                      fontWeight: 800,
+                      padding: "2px 8px",
+                      borderRadius: "var(--radius-sm)",
+                      backgroundColor: "var(--color-primary)",
+                      color: "#FFFFFF",
+                    }}
+                  >
+                    {main} min
+                  </span>
+                </div>
+
+                {/* Segmented Options */}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 6 }}>
+                  {[
+                    { label: "5 min", val: 5 },
+                    { label: "7 min", val: 7 },
+                    { label: "10 min", val: 10 },
+                    { label: "12 min", val: 12 },
+                    { label: "15 min", val: 15 },
+                  ].map((opt) => {
+                    const active = main === opt.val;
+                    return (
+                      <button
+                        key={opt.val}
+                        type="button"
+                        onClick={() => handleUpdate({ defaultDurationMinutes: opt.val })}
+                        style={{
+                          padding: "8px 2px",
+                          borderRadius: "var(--radius-md)",
+                          fontSize: "0.78rem",
+                          fontWeight: active ? 800 : 500,
+                          backgroundColor: active ? "var(--color-primary)" : "var(--bg-surface)",
+                          color: active ? "#FFFFFF" : "var(--text-main)",
+                          border: active ? "none" : "1px solid var(--border-subtle)",
+                          boxShadow: active ? "0 2px 8px rgba(27, 67, 50, 0.3)" : "none",
+                          cursor: "pointer",
+                          transition: "all 0.15s ease",
+                        }}
+                      >
+                        {opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* STAGE 3: Étirements après séance */}
+              <div
+                style={{
+                  padding: "12px 14px",
+                  borderRadius: "var(--radius-lg)",
+                  backgroundColor: cooldown > 0 ? "rgba(231, 111, 81, 0.07)" : "var(--bg-surface-elevated)",
+                  border: cooldown > 0 ? "1.5px solid rgba(231, 111, 81, 0.35)" : "1px solid var(--border-subtle)",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 10,
+                  transition: "all 0.2s ease",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ fontSize: "1.2rem" }}>✨</span>
+                    <div>
+                      <div style={{ fontSize: "0.88rem", fontWeight: 700, color: "var(--text-main)" }}>
+                        3. Étirements après séance
+                      </div>
+                      <div style={{ fontSize: "0.74rem", color: "var(--text-muted)" }}>
+                        Assouplissements de fin & retour au calme
+                      </div>
+                    </div>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: "0.78rem",
+                      fontWeight: 800,
+                      padding: "2px 8px",
+                      borderRadius: "var(--radius-sm)",
+                      backgroundColor: cooldown > 0 ? "#E76F51" : "transparent",
+                      color: cooldown > 0 ? "#FFFFFF" : "var(--text-subtle)",
+                    }}
+                  >
+                    {cooldown === 0 ? "Off" : `+${cooldown} min`}
+                  </span>
+                </div>
+
+                {/* Segmented Options */}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
+                  {[
+                    { label: "Désactivé", val: 0 },
+                    { label: "+2 min", val: 2 },
+                    { label: "+3 min", val: 3 },
+                    { label: "+5 min", val: 5 },
+                  ].map((opt) => {
+                    const active = cooldown === opt.val;
+                    return (
+                      <button
+                        key={opt.val}
+                        type="button"
+                        onClick={() => handleUpdate({ cooldownExtraMinutes: opt.val })}
+                        style={{
+                          padding: "8px 4px",
+                          borderRadius: "var(--radius-md)",
+                          fontSize: "0.78rem",
+                          fontWeight: active ? 800 : 500,
+                          backgroundColor: active ? "#E76F51" : "var(--bg-surface)",
+                          color: active ? "#FFFFFF" : "var(--text-main)",
+                          border: active ? "none" : "1px solid var(--border-subtle)",
+                          boxShadow: active ? "0 2px 8px rgba(231, 111, 81, 0.3)" : "none",
+                          cursor: "pointer",
+                          transition: "all 0.15s ease",
+                        }}
+                      >
+                        {opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        );
+      })()}
 
       {/* 2. Morning Reminder & Active Days */}
       <div className="card" style={{ display: "flex", flexDirection: "column", gap: 16 }}>

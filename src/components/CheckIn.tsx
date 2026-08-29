@@ -656,13 +656,13 @@ export const CheckIn: React.FC<CheckInProps> = ({
             </button>
           </div>
 
-          {/* Optional Warmup & Cooldown Add-on Section with Sliders */}
+          {/* Optional Warmup & Cooldown Add-on Section with Segmented Pills */}
           <div
             className="card"
             style={{
               display: "flex",
               flexDirection: "column",
-              gap: 14,
+              gap: 12,
               padding: "16px",
               marginTop: 4,
               backgroundColor: "var(--bg-surface)",
@@ -687,83 +687,101 @@ export const CheckIn: React.FC<CheckInProps> = ({
               </span>
             </div>
 
-            {/* Slider 1: Échauffement avant */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {/* Stage 1: Échauffement avant */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--text-main)" }}>
                   🧘 1. Échauffement & mobilité avant
                 </span>
                 <span
                   style={{
-                    fontSize: "0.8rem",
+                    fontSize: "0.78rem",
                     fontWeight: 800,
-                    color: warmupExtra > 0 ? "var(--color-primary)" : "var(--text-subtle)",
+                    padding: "2px 6px",
+                    borderRadius: "var(--radius-sm)",
+                    backgroundColor: warmupExtra > 0 ? "#2A9D8F" : "transparent",
+                    color: warmupExtra > 0 ? "#FFFFFF" : "var(--text-subtle)",
                   }}
                 >
                   {warmupExtra === 0 ? "Off" : `+${warmupExtra} min`}
                 </span>
               </div>
-              <input
-                type="range"
-                min={0}
-                max={5}
-                step={1}
-                value={warmupExtra}
-                onChange={(e) => setWarmupExtra(Number(e.target.value))}
-                style={{
-                  width: "100%",
-                  accentColor: "var(--color-primary)",
-                  cursor: "pointer",
-                  height: 6,
-                }}
-              />
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.68rem", color: "var(--text-subtle)", fontWeight: 600 }}>
-                <span>Off</span>
-                <span>+1m</span>
-                <span>+2m</span>
-                <span>+3m</span>
-                <span>+4m</span>
-                <span>+5m</span>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
+                {[
+                  { label: "Off", val: 0 },
+                  { label: "+2 min", val: 2 },
+                  { label: "+3 min", val: 3 },
+                  { label: "+5 min", val: 5 },
+                ].map((opt) => (
+                  <button
+                    key={opt.val}
+                    type="button"
+                    onClick={() => setWarmupExtra(opt.val)}
+                    style={{
+                      padding: "8px 2px",
+                      borderRadius: "var(--radius-md)",
+                      fontSize: "0.78rem",
+                      fontWeight: warmupExtra === opt.val ? 800 : 500,
+                      backgroundColor: warmupExtra === opt.val ? "#2A9D8F" : "var(--bg-surface-elevated)",
+                      color: warmupExtra === opt.val ? "#FFFFFF" : "var(--text-main)",
+                      border: warmupExtra === opt.val ? "none" : "1px solid var(--border-subtle)",
+                      boxShadow: warmupExtra === opt.val ? "0 2px 8px rgba(42, 157, 143, 0.3)" : "none",
+                      cursor: "pointer",
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Slider 2: Étirements après */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 6, paddingTop: 8, borderTop: "1px solid var(--border-subtle)" }}>
+            {/* Stage 2: Étirements après */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, paddingTop: 8, borderTop: "1px solid var(--border-subtle)" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--text-main)" }}>
                   ✨ 2. Étirements & retour au calme après
                 </span>
                 <span
                   style={{
-                    fontSize: "0.8rem",
+                    fontSize: "0.78rem",
                     fontWeight: 800,
-                    color: cooldownExtra > 0 ? "var(--color-primary)" : "var(--text-subtle)",
+                    padding: "2px 6px",
+                    borderRadius: "var(--radius-sm)",
+                    backgroundColor: cooldownExtra > 0 ? "#E76F51" : "transparent",
+                    color: cooldownExtra > 0 ? "#FFFFFF" : "var(--text-subtle)",
                   }}
                 >
                   {cooldownExtra === 0 ? "Off" : `+${cooldownExtra} min`}
                 </span>
               </div>
-              <input
-                type="range"
-                min={0}
-                max={5}
-                step={1}
-                value={cooldownExtra}
-                onChange={(e) => setCooldownExtra(Number(e.target.value))}
-                style={{
-                  width: "100%",
-                  accentColor: "var(--color-primary)",
-                  cursor: "pointer",
-                  height: 6,
-                }}
-              />
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.68rem", color: "var(--text-subtle)", fontWeight: 600 }}>
-                <span>Off</span>
-                <span>+1m</span>
-                <span>+2m</span>
-                <span>+3m</span>
-                <span>+4m</span>
-                <span>+5m</span>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
+                {[
+                  { label: "Off", val: 0 },
+                  { label: "+2 min", val: 2 },
+                  { label: "+3 min", val: 3 },
+                  { label: "+5 min", val: 5 },
+                ].map((opt) => (
+                  <button
+                    key={opt.val}
+                    type="button"
+                    onClick={() => setCooldownExtra(opt.val)}
+                    style={{
+                      padding: "8px 2px",
+                      borderRadius: "var(--radius-md)",
+                      fontSize: "0.78rem",
+                      fontWeight: cooldownExtra === opt.val ? 800 : 500,
+                      backgroundColor: cooldownExtra === opt.val ? "#E76F51" : "var(--bg-surface-elevated)",
+                      color: cooldownExtra === opt.val ? "#FFFFFF" : "var(--text-main)",
+                      border: cooldownExtra === opt.val ? "none" : "1px solid var(--border-subtle)",
+                      boxShadow: cooldownExtra === opt.val ? "0 2px 8px rgba(231, 111, 81, 0.3)" : "none",
+                      cursor: "pointer",
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
