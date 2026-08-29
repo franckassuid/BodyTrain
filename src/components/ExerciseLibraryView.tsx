@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Search, Sparkles, Play, ChevronRight } from "lucide-react";
+import { Search, Sparkles, Play, Info } from "lucide-react";
 import { EXERCISES } from "../data/exercisesData.ts";
 import type { Exercise } from "../types/exercise.ts";
 import { CATEGORY_LABELS, type SessionPhase } from "../types/enums.ts";
@@ -239,7 +239,13 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({ onPlay
           return (
             <div
               key={ex.id}
-              onClick={() => setSelectedExercise(ex)}
+              onClick={() => {
+                if (onPlayExercise) {
+                  onPlayExercise(ex, 45);
+                } else {
+                  setSelectedExercise(ex);
+                }
+              }}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -313,8 +319,32 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({ onPlay
                 </div>
               </div>
 
-              {/* Quick Launch & Arrow Buttons */}
+              {/* Quick Launch & Info Buttons */}
               <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0, marginLeft: 8 }}>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedExercise(ex);
+                  }}
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: "50%",
+                    backgroundColor: "var(--bg-surface-elevated)",
+                    color: "var(--text-muted)",
+                    border: "1px solid var(--border-subtle)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                  }}
+                  aria-label={`Détails et consignes pour ${ex.nameFr || ex.name}`}
+                  title="Détails et consignes"
+                >
+                  <Info size={15} />
+                </button>
+
                 {onPlayExercise && (
                   <button
                     type="button"
@@ -341,8 +371,6 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({ onPlay
                     <Play size={15} fill="currentColor" />
                   </button>
                 )}
-
-                <ChevronRight size={18} color="var(--text-subtle)" />
               </div>
             </div>
           );
