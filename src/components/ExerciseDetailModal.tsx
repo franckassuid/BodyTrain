@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { createPortal } from "react-dom";
 import { X, Play, Volume2, Wind, Clock } from "lucide-react";
 import type { Exercise } from "../types/exercise.ts";
 import { ExerciseAnimation } from "./ExerciseAnimation.tsx";
@@ -36,7 +37,9 @@ export const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
     }
   };
 
-  return (
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
     <div
       style={{
         position: "fixed",
@@ -44,14 +47,16 @@ export const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
         left: 0,
         right: 0,
         bottom: 0,
+        width: "100vw",
+        height: "100vh",
         backgroundColor: "rgba(0, 0, 0, 0.65)",
         backdropFilter: "blur(6px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        zIndex: 10000,
+        zIndex: 999999,
         padding: "16px 12px",
-        overflowY: "auto",
+        boxSizing: "border-box",
       }}
       onClick={onClose}
     >
@@ -329,6 +334,7 @@ export const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
           <span>Fermer</span>
         </button>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

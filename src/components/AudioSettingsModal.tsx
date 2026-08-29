@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   X,
   Volume2,
@@ -102,7 +103,9 @@ export const AudioSettingsModal: React.FC<AudioSettingsModalProps> = ({ isOpen, 
     voiceCoach.testVoice();
   };
 
-  return (
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
     <div
       style={{
         position: "fixed",
@@ -110,13 +113,16 @@ export const AudioSettingsModal: React.FC<AudioSettingsModalProps> = ({ isOpen, 
         left: 0,
         right: 0,
         bottom: 0,
+        width: "100vw",
+        height: "100vh",
         backgroundColor: "rgba(0, 0, 0, 0.65)",
-        backdropFilter: "blur(5px)",
+        backdropFilter: "blur(6px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        zIndex: 10000,
-        padding: 16,
+        zIndex: 999999,
+        padding: "16px 12px",
+        boxSizing: "border-box",
       }}
       onClick={onClose}
     >
@@ -469,6 +475,7 @@ export const AudioSettingsModal: React.FC<AudioSettingsModalProps> = ({ isOpen, 
           <span>Terminé</span>
         </button>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

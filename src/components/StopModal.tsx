@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import { Check, X, Play } from "lucide-react";
 
 interface StopModalProps {
@@ -18,11 +19,11 @@ export const StopModal: React.FC<StopModalProps> = ({
   onDiscard,
   onResume,
 }) => {
-  if (!isOpen) return null;
+  if (!isOpen || typeof document === "undefined") return null;
 
   const elapsedMin = Math.max(1, Math.round(elapsedSeconds / 60));
 
-  return (
+  return createPortal(
     <div
       style={{
         position: "fixed",
@@ -30,18 +31,21 @@ export const StopModal: React.FC<StopModalProps> = ({
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: "rgba(0, 0, 0, 0.55)",
-        backdropFilter: "blur(4px)",
+        width: "100vw",
+        height: "100vh",
+        backgroundColor: "rgba(0, 0, 0, 0.65)",
+        backdropFilter: "blur(6px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: 20,
-        zIndex: 200,
+        padding: "20px 16px",
+        zIndex: 999999,
+        boxSizing: "border-box",
       }}
-      className="animate-fade-in"
+      onClick={onResume}
     >
       <div
-        className="card"
+        className="animate-slide-up"
         style={{
           width: "100%",
           maxWidth: 400,
@@ -49,8 +53,13 @@ export const StopModal: React.FC<StopModalProps> = ({
           flexDirection: "column",
           gap: 20,
           padding: "24px 20px",
-          boxShadow: "var(--shadow-lg)",
+          backgroundColor: "var(--bg-surface, #FFFFFF)",
+          color: "var(--text-main, #1F2937)",
+          borderRadius: "var(--radius-xl)",
+          boxShadow: "0 25px 60px rgba(0,0,0,0.35)",
+          border: "1px solid var(--border-color, #E2E8F0)",
         }}
+        onClick={(e) => e.stopPropagation()}
       >
         <div>
           <h2 style={{ fontSize: "1.3rem", fontWeight: 700, color: "var(--text-main)", lineHeight: 1.3 }}>
@@ -79,6 +88,7 @@ export const StopModal: React.FC<StopModalProps> = ({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

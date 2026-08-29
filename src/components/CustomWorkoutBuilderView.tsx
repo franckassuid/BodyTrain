@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { createPortal } from "react-dom";
 import {
   Plus,
   Play,
@@ -713,236 +714,243 @@ export const CustomWorkoutBuilderView: React.FC<CustomWorkoutBuilderViewProps> =
       {/* ══════════════════════════════════════════════════════════════════════
           EXERCISE PICKER MODAL (131 Exercises)
       ══════════════════════════════════════════════════════════════════════ */}
-      {showExercisePicker && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.65)",
-            backdropFilter: "blur(6px)",
-            zIndex: 10000,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "16px 12px",
-          }}
-          onClick={() => setShowExercisePicker(false)}
-        >
+      {showExercisePicker &&
+        typeof document !== "undefined" &&
+        createPortal(
           <div
-            className="animate-slide-up"
             style={{
-              backgroundColor: "var(--bg-surface)",
-              borderRadius: "var(--radius-xl)",
-              width: "100%",
-              maxWidth: 480,
-              maxHeight: "85vh",
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              width: "100vw",
+              height: "100vh",
+              backgroundColor: "rgba(0, 0, 0, 0.7)",
+              backdropFilter: "blur(6px)",
+              zIndex: 999999,
               display: "flex",
-              flexDirection: "column",
-              overflow: "hidden",
-              border: "1px solid var(--border-color)",
-              boxShadow: "0 20px 50px rgba(0,0,0,0.3)",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "16px 12px",
+              boxSizing: "border-box",
             }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={() => setShowExercisePicker(false)}
           >
-            {/* Modal Header */}
             <div
+              className="animate-slide-up"
               style={{
-                padding: "16px 18px",
-                borderBottom: "1px solid var(--border-color)",
+                backgroundColor: "var(--bg-surface, #FFFFFF)",
+                borderRadius: "var(--radius-xl)",
+                width: "100%",
+                maxWidth: 480,
+                height: "85vh",
+                maxHeight: "85vh",
                 display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
+                flexDirection: "column",
+                overflow: "hidden",
+                border: "1px solid var(--border-color, #E2E8F0)",
+                boxShadow: "0 25px 60px rgba(0,0,0,0.35)",
               }}
+              onClick={(e) => e.stopPropagation()}
             >
-              <div>
-                <h3 style={{ fontSize: "1.1rem", fontWeight: 800, margin: 0, color: "var(--text-main)" }}>
-                  Choisir un exercice
-                </h3>
-                <p style={{ fontSize: "0.78rem", color: "var(--text-muted)", margin: "2px 0 0 0" }}>
-                  {filteredPickerExercises.length} exercices disponibles
-                </p>
-              </div>
-              <button
-                type="button"
-                className="btn-ghost"
-                onClick={() => setShowExercisePicker(false)}
-                style={{ padding: 6, borderRadius: "50%" }}
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            {/* Search and Category Filter */}
-            <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--border-subtle)", display: "flex", flexDirection: "column", gap: 8 }}>
+              {/* Modal Header */}
               <div
                 style={{
+                  padding: "16px 18px",
+                  borderBottom: "1px solid var(--border-color)",
                   display: "flex",
                   alignItems: "center",
-                  gap: 8,
-                  padding: "8px 12px",
-                  borderRadius: "var(--radius-md)",
-                  backgroundColor: "var(--bg-surface-elevated)",
-                  border: "1px solid var(--border-color)",
+                  justifyContent: "space-between",
                 }}
               >
-                <Search size={16} color="var(--text-subtle)" />
-                <input
-                  type="text"
-                  value={pickerSearch}
-                  onChange={(e) => setPickerSearch(e.target.value)}
-                  placeholder="Rechercher par nom (ex: pompe, fente, gainage...)"
-                  style={{
-                    border: "none",
-                    background: "transparent",
-                    color: "var(--text-main)",
-                    width: "100%",
-                    fontSize: "0.85rem",
-                    outline: "none",
-                  }}
-                />
-              </div>
-
-              {/* Category selector */}
-              <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 4 }}>
+                <div>
+                  <h3 style={{ fontSize: "1.1rem", fontWeight: 800, margin: 0, color: "var(--text-main)" }}>
+                    Choisir un exercice
+                  </h3>
+                  <p style={{ fontSize: "0.78rem", color: "var(--text-muted)", margin: "2px 0 0 0" }}>
+                    {filteredPickerExercises.length} exercices disponibles
+                  </p>
+                </div>
                 <button
                   type="button"
-                  onClick={() => setPickerCategory("all")}
+                  className="btn-ghost"
+                  onClick={() => setShowExercisePicker(false)}
+                  style={{ padding: 6, borderRadius: "50%" }}
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              {/* Search and Category Filter */}
+              <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--border-subtle)", display: "flex", flexDirection: "column", gap: 8 }}>
+                <div
                   style={{
-                    padding: "4px 10px",
-                    borderRadius: "var(--radius-full)",
-                    fontSize: "0.74rem",
-                    fontWeight: pickerCategory === "all" ? 700 : 500,
-                    backgroundColor: pickerCategory === "all" ? "var(--color-primary)" : "var(--bg-surface-elevated)",
-                    color: pickerCategory === "all" ? "#FFFFFF" : "var(--text-main)",
-                    border: "none",
-                    whiteSpace: "nowrap",
-                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "8px 12px",
+                    borderRadius: "var(--radius-md)",
+                    backgroundColor: "var(--bg-surface-elevated)",
+                    border: "1px solid var(--border-color)",
                   }}
                 >
-                  Tous
-                </button>
-                {Object.entries(CATEGORY_LABELS).map(([catKey, catLabel]) => (
+                  <Search size={16} color="var(--text-subtle)" />
+                  <input
+                    type="text"
+                    value={pickerSearch}
+                    onChange={(e) => setPickerSearch(e.target.value)}
+                    placeholder="Rechercher par nom (ex: pompe, fente, gainage...)"
+                    style={{
+                      border: "none",
+                      background: "transparent",
+                      color: "var(--text-main)",
+                      width: "100%",
+                      fontSize: "0.85rem",
+                      outline: "none",
+                    }}
+                  />
+                </div>
+
+                {/* Category selector */}
+                <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 4 }}>
                   <button
-                    key={catKey}
                     type="button"
-                    onClick={() => setPickerCategory(catKey)}
+                    onClick={() => setPickerCategory("all")}
                     style={{
                       padding: "4px 10px",
                       borderRadius: "var(--radius-full)",
                       fontSize: "0.74rem",
-                      fontWeight: pickerCategory === catKey ? 700 : 500,
-                      backgroundColor: pickerCategory === catKey ? "var(--color-primary)" : "var(--bg-surface-elevated)",
-                      color: pickerCategory === catKey ? "#FFFFFF" : "var(--text-main)",
+                      fontWeight: pickerCategory === "all" ? 700 : 500,
+                      backgroundColor: pickerCategory === "all" ? "var(--color-primary)" : "var(--bg-surface-elevated)",
+                      color: pickerCategory === "all" ? "#FFFFFF" : "var(--text-main)",
                       border: "none",
                       whiteSpace: "nowrap",
                       cursor: "pointer",
                     }}
                   >
-                    {catLabel}
+                    Tous
                   </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Exercises List */}
-            <div style={{ flex: 1, overflowY: "auto", padding: "10px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
-              {filteredPickerExercises.map((ex) => {
-                const slug = ex.slug || ex.id;
-                const gifUrl = `/animations/${slug}.gif`;
-                const alreadyCount = selectedItems.filter((it) => it.exercise.id === ex.id).length;
-
-                return (
-                  <div
-                    key={ex.id}
-                    onClick={() => {
-                      handleAddItem(ex);
-                    }}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      padding: "8px 10px",
-                      borderRadius: "var(--radius-md)",
-                      backgroundColor: "var(--bg-surface)",
-                      border: "1px solid var(--border-subtle)",
-                      cursor: "pointer",
-                      transition: "all 0.15s ease",
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0 }}>
-                      <div
-                        style={{
-                          width: 44,
-                          height: 44,
-                          borderRadius: "var(--radius-md)",
-                          backgroundColor: "var(--bg-surface-elevated)",
-                          overflow: "hidden",
-                          flexShrink: 0,
-                        }}
-                      >
-                        <img
-                          src={gifUrl}
-                          alt={ex.nameFr || ex.name}
-                          style={{ width: "100%", height: "100%", objectFit: "contain" }}
-                          onError={(e) => ((e.target as HTMLElement).style.display = "none")}
-                        />
-                      </div>
-
-                      <div style={{ minWidth: 0, flex: 1 }}>
-                        <div style={{ fontWeight: 700, fontSize: "0.88rem", color: "var(--text-main)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                          {ex.nameFr || ex.name}
-                        </div>
-                        <div style={{ fontSize: "0.74rem", color: "var(--text-muted)" }}>
-                          {CATEGORY_LABELS[ex.category] || ex.category} • Intensité {ex.intensity}/5
-                          {ex.unilateral && " • 🔄 2 côtés"}
-                        </div>
-                      </div>
-                    </div>
-
+                  {Object.entries(CATEGORY_LABELS).map(([catKey, catLabel]) => (
                     <button
+                      key={catKey}
                       type="button"
+                      onClick={() => setPickerCategory(catKey)}
                       style={{
-                        padding: "6px 10px",
-                        borderRadius: "var(--radius-sm)",
-                        fontSize: "0.76rem",
-                        fontWeight: 700,
-                        backgroundColor: alreadyCount > 0 ? "var(--color-primary-soft)" : "var(--bg-surface-elevated)",
-                        color: alreadyCount > 0 ? "var(--color-primary-dark)" : "var(--text-main)",
-                        border: "1px solid var(--border-subtle)",
+                        padding: "4px 10px",
+                        borderRadius: "var(--radius-full)",
+                        fontSize: "0.74rem",
+                        fontWeight: pickerCategory === catKey ? 700 : 500,
+                        backgroundColor: pickerCategory === catKey ? "var(--color-primary)" : "var(--bg-surface-elevated)",
+                        color: pickerCategory === catKey ? "#FFFFFF" : "var(--text-main)",
+                        border: "none",
+                        whiteSpace: "nowrap",
                         cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 4,
                       }}
                     >
-                      <Plus size={14} />
-                      <span>{alreadyCount > 0 ? `Ajouté (${alreadyCount})` : "Ajouter"}</span>
+                      {catLabel}
                     </button>
-                  </div>
-                );
-              })}
-            </div>
+                  ))}
+                </div>
+              </div>
 
-            {/* Modal Footer */}
-            <div style={{ padding: "12px 16px", borderTop: "1px solid var(--border-color)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "0.82rem", fontWeight: 600, color: "var(--text-muted)" }}>
-                {selectedItems.length} exercice{selectedItems.length > 1 ? "s" : ""} dans la séance
-              </span>
-              <button
-                type="button"
-                className="btn-primary"
-                onClick={() => setShowExercisePicker(false)}
-                style={{ padding: "6px 14px", fontSize: "0.84rem" }}
-              >
-                <span>Terminer la sélection</span>
-              </button>
+              {/* Exercises List */}
+              <div style={{ flex: 1, overflowY: "auto", padding: "10px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
+                {filteredPickerExercises.map((ex) => {
+                  const slug = ex.slug || ex.id;
+                  const gifUrl = `/animations/${slug}.gif`;
+                  const alreadyCount = selectedItems.filter((it) => it.exercise.id === ex.id).length;
+
+                  return (
+                    <div
+                      key={ex.id}
+                      onClick={() => {
+                        handleAddItem(ex);
+                      }}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        padding: "8px 10px",
+                        borderRadius: "var(--radius-md)",
+                        backgroundColor: "var(--bg-surface)",
+                        border: "1px solid var(--border-subtle)",
+                        cursor: "pointer",
+                        transition: "all 0.15s ease",
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0 }}>
+                        <div
+                          style={{
+                            width: 44,
+                            height: 44,
+                            borderRadius: "var(--radius-md)",
+                            backgroundColor: "var(--bg-surface-elevated)",
+                            overflow: "hidden",
+                            flexShrink: 0,
+                          }}
+                        >
+                          <img
+                            src={gifUrl}
+                            alt={ex.nameFr || ex.name}
+                            style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                            onError={(e) => ((e.target as HTMLElement).style.display = "none")}
+                          />
+                        </div>
+
+                        <div style={{ minWidth: 0, flex: 1 }}>
+                          <div style={{ fontWeight: 700, fontSize: "0.88rem", color: "var(--text-main)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            {ex.nameFr || ex.name}
+                          </div>
+                          <div style={{ fontSize: "0.74rem", color: "var(--text-muted)" }}>
+                            {CATEGORY_LABELS[ex.category] || ex.category} • Intensité {ex.intensity}/5
+                            {ex.unilateral && " • 🔄 2 côtés"}
+                          </div>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        style={{
+                          padding: "6px 10px",
+                          borderRadius: "var(--radius-sm)",
+                          fontSize: "0.76rem",
+                          fontWeight: 700,
+                          backgroundColor: alreadyCount > 0 ? "var(--color-primary-soft)" : "var(--bg-surface-elevated)",
+                          color: alreadyCount > 0 ? "var(--color-primary-dark)" : "var(--text-main)",
+                          border: "1px solid var(--border-subtle)",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 4,
+                        }}
+                      >
+                        <Plus size={14} />
+                        <span>{alreadyCount > 0 ? `Ajouté (${alreadyCount})` : "Ajouter"}</span>
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Modal Footer */}
+              <div style={{ padding: "12px 16px", borderTop: "1px solid var(--border-color)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ fontSize: "0.82rem", fontWeight: 600, color: "var(--text-muted)" }}>
+                  {selectedItems.length} exercice{selectedItems.length > 1 ? "s" : ""} dans la séance
+                </span>
+                <button
+                  type="button"
+                  className="btn-primary"
+                  onClick={() => setShowExercisePicker(false)}
+                  style={{ padding: "6px 14px", fontSize: "0.84rem" }}
+                >
+                  <span>Terminer la sélection</span>
+                </button>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </div>
   );
 };
