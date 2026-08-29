@@ -193,6 +193,73 @@ export const SettingsView: React.FC = () => {
         <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
           Chaque matin, la séance sera automatiquement configurée sur cette durée.
         </div>
+
+        {/* Extra Warmup & Cooldown Defaults */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, paddingTop: 12, borderTop: "1px solid var(--border-subtle)" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div>
+              <div style={{ fontSize: "0.88rem", fontWeight: 700, color: "var(--text-main)" }}>
+                🧘 Échauffement préparatoire
+              </div>
+              <div style={{ fontSize: "0.76rem", color: "var(--text-muted)" }}>
+                Mobilité douce avant la séance
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 6 }}>
+              {[0, 2, 3].map((mins) => (
+                <button
+                  key={mins}
+                  type="button"
+                  onClick={() => handleUpdate({ warmupExtraMinutes: mins })}
+                  style={{
+                    padding: "4px 10px",
+                    borderRadius: "var(--radius-sm)",
+                    fontSize: "0.78rem",
+                    fontWeight: (settings.warmupExtraMinutes || 0) === mins ? 700 : 500,
+                    backgroundColor: (settings.warmupExtraMinutes || 0) === mins ? "var(--color-primary-soft)" : "var(--bg-surface-elevated)",
+                    color: (settings.warmupExtraMinutes || 0) === mins ? "var(--color-primary-dark)" : "var(--text-muted)",
+                    border: (settings.warmupExtraMinutes || 0) === mins ? "1px solid var(--color-primary)" : "1px solid var(--border-subtle)",
+                    cursor: "pointer",
+                  }}
+                >
+                  {mins === 0 ? "Off" : `+${mins} min`}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 8 }}>
+            <div>
+              <div style={{ fontSize: "0.88rem", fontWeight: 700, color: "var(--text-main)" }}>
+                ✨ Étirements après séance
+              </div>
+              <div style={{ fontSize: "0.76rem", color: "var(--text-muted)" }}>
+                Assouplissements & retour au calme
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 6 }}>
+              {[0, 2, 3, 5].map((mins) => (
+                <button
+                  key={mins}
+                  type="button"
+                  onClick={() => handleUpdate({ cooldownExtraMinutes: mins })}
+                  style={{
+                    padding: "4px 10px",
+                    borderRadius: "var(--radius-sm)",
+                    fontSize: "0.78rem",
+                    fontWeight: (settings.cooldownExtraMinutes || 0) === mins ? 700 : 500,
+                    backgroundColor: (settings.cooldownExtraMinutes || 0) === mins ? "var(--color-primary-soft)" : "var(--bg-surface-elevated)",
+                    color: (settings.cooldownExtraMinutes || 0) === mins ? "var(--color-primary-dark)" : "var(--text-muted)",
+                    border: (settings.cooldownExtraMinutes || 0) === mins ? "1px solid var(--color-primary)" : "1px solid var(--border-subtle)",
+                    cursor: "pointer",
+                  }}
+                >
+                  {mins === 0 ? "Off" : `+${mins} min`}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* 2. Morning Reminder & Active Days */}

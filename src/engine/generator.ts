@@ -13,6 +13,8 @@ export interface GeneratorOptions {
   energyScore: number; // 0 to 10
   discomfortZone: DiscomfortZone;
   targetDurationMinutes?: number; // 5, 7 (default), or 10
+  warmupExtraMinutes?: number; // 0, 2, 3, 5
+  cooldownExtraMinutes?: number; // 0, 2, 3, 5
   recentSessionExerciseIds?: string[][]; // Last sessions arrays of exercise IDs
   seed?: number;
 }
@@ -182,7 +184,6 @@ export function generateSession(options: GeneratorOptions): GeneratedSession {
   } = options;
 
   const rng = createRng(seed);
-  const targetTotalSeconds = targetDurationMinutes * 60;
   const profile = getEnergyProfile(energyScore);
   const template = selectTemplate(targetDurationMinutes, energyScore);
 
@@ -252,8 +253,49 @@ export function generateSession(options: GeneratorOptions): GeneratedSession {
     }
   }
 
-  // ── Ensure minimum exercise count ─────────────────────────────────────
+  // ── Prepend Extra Warmup if requested ────────────────────────────────
+  const warmupExtraMinutes = options.warmupExtraMinutes || 0;
+  if (warmupExtraMinutes > 0) {
+    const warmupCount = warmupExtraMinutes >= 3 ? 2 : 1;
+    const warmupPool = candidates.filter(
+      (e) =>
+        !chosenIds.has(e.id) &&
+        (e.category === "gentle_wakeup" ||
+          e.category === "neck_mobility" ||
+          e.category === "shoulder_mobility" ||
+          e.category === "spine_mobility" ||
+          e.category === "ankle_mobility") &&
+        e.intensity <= 2
+    );
+    for (let i = 0; i < warmupCount && warmupPool.length > 0; i++) {
+      const idx = Math.floor(rng() * warmupPool.length);
+      const ex = warmupPool.splice(idx, 1)[0];
+      chosenExercises.unshift({ exercise: ex, phase: "wakeup" });
+      chosenIds.add(ex.id);
+    }
+  }
 
+  // ── Append Extra Cooldown Stretching if requested ─────────────────────
+  const cooldownExtraMinutes = options.cooldownExtraMinutes || 0;
+  if (cooldownExtraMinutes > 0) {
+    const cooldownCount = cooldownExtraMinutes >= 3 ? 2 : 1;
+    const cooldownPool = candidates.filter(
+      (e) =>
+        !chosenIds.has(e.id) &&
+        (e.category === "light_stretching" ||
+          e.category === "cooldown" ||
+          e.category === "breathing") &&
+        e.intensity <= 2
+    );
+    for (let i = 0; i < cooldownCount && cooldownPool.length > 0; i++) {
+      const idx = Math.floor(rng() * cooldownPool.length);
+      const ex = cooldownPool.splice(idx, 1)[0];
+      chosenExercises.push({ exercise: ex, phase: "finish" });
+      chosenIds.add(ex.id);
+    }
+  }
+
+  // ── Ensure minimum exercise count ─────────────────────────────────────
   const minExercises = targetDurationMinutes === 5 ? 3 : targetDurationMinutes === 10 ? 5 : 4;
   if (chosenExercises.length < minExercises) {
     const remaining = candidates.filter((e) => !chosenIds.has(e.id));
@@ -267,10 +309,10 @@ export function generateSession(options: GeneratorOptions): GeneratedSession {
   }
 
   // ── Allocate timings ──────────────────────────────────────────────────
-
+  const effectiveTotalSeconds = (targetDurationMinutes + warmupExtraMinutes + cooldownExtraMinutes) * 60;
   const sessionExercises = allocateTimings(
     chosenExercises,
-    targetTotalSeconds,
+    effectiveTotalSeconds,
     energyScore,
     template
   );
@@ -285,7 +327,10 @@ export function generateSession(options: GeneratorOptions): GeneratedSession {
     createdAt: new Date().toISOString(),
     energyScore,
     discomfortZone,
-    targetDurationMinutes,
+    targetDurationMinutes: targetDurationMinutes + warmupExtraMinutes + cooldownExtraMinutes,
+    baseDurationMinutes: targetDurationMinutes,
+    warmupExtraMinutes,
+    cooldownExtraMinutes,
     estimatedTotalSeconds,
     intensityLevel: profile.intensityLabel,
     description: profile.description,

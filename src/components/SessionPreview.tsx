@@ -40,7 +40,7 @@ export const SessionPreview: React.FC<SessionPreviewProps> = ({
         }}
       >
         {/* Badges Header */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 6 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-start", flexWrap: "wrap", gap: 6 }}>
           <span className="badge">
             <Clock size={14} />
             <span>~{durationMin} min</span>
@@ -58,6 +58,24 @@ export const SessionPreview: React.FC<SessionPreviewProps> = ({
             <ListChecks size={14} />
             <span>{session.exercises.length} mouvements</span>
           </span>
+
+          {session.warmupExtraMinutes && session.warmupExtraMinutes > 0 ? (
+            <span
+              className="badge"
+              style={{ backgroundColor: "var(--color-primary-soft)", color: "var(--color-primary-dark)" }}
+            >
+              <span>🧘 Échauffement +{session.warmupExtraMinutes} min</span>
+            </span>
+          ) : null}
+
+          {session.cooldownExtraMinutes && session.cooldownExtraMinutes > 0 ? (
+            <span
+              className="badge"
+              style={{ backgroundColor: "var(--color-primary-soft)", color: "var(--color-primary-dark)" }}
+            >
+              <span>✨ Étirements +{session.cooldownExtraMinutes} min</span>
+            </span>
+          ) : null}
         </div>
 
         {/* Title & Description */}

@@ -1,7 +1,7 @@
 import React from "react";
-import { PlayCircle, Dumbbell, History, Settings } from "lucide-react";
+import { PlayCircle, Dumbbell, Sliders, History, Settings } from "lucide-react";
 
-export type NavTab = "workout" | "library" | "history" | "settings";
+export type NavTab = "workout" | "library" | "custom" | "history" | "settings";
 
 interface NavigationProps {
   activeTab: NavTab;
@@ -29,6 +29,16 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, onSelectTab }
       >
         <Dumbbell />
         <span>Exercices</span>
+      </button>
+
+      <button
+        type="button"
+        className={`nav-item ${activeTab === "custom" ? "active" : ""}`}
+        onClick={() => onSelectTab("custom")}
+        aria-label="Créer une séance sur-mesure"
+      >
+        <Sliders />
+        <span>Créer</span>
       </button>
 
       <button

@@ -9,6 +9,7 @@ import { SessionComplete } from "./components/SessionComplete.tsx";
 import { HistoryView } from "./components/HistoryView.tsx";
 import { SettingsView } from "./components/SettingsView.tsx";
 import { ExerciseLibraryView } from "./components/ExerciseLibraryView.tsx";
+import { CustomWorkoutBuilderView } from "./components/CustomWorkoutBuilderView.tsx";
 
 import { generateSession } from "./engine/generator.ts";
 import { storageService } from "./services/storage.ts";
@@ -66,14 +67,22 @@ export const App: React.FC = () => {
     await storageService.saveSettings({ safetyDisclaimerAcknowledged: true });
   };
 
-  const handleGenerate = async (energy: number, discomfort: DiscomfortZone) => {
+  const handleGenerate = async (
+    energy: number,
+    discomfort: DiscomfortZone,
+    options?: { warmupExtraMinutes?: number; cooldownExtraMinutes?: number }
+  ) => {
     const recentExerciseArrays = await storageService.getRecentExerciseIds(3);
     const targetDurationMinutes = settings?.defaultDurationMinutes || 7;
+    const warmupExtraMinutes = options?.warmupExtraMinutes ?? settings?.warmupExtraMinutes ?? 0;
+    const cooldownExtraMinutes = options?.cooldownExtraMinutes ?? settings?.cooldownExtraMinutes ?? 0;
 
     const session = generateSession({
       energyScore: energy,
       discomfortZone: discomfort,
       targetDurationMinutes,
+      warmupExtraMinutes,
+      cooldownExtraMinutes,
       recentSessionExerciseIds: recentExerciseArrays,
       seed: Date.now(),
     });
@@ -89,7 +98,9 @@ export const App: React.FC = () => {
     const session = generateSession({
       energyScore: currentSession.energyScore,
       discomfortZone: currentSession.discomfortZone,
-      targetDurationMinutes: currentSession.targetDurationMinutes,
+      targetDurationMinutes: currentSession.baseDurationMinutes || currentSession.targetDurationMinutes,
+      warmupExtraMinutes: currentSession.warmupExtraMinutes || 0,
+      cooldownExtraMinutes: currentSession.cooldownExtraMinutes || 0,
       recentSessionExerciseIds: recentExerciseArrays,
       seed: Date.now() + Math.floor(Math.random() * 1000),
     });
@@ -99,6 +110,14 @@ export const App: React.FC = () => {
 
   const handleStartWorkout = () => {
     setReturnTabAfterWorkout("workout");
+    setWorkoutScreen("player");
+  };
+
+  // Launch a custom workout created by the user
+  const handleStartCustomWorkout = (session: GeneratedSession) => {
+    setCurrentSession(session);
+    setReturnTabAfterWorkout("custom");
+    setActiveTab("workout");
     setWorkoutScreen("player");
   };
 
@@ -218,6 +237,8 @@ export const App: React.FC = () => {
                 <CheckIn
                   onGenerate={handleGenerate}
                   defaultEnergy={6}
+                  initialWarmupExtra={settings?.warmupExtraMinutes || 0}
+                  initialCooldownExtra={settings?.cooldownExtraMinutes || 0}
                 />
               </>
             )}
@@ -255,10 +276,13 @@ export const App: React.FC = () => {
         {/* TAB 2: LIBRARY */}
         {activeTab === "library" && <ExerciseLibraryView onPlayExercise={handlePlaySingleExercise} />}
 
-        {/* TAB 3: HISTORY */}
+        {/* TAB 3: CUSTOM WORKOUT BUILDER */}
+        {activeTab === "custom" && <CustomWorkoutBuilderView onStartCustomWorkout={handleStartCustomWorkout} />}
+
+        {/* TAB 4: HISTORY */}
         {activeTab === "history" && <HistoryView />}
 
-        {/* TAB 4: SETTINGS */}
+        {/* TAB 5: SETTINGS */}
         {activeTab === "settings" && <SettingsView />}
       </main>
 

@@ -4,8 +4,14 @@ import type { DiscomfortZone } from "../types/enums.ts";
 import { vibrationService } from "../services/vibration.ts";
 
 interface CheckInProps {
-  onGenerate: (energy: number, discomfort: DiscomfortZone) => void;
+  onGenerate: (
+    energy: number,
+    discomfort: DiscomfortZone,
+    options?: { warmupExtraMinutes?: number; cooldownExtraMinutes?: number }
+  ) => void;
   defaultEnergy?: number;
+  initialWarmupExtra?: number;
+  initialCooldownExtra?: number;
 }
 
 interface EnergyLevelInfo {
@@ -98,44 +104,51 @@ const ENERGY_LEVELS: EnergyLevelInfo[] = [
     themeColor: "#EA580C",
     bgSoft: "rgba(234, 88, 12, 0.13)",
     gradient: "linear-gradient(135deg, #FB923C 0%, #EA580C 100%)",
-    tempo: "Actif & dynamique",
+    tempo: "Actif & cardio léger",
   },
   {
     emoji: "⚡",
-    badge: "Pleine énergie !",
-    title: "Dynamisme & endurance",
-    subtitle: "Séance soutenue avec mouvements polyarticulaires stimulants.",
-    themeColor: "#E76F51",
-    bgSoft: "rgba(231, 111, 81, 0.14)",
-    gradient: "linear-gradient(135deg, #F4A261 0%, #E76F51 100%)",
-    tempo: "Intense & cadencé",
-  },
-  {
-    emoji: "🚀",
-    badge: "Super forme !",
-    title: "Cardio-activation intense",
-    subtitle: "Enchaînements rapides pour élever le rythme cardiaque et transpirer.",
+    badge: "Super forme",
+    title: "Séance stimulante & gainage",
+    subtitle: "Enchaînement dynamique pour réveiller le cœur et tonifier tout le corps.",
     themeColor: "#DC2626",
-    bgSoft: "rgba(220, 38, 38, 0.13)",
-    gradient: "linear-gradient(135deg, #EF4444 0%, #B91C1C 100%)",
-    tempo: "Très dynamique",
+    bgSoft: "rgba(220, 38, 38, 0.12)",
+    gradient: "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)",
+    tempo: "Dynamique & intense",
   },
   {
     emoji: "🔥",
-    badge: "À 200% !",
-    title: "Puissance & réveil maximal",
-    subtitle: "Entraînement matinal à haute intensité pour démarrer à 100 à l'heure !",
+    badge: "Plein d'énergie",
+    title: "Entraînement complet & intense",
+    subtitle: "Séance rythmée à haute intensité pour un réveil sportif maximal.",
     themeColor: "#B91C1C",
-    bgSoft: "rgba(185, 28, 28, 0.15)",
+    bgSoft: "rgba(185, 28, 28, 0.13)",
+    gradient: "linear-gradient(135deg, #DC2626 0%, #991B1B 100%)",
+    tempo: "Intense & puissant",
+  },
+  {
+    emoji: "🚀",
+    badge: "Énergie au sommet",
+    title: "Défi dynamique matinal",
+    subtitle: "Puissance musculaire et cardio complet pour attaquer la journée.",
+    themeColor: "#9F1239",
+    bgSoft: "rgba(159, 18, 57, 0.14)",
     gradient: "linear-gradient(135deg, #E11D48 0%, #9F1239 100%)",
     tempo: "Intensité maximale",
   },
 ];
 
-export const CheckIn: React.FC<CheckInProps> = ({ onGenerate, defaultEnergy = 6 }) => {
+export const CheckIn: React.FC<CheckInProps> = ({
+  onGenerate,
+  defaultEnergy = 6,
+  initialWarmupExtra = 0,
+  initialCooldownExtra = 0,
+}) => {
   const [step, setStep] = useState<1 | 2>(1);
   const [energyScore, setEnergyScore] = useState<number>(Math.max(0, Math.min(10, defaultEnergy)));
   const [discomfortZone, setDiscomfortZone] = useState<DiscomfortZone>("none");
+  const [warmupExtra, setWarmupExtra] = useState<number>(initialWarmupExtra);
+  const [cooldownExtra, setCooldownExtra] = useState<number>(initialCooldownExtra);
 
   const currentLevel = ENERGY_LEVELS[energyScore] || ENERGY_LEVELS[5];
 
@@ -151,7 +164,13 @@ export const CheckIn: React.FC<CheckInProps> = ({ onGenerate, defaultEnergy = 6 
 
   const handleSelectDiscomfort = (zone: DiscomfortZone) => {
     setDiscomfortZone(zone);
-    onGenerate(energyScore, zone);
+  };
+
+  const handleConfirmGenerate = () => {
+    onGenerate(energyScore, discomfortZone, {
+      warmupExtraMinutes: warmupExtra,
+      cooldownExtraMinutes: cooldownExtra,
+    });
   };
 
   return (
@@ -636,6 +655,117 @@ export const CheckIn: React.FC<CheckInProps> = ({ onGenerate, defaultEnergy = 6 
               </div>
             </button>
           </div>
+
+          {/* Optional Warmup & Cooldown Add-on Section */}
+          <div
+            className="card"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 12,
+              padding: "16px",
+              marginTop: 4,
+              backgroundColor: "var(--bg-surface)",
+              border: "1px solid var(--border-subtle)",
+            }}
+          >
+            <div style={{ fontSize: "0.86rem", fontWeight: 700, color: "var(--text-main)" }}>
+              ⏱️ Suppléments facultatifs
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              {/* Extra Warmup Button */}
+              <button
+                type="button"
+                onClick={() => setWarmupExtra((prev) => (prev > 0 ? 0 : 2))}
+                style={{
+                  padding: "10px 12px",
+                  borderRadius: "var(--radius-md)",
+                  backgroundColor: warmupExtra > 0 ? "var(--color-primary-soft)" : "var(--bg-surface-elevated)",
+                  border: warmupExtra > 0 ? "1.5px solid var(--color-primary)" : "1px solid var(--border-subtle)",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  gap: 4,
+                  cursor: "pointer",
+                  textAlign: "left",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
+                  <span style={{ fontSize: "0.82rem", fontWeight: 700, color: warmupExtra > 0 ? "var(--color-primary-dark)" : "var(--text-main)" }}>
+                    🧘 Échauffement
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "0.72rem",
+                      fontWeight: 700,
+                      padding: "2px 6px",
+                      borderRadius: "var(--radius-sm)",
+                      backgroundColor: warmupExtra > 0 ? "var(--color-primary)" : "var(--border-color)",
+                      color: "#FFFFFF",
+                    }}
+                  >
+                    +2 min
+                  </span>
+                </div>
+                <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>
+                  Mobilité douce avant l'effort
+                </span>
+              </button>
+
+              {/* Extra Cooldown Stretching Button */}
+              <button
+                type="button"
+                onClick={() => setCooldownExtra((prev) => (prev === 0 ? 3 : prev === 3 ? 2 : 0))}
+                style={{
+                  padding: "10px 12px",
+                  borderRadius: "var(--radius-md)",
+                  backgroundColor: cooldownExtra > 0 ? "var(--color-primary-soft)" : "var(--bg-surface-elevated)",
+                  border: cooldownExtra > 0 ? "1.5px solid var(--color-primary)" : "1px solid var(--border-subtle)",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  gap: 4,
+                  cursor: "pointer",
+                  textAlign: "left",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
+                  <span style={{ fontSize: "0.82rem", fontWeight: 700, color: cooldownExtra > 0 ? "var(--color-primary-dark)" : "var(--text-main)" }}>
+                    ✨ Étirements
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "0.72rem",
+                      fontWeight: 700,
+                      padding: "2px 6px",
+                      borderRadius: "var(--radius-sm)",
+                      backgroundColor: cooldownExtra > 0 ? "var(--color-primary)" : "var(--border-color)",
+                      color: "#FFFFFF",
+                    }}
+                  >
+                    {cooldownExtra > 0 ? `+${cooldownExtra} min` : "+3 min"}
+                  </span>
+                </div>
+                <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>
+                  Assouplissements de fin
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* Confirm Button */}
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={handleConfirmGenerate}
+            style={{ width: "100%", padding: "14px", marginTop: 4 }}
+          >
+            <span>Générer ma proposition du matin</span>
+            <ArrowRight size={18} />
+          </button>
         </div>
       )}
     </div>

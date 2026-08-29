@@ -18,6 +18,9 @@ export interface GeneratedSession {
   energyScore: number; // 0 - 10
   discomfortZone: DiscomfortZone;
   targetDurationMinutes: number; // 5, 7, or 10
+  baseDurationMinutes?: number; // Base duration before add-ons
+  warmupExtraMinutes?: number; // Extra warmup minutes added
+  cooldownExtraMinutes?: number; // Extra cooldown stretching minutes added
   estimatedTotalSeconds: number;
   intensityLevel: string; // "Très doux", "Doux", "Équilibré", "Dynamique"
   description: string;

@@ -467,6 +467,12 @@ class VoiceCoachService {
     }
   }
 
+  /** Announce halfway side switch for unilateral exercises */
+  public async announceHalfwaySwitch() {
+    if (!this.settings.voiceCoachEnabled) return;
+    this.speak("Changez de côté !", { priority: true });
+  }
+
   /** Announce rest period using studio audio cue */
   public async announceRest(nextExerciseName?: string) {
     if (!this.settings.voiceCoachEnabled) return;

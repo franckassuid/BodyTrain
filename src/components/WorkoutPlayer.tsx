@@ -272,6 +272,28 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
               <span>{CATEGORY_LABELS[currentExercise.category] || currentExercise.category}</span>
               <span>•</span>
               <span>Intensité {currentExercise.intensity}/5</span>
+              {snapshot.isUnilateral && (
+                <>
+                  <span>•</span>
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 4,
+                      padding: "2px 8px",
+                      borderRadius: "var(--radius-sm)",
+                      backgroundColor: snapshot.isSecondSide
+                        ? "rgba(244, 162, 97, 0.2)"
+                        : "var(--color-primary-soft)",
+                      color: snapshot.isSecondSide ? "#E76F51" : "var(--color-primary-dark)",
+                      fontWeight: 700,
+                      fontSize: "0.76rem",
+                    }}
+                  >
+                    {snapshot.isSecondSide ? "🔸 2ème côté (Droit)" : "🔹 1er côté (Gauche)"}
+                  </span>
+                </>
+              )}
             </>
           )}
         </div>
@@ -294,6 +316,31 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
           overflow: "hidden",
         }}
       >
+        {/* Unilateral Halfway Side Switch Flash Banner */}
+        {snapshot.showSideSwitchFlash && (
+          <div
+            className="animate-slide-up"
+            style={{
+              position: "absolute",
+              top: 18,
+              zIndex: 30,
+              backgroundColor: "#E76F51",
+              color: "#FFFFFF",
+              padding: "8px 20px",
+              borderRadius: "var(--radius-full)",
+              fontWeight: 800,
+              fontSize: "1rem",
+              boxShadow: "0 8px 25px rgba(231, 111, 81, 0.45)",
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              letterSpacing: "0.02em",
+            }}
+          >
+            <span>🔄</span>
+            <span>Changez de côté !</span>
+          </div>
+        )}
         {/* Central Stage: Giant Circular Gauge wrapping the Visual Content */}
         <div
           style={{

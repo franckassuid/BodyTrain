@@ -2,6 +2,7 @@ import type { GeneratedSession, SessionExercise } from "../types/session.ts";
 import { soundService } from "../services/sound.ts";
 import { vibrationService } from "../services/vibration.ts";
 import { voiceCoach } from "../services/voiceCoach.ts";
+import { wakeLockService } from "../services/wakeLock.ts";
 
 export type WorkoutState = "not_started" | "preparation" | "work" | "rest" | "paused" | "completed" | "abandoned";
 export type WorkoutPhase = "preparation" | "work" | "rest" | "finished";
@@ -18,6 +19,9 @@ export interface TimerSnapshot {
   totalElapsedSeconds: number;
   completedExerciseIds: string[];
   isPaused: boolean;
+  isUnilateral: boolean;
+  isSecondSide: boolean;
+  showSideSwitchFlash: boolean;
 }
 
 export type TimerSubscriber = (snapshot: TimerSnapshot) => void;
@@ -31,6 +35,10 @@ export class WorkoutEngine {
   private phaseTimeRemaining: number = 0;
   private phaseTotalSeconds: number = 0;
   private totalElapsedSeconds: number = 0;
+
+  private isSecondSide: boolean = false;
+  private hasTriggeredHalfway: boolean = false;
+  private showSideSwitchFlash: boolean = false;
 
   private completedExerciseIds: Set<string> = new Set();
   private subscribers: Set<TimerSubscriber> = new Set();
@@ -47,6 +55,7 @@ export class WorkoutEngine {
   public destroy() {
     this.stopTimer();
     voiceCoach.stop();
+    wakeLockService.release();
     this.subscribers.clear();
     if (typeof document !== "undefined") {
       document.removeEventListener("visibilitychange", this.handleVisibilityChange);
@@ -67,6 +76,7 @@ export class WorkoutEngine {
   public getSnapshot(): TimerSnapshot {
     const currentEx = this.session?.exercises[this.currentExerciseIndex] || null;
     const nextEx = this.session?.exercises[this.currentExerciseIndex + 1] || null;
+    const isUnilateral = Boolean(currentEx?.exercise?.unilateral);
 
     return {
       state: this.state,
@@ -80,23 +90,32 @@ export class WorkoutEngine {
       totalElapsedSeconds: Math.floor(this.totalElapsedSeconds),
       completedExerciseIds: Array.from(this.completedExerciseIds),
       isPaused: this.state === "paused",
+      isUnilateral,
+      isSecondSide: this.isSecondSide,
+      showSideSwitchFlash: this.showSideSwitchFlash,
     };
   }
 
   public start(session: GeneratedSession) {
     this.stopTimer();
     voiceCoach.stop();
+    wakeLockService.acquire();
+
     this.session = session;
     this.currentExerciseIndex = 0;
     this.completedExerciseIds.clear();
     this.totalElapsedSeconds = 0;
 
     const firstEx = session.exercises[0];
-    // Initial preparation before starting the whole workout (5s)
+    const initialPrep = firstEx?.preparationSeconds || 5;
+
     this.currentPhase = "preparation";
-    this.phaseTotalSeconds = 5;
-    this.phaseTimeRemaining = 5;
     this.state = "preparation";
+    this.phaseTotalSeconds = initialPrep;
+    this.phaseTimeRemaining = initialPrep;
+    this.isSecondSide = false;
+    this.hasTriggeredHalfway = false;
+    this.showSideSwitchFlash = false;
 
     this.lastTimestamp = performance.now();
     this.startTimer();
@@ -111,6 +130,7 @@ export class WorkoutEngine {
     this.state = "paused";
     this.stopTimer();
     voiceCoach.stop();
+    wakeLockService.release();
     this.notify();
   }
 
@@ -118,6 +138,7 @@ export class WorkoutEngine {
     if (this.state !== "paused") return;
     this.state = this.currentPhase === "preparation" ? "preparation" : this.currentPhase === "rest" ? "rest" : "work";
     this.lastTimestamp = performance.now();
+    wakeLockService.acquire();
     this.startTimer();
     this.notify();
   }
@@ -139,6 +160,10 @@ export class WorkoutEngine {
       this.state = "work";
       this.phaseTotalSeconds = currentEx.targetDurationSeconds;
       this.phaseTimeRemaining = currentEx.targetDurationSeconds;
+      this.isSecondSide = false;
+      this.hasTriggeredHalfway = false;
+      this.showSideSwitchFlash = false;
+
       soundService.playStartChime();
       vibrationService.transition();
       voiceCoach.announceExerciseStart(
@@ -159,6 +184,8 @@ export class WorkoutEngine {
     if (curr && this.currentPhase === "work") {
       this.phaseTotalSeconds = curr.targetDurationSeconds;
       this.phaseTimeRemaining = curr.targetDurationSeconds;
+      this.isSecondSide = false;
+      this.hasTriggeredHalfway = false;
     }
     this.notify();
   }
@@ -181,6 +208,7 @@ export class WorkoutEngine {
     } else {
       // Foregrounded, sync delta
       if (this.state !== "paused" && this.state !== "not_started" && this.state !== "completed") {
+        wakeLockService.acquire();
         const now = performance.now();
         const delta = (now - this.lastTimestamp) / 1000;
         this.lastTimestamp = now;
@@ -203,6 +231,28 @@ export class WorkoutEngine {
     const prevSec = Math.ceil(this.phaseTimeRemaining);
     this.phaseTimeRemaining -= delta;
     const newSec = Math.ceil(this.phaseTimeRemaining);
+
+    const currentEx = this.session.exercises[this.currentExerciseIndex];
+    const isUnilateral = Boolean(currentEx?.exercise?.unilateral);
+
+    // Unilateral Halfway Side Switch Detection
+    if (this.currentPhase === "work" && isUnilateral && !this.hasTriggeredHalfway) {
+      const halfTime = this.phaseTotalSeconds / 2;
+      if (this.phaseTimeRemaining <= halfTime) {
+        this.hasTriggeredHalfway = true;
+        this.isSecondSide = true;
+        this.showSideSwitchFlash = true;
+        voiceCoach.announceHalfwaySwitch();
+        soundService.playStartChime();
+        vibrationService.transition();
+
+        // Clear visual switch flash banner after 2.5s
+        setTimeout(() => {
+          this.showSideSwitchFlash = false;
+          this.notify();
+        }, 2500);
+      }
+    }
 
     // Audio & voice countdown on 5, 4, 3, 2, 1 during work phase
     if (this.currentPhase === "work" && newSec !== prevSec && newSec > 0 && newSec <= 5) {
@@ -231,6 +281,10 @@ export class WorkoutEngine {
       this.state = "work";
       this.phaseTotalSeconds = currentEx.targetDurationSeconds;
       this.phaseTimeRemaining = currentEx.targetDurationSeconds;
+      this.isSecondSide = false;
+      this.hasTriggeredHalfway = false;
+      this.showSideSwitchFlash = false;
+
       soundService.playStartChime();
       vibrationService.transition();
       voiceCoach.announceExerciseStart(
@@ -241,7 +295,7 @@ export class WorkoutEngine {
     } else if (this.currentPhase === "work") {
       this.finishCurrentExerciseWork();
     } else if (this.currentPhase === "rest") {
-      // Rest completed -> move directly to the work phase of next exercise (no redundant second prep!)
+      // Rest completed -> move directly to the work phase of next exercise
       this.advanceNext();
     }
   }
@@ -262,6 +316,10 @@ export class WorkoutEngine {
       this.state = "rest";
       this.phaseTotalSeconds = currentEx.restSeconds;
       this.phaseTimeRemaining = currentEx.restSeconds;
+      this.isSecondSide = false;
+      this.hasTriggeredHalfway = false;
+      this.showSideSwitchFlash = false;
+
       soundService.playRestChime();
       vibrationService.transition();
       voiceCoach.announceRest(nextEx?.exercise.nameFr || nextEx?.exercise.name);
@@ -282,6 +340,10 @@ export class WorkoutEngine {
       this.state = "work";
       this.phaseTotalSeconds = next.targetDurationSeconds;
       this.phaseTimeRemaining = next.targetDurationSeconds;
+      this.isSecondSide = false;
+      this.hasTriggeredHalfway = false;
+      this.showSideSwitchFlash = false;
+
       soundService.playStartChime();
       vibrationService.transition();
       voiceCoach.announceExerciseStart(
@@ -294,21 +356,15 @@ export class WorkoutEngine {
 
   private completeWorkout() {
     this.stopTimer();
-    this.state = "completed";
     this.currentPhase = "finished";
-    this.phaseTimeRemaining = 0;
+    this.state = "completed";
+    wakeLockService.release();
     soundService.playCompletionFanfare();
     vibrationService.completion();
     voiceCoach.announceCompletion();
     this.notify();
   }
-
-  public abandon() {
-    this.stopTimer();
-    voiceCoach.stop();
-    this.state = "abandoned";
-    this.notify();
-  }
 }
 
 export const workoutEngine = new WorkoutEngine();
+

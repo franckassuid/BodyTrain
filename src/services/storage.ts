@@ -178,4 +178,36 @@ export const storageService = {
     }
     return updated;
   },
+
+  // ── Custom Workouts Storage ─────────────────────────────────────────────
+  async getCustomWorkouts(): Promise<any[]> {
+    try {
+      const raw = localStorage.getItem("bodytrain_custom_workouts");
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  },
+
+  async saveCustomWorkout(workout: any): Promise<any> {
+    const list = await this.getCustomWorkouts();
+    const existingIndex = list.findIndex((w) => w.id === workout.id);
+    let updatedList;
+    if (existingIndex >= 0) {
+      updatedList = [...list];
+      updatedList[existingIndex] = workout;
+    } else {
+      updatedList = [workout, ...list];
+    }
+    localStorage.setItem("bodytrain_custom_workouts", JSON.stringify(updatedList));
+    return workout;
+  },
+
+  async deleteCustomWorkout(id: string): Promise<boolean> {
+    const list = await this.getCustomWorkouts();
+    const filtered = list.filter((w) => w.id !== id);
+    localStorage.setItem("bodytrain_custom_workouts", JSON.stringify(filtered));
+    return true;
+  },
 };
+
