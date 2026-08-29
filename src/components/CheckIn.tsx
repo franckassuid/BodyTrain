@@ -656,103 +656,115 @@ export const CheckIn: React.FC<CheckInProps> = ({
             </button>
           </div>
 
-          {/* Optional Warmup & Cooldown Add-on Section */}
+          {/* Optional Warmup & Cooldown Add-on Section with Sliders */}
           <div
             className="card"
             style={{
               display: "flex",
               flexDirection: "column",
-              gap: 12,
+              gap: 14,
               padding: "16px",
               marginTop: 4,
               backgroundColor: "var(--bg-surface)",
               border: "1px solid var(--border-subtle)",
             }}
           >
-            <div style={{ fontSize: "0.86rem", fontWeight: 700, color: "var(--text-main)" }}>
-              ⏱️ Suppléments facultatifs
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div style={{ fontSize: "0.88rem", fontWeight: 700, color: "var(--text-main)" }}>
+                ⏱️ Suppléments facultatifs
+              </div>
+              <span
+                style={{
+                  fontSize: "0.76rem",
+                  fontWeight: 700,
+                  padding: "2px 8px",
+                  borderRadius: "var(--radius-full)",
+                  backgroundColor: warmupExtra > 0 || cooldownExtra > 0 ? "var(--color-primary-soft)" : "var(--bg-surface-elevated)",
+                  color: warmupExtra > 0 || cooldownExtra > 0 ? "var(--color-primary-dark)" : "var(--text-muted)",
+                }}
+              >
+                {warmupExtra + cooldownExtra > 0 ? `+${warmupExtra + cooldownExtra} min d'étirements` : "Aucun supplément"}
+              </span>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-              {/* Extra Warmup Button */}
-              <button
-                type="button"
-                onClick={() => setWarmupExtra((prev) => (prev > 0 ? 0 : 2))}
-                style={{
-                  padding: "10px 12px",
-                  borderRadius: "var(--radius-md)",
-                  backgroundColor: warmupExtra > 0 ? "var(--color-primary-soft)" : "var(--bg-surface-elevated)",
-                  border: warmupExtra > 0 ? "1.5px solid var(--color-primary)" : "1px solid var(--border-subtle)",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  gap: 4,
-                  cursor: "pointer",
-                  textAlign: "left",
-                  transition: "all 0.15s ease",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
-                  <span style={{ fontSize: "0.82rem", fontWeight: 700, color: warmupExtra > 0 ? "var(--color-primary-dark)" : "var(--text-main)" }}>
-                    🧘 Échauffement
-                  </span>
-                  <span
-                    style={{
-                      fontSize: "0.72rem",
-                      fontWeight: 700,
-                      padding: "2px 6px",
-                      borderRadius: "var(--radius-sm)",
-                      backgroundColor: warmupExtra > 0 ? "var(--color-primary)" : "var(--border-color)",
-                      color: "#FFFFFF",
-                    }}
-                  >
-                    +2 min
-                  </span>
-                </div>
-                <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>
-                  Mobilité douce avant l'effort
+            {/* Slider 1: Échauffement avant */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--text-main)" }}>
+                  🧘 1. Échauffement & mobilité avant
                 </span>
-              </button>
+                <span
+                  style={{
+                    fontSize: "0.8rem",
+                    fontWeight: 800,
+                    color: warmupExtra > 0 ? "var(--color-primary)" : "var(--text-subtle)",
+                  }}
+                >
+                  {warmupExtra === 0 ? "Off" : `+${warmupExtra} min`}
+                </span>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={5}
+                step={1}
+                value={warmupExtra}
+                onChange={(e) => setWarmupExtra(Number(e.target.value))}
+                style={{
+                  width: "100%",
+                  accentColor: "var(--color-primary)",
+                  cursor: "pointer",
+                  height: 6,
+                }}
+              />
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.68rem", color: "var(--text-subtle)", fontWeight: 600 }}>
+                <span>Off</span>
+                <span>+1m</span>
+                <span>+2m</span>
+                <span>+3m</span>
+                <span>+4m</span>
+                <span>+5m</span>
+              </div>
+            </div>
 
-              {/* Extra Cooldown Stretching Button */}
-              <button
-                type="button"
-                onClick={() => setCooldownExtra((prev) => (prev === 0 ? 3 : prev === 3 ? 2 : 0))}
-                style={{
-                  padding: "10px 12px",
-                  borderRadius: "var(--radius-md)",
-                  backgroundColor: cooldownExtra > 0 ? "var(--color-primary-soft)" : "var(--bg-surface-elevated)",
-                  border: cooldownExtra > 0 ? "1.5px solid var(--color-primary)" : "1px solid var(--border-subtle)",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  gap: 4,
-                  cursor: "pointer",
-                  textAlign: "left",
-                  transition: "all 0.15s ease",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
-                  <span style={{ fontSize: "0.82rem", fontWeight: 700, color: cooldownExtra > 0 ? "var(--color-primary-dark)" : "var(--text-main)" }}>
-                    ✨ Étirements
-                  </span>
-                  <span
-                    style={{
-                      fontSize: "0.72rem",
-                      fontWeight: 700,
-                      padding: "2px 6px",
-                      borderRadius: "var(--radius-sm)",
-                      backgroundColor: cooldownExtra > 0 ? "var(--color-primary)" : "var(--border-color)",
-                      color: "#FFFFFF",
-                    }}
-                  >
-                    {cooldownExtra > 0 ? `+${cooldownExtra} min` : "+3 min"}
-                  </span>
-                </div>
-                <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>
-                  Assouplissements de fin
+            {/* Slider 2: Étirements après */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 6, paddingTop: 8, borderTop: "1px solid var(--border-subtle)" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--text-main)" }}>
+                  ✨ 2. Étirements & retour au calme après
                 </span>
-              </button>
+                <span
+                  style={{
+                    fontSize: "0.8rem",
+                    fontWeight: 800,
+                    color: cooldownExtra > 0 ? "var(--color-primary)" : "var(--text-subtle)",
+                  }}
+                >
+                  {cooldownExtra === 0 ? "Off" : `+${cooldownExtra} min`}
+                </span>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={5}
+                step={1}
+                value={cooldownExtra}
+                onChange={(e) => setCooldownExtra(Number(e.target.value))}
+                style={{
+                  width: "100%",
+                  accentColor: "var(--color-primary)",
+                  cursor: "pointer",
+                  height: 6,
+                }}
+              />
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.68rem", color: "var(--text-subtle)", fontWeight: 600 }}>
+                <span>Off</span>
+                <span>+1m</span>
+                <span>+2m</span>
+                <span>+3m</span>
+                <span>+4m</span>
+                <span>+5m</span>
+              </div>
             </div>
           </div>
 

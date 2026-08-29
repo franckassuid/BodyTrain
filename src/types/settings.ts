@@ -1,11 +1,11 @@
-export type DefaultDurationMinutes = 5 | 7 | 10;
+export type DefaultDurationMinutes = number; // e.g. 5, 7, 10, 12, 15
 
 export type DayOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6; // 0 = Sunday, 1 = Monday, ...
 
 export interface AppSettings {
-  defaultDurationMinutes: DefaultDurationMinutes;
-  warmupExtraMinutes: number; // 0, 2, 3
-  cooldownExtraMinutes: number; // 0, 2, 3, 5
+  defaultDurationMinutes: number; // e.g. 5, 7, 10, 12, 15
+  warmupExtraMinutes: number; // 0 to 5 min
+  cooldownExtraMinutes: number; // 0 to 5 min
   reminderEnabled: boolean;
   reminderTime: string; // "HH:MM" e.g. "07:30"
   activeDays: DayOfWeek[]; // Default: [1, 2, 3, 4, 5, 6] (Lundi à Samedi)
