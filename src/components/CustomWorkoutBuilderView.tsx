@@ -20,6 +20,7 @@ import { convertCustomToGeneratedSession } from "../types/customWorkout.ts";
 import { storageService } from "../services/storage.ts";
 import { CATEGORY_LABELS } from "../types/enums.ts";
 import type { GeneratedSession } from "../types/session.ts";
+import { searchAndRankExercises } from "../utils/exerciseSearch.ts";
 
 interface CustomWorkoutBuilderViewProps {
   onStartCustomWorkout: (session: GeneratedSession) => void;
@@ -165,17 +166,17 @@ export const CustomWorkoutBuilderView: React.FC<CustomWorkoutBuilderViewProps> =
 
   // Filtered exercises for picker modal
   const filteredPickerExercises = useMemo(() => {
-    return EXERCISES.filter((ex) => {
+    let pool = EXERCISES.filter((ex) => {
       if (!ex.enabled) return false;
       if (pickerCategory !== "all" && ex.category !== pickerCategory) return false;
-      if (pickerSearch.trim()) {
-        const q = pickerSearch.toLowerCase();
-        const nameMatch = (ex.nameFr || ex.name || "").toLowerCase().includes(q);
-        const descMatch = (ex.shortDescriptionFr || "").toLowerCase().includes(q);
-        return nameMatch || descMatch;
-      }
       return true;
     });
+
+    if (pickerSearch.trim()) {
+      pool = searchAndRankExercises(pool, pickerSearch);
+    }
+
+    return pool;
   }, [pickerSearch, pickerCategory]);
 
   const formatDurationMinSec = (sec: number) => {
@@ -800,7 +801,7 @@ export const CustomWorkoutBuilderView: React.FC<CustomWorkoutBuilderViewProps> =
                     type="text"
                     value={pickerSearch}
                     onChange={(e) => setPickerSearch(e.target.value)}
-                    placeholder="Rechercher par nom (ex: pompe, fente, gainage...)"
+                    placeholder="Rechercher (ex: abdos, fessiers, dos, cuisses, pompes...)"
                     style={{
                       border: "none",
                       background: "transparent",

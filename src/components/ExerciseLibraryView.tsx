@@ -4,6 +4,7 @@ import { EXERCISES } from "../data/exercisesData.ts";
 import type { Exercise } from "../types/exercise.ts";
 import { CATEGORY_LABELS, type SessionPhase } from "../types/enums.ts";
 import { ExerciseDetailModal } from "./ExerciseDetailModal.tsx";
+import { searchAndRankExercises } from "../utils/exerciseSearch.ts";
 
 interface ExerciseLibraryViewProps {
   onPlayExercise?: (exercise: Exercise, durationSeconds: number) => void;
@@ -25,26 +26,15 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({ onPlay
   ];
 
   const filteredExercises = useMemo(() => {
-    return EXERCISES.filter((ex) => {
-      // 1. Search text
-      if (search.trim()) {
-        const query = search.toLowerCase();
-        const nameFr = (ex.nameFr || "").toLowerCase();
-        const nameEn = (ex.name || "").toLowerCase();
-        const desc = (ex.shortDescriptionFr || "").toLowerCase();
-        if (!nameFr.includes(query) && !nameEn.includes(query) && !desc.includes(query)) {
-          return false;
-        }
-      }
-
-      // 2. Phase filter
+    let pool = EXERCISES.filter((ex) => {
+      // 1. Phase filter
       if (selectedPhase !== "all") {
         if (!ex.suitablePhases?.includes(selectedPhase)) {
           return false;
         }
       }
 
-      // 3. Discomfort filter
+      // 2. Discomfort filter
       if (selectedDiscomfort === "upper" && !ex.compatibleWithUpperBodyDiscomfort) {
         return false;
       }
@@ -54,6 +44,12 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({ onPlay
 
       return true;
     });
+
+    if (search.trim()) {
+      pool = searchAndRankExercises(pool, search);
+    }
+
+    return pool;
   }, [search, selectedPhase, selectedDiscomfort]);
 
   return (
@@ -107,7 +103,7 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({ onPlay
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Rechercher un exercice, un muscle..."
+            placeholder="Rechercher (ex: abdos, fessiers, dos, cuisses, épaules...)"
             style={{
               border: "none",
               background: "transparent",
