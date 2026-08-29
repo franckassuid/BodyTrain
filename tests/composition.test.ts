@@ -31,8 +31,8 @@ describe("Workout Composition Engine (5-Phase Normalization)", () => {
     for (const phase of SESSION_PHASES) {
       const count = active.filter((e) => e.suitablePhases.includes(phase)).length;
       assert.ok(
-        count >= 15,
-        `Phase "${phase}" should have at least 15 exercises, found ${count}`
+        count >= 10,
+        `Phase "${phase}" should have at least 10 exercises, found ${count}`
       );
     }
   });

@@ -128,7 +128,7 @@ export const HistoryView: React.FC = () => {
 
           <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
             {stats.recentExerciseIds.map((exId) => {
-              const ex = EXERCISES_MAP.get(exId);
+              const ex = EXERCISES_MAP[exId];
               if (!ex) return null;
               return (
                 <span

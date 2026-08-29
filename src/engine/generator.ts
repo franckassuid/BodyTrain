@@ -1,6 +1,6 @@
 import { EXERCISES, EXERCISES_MAP } from "../data/exercisesData.ts";
 import type { DiscomfortZone, SessionPhase, Position } from "../types/enums.ts";
-import { getTransitionLevel } from "../types/enums.ts";
+import { getTransitionLevel, SESSION_PHASES } from "../types/enums.ts";
 import type { Exercise } from "../types/exercise.ts";
 import type { GeneratedSession, SessionExercise } from "../types/session.ts";
 import { selectTemplate } from "./sessionTemplates.ts";
@@ -212,7 +212,7 @@ export function generateSession(options: GeneratorOptions): GeneratedSession {
     }
   });
 
-  const chosenExercises: { exercise: Exercise; phase: SessionPhase }[] = [];
+  let chosenExercises: { exercise: Exercise; phase: SessionPhase }[] = [];
   const chosenIds = new Set<string>();
 
   // ── Pick exercises per phase ──────────────────────────────────────────
@@ -296,17 +296,94 @@ export function generateSession(options: GeneratorOptions): GeneratedSession {
   }
 
   // ── Ensure minimum exercise count ─────────────────────────────────────
-  const minExercises = targetDurationMinutes === 5 ? 3 : targetDurationMinutes === 10 ? 5 : 4;
+  const minExercises = targetDurationMinutes === 5 ? 4 : targetDurationMinutes === 7 ? 6 : 8;
   if (chosenExercises.length < minExercises) {
     const remaining = candidates.filter((e) => !chosenIds.has(e.id));
     while (chosenExercises.length < minExercises && remaining.length > 0) {
-      const idx = Math.floor(rng() * remaining.length);
-      const ex = remaining.splice(idx, 1)[0];
-      const phase = (ex.suitablePhases && ex.suitablePhases[0]) || "activation";
-      chosenExercises.push({ exercise: ex, phase: phase as SessionPhase });
+      // Pick a candidate with non-identical movement pattern to existing items
+      const existingPatterns = new Set(
+        chosenExercises.flatMap((c) => c.exercise.movementPatterns || [])
+      );
+      let bestIdx = remaining.findIndex(
+        (e) => !(e.movementPatterns || []).every((p) => existingPatterns.has(p))
+      );
+      if (bestIdx === -1) bestIdx = Math.floor(rng() * remaining.length);
+
+      const ex = remaining.splice(bestIdx, 1)[0];
+      const phase: SessionPhase =
+        ex.suitablePhases?.find((p) => p !== "wakeup" && p !== "finish") ||
+        (ex.suitablePhases && ex.suitablePhases[0]) ||
+        "activation";
+      chosenExercises.push({ exercise: ex, phase });
       chosenIds.add(ex.id);
     }
   }
+
+  // ── Normalize Phase Order & Group Position Levels ─────────────────────
+  const groupedByPhase: Record<SessionPhase, { exercise: Exercise; phase: SessionPhase }[]> = {
+    wakeup: [],
+    mobility: [],
+    activation: [],
+    dynamic: [],
+    finish: [],
+  };
+  for (const item of chosenExercises) {
+    if (groupedByPhase[item.phase]) {
+      groupedByPhase[item.phase].push(item);
+    } else {
+      groupedByPhase.activation.push(item);
+    }
+  }
+
+  const finalOrdered: { exercise: Exercise; phase: SessionPhase }[] = [];
+  let currentLevel = "standing";
+
+  for (const phase of SESSION_PHASES) {
+    const list = groupedByPhase[phase];
+    if (list.length === 0) continue;
+
+    list.sort((a, b) => {
+      const aLevel = getTransitionLevel(a.exercise.positions as Position[]);
+      const bLevel = getTransitionLevel(b.exercise.positions as Position[]);
+      if (aLevel === currentLevel && bLevel !== currentLevel) return -1;
+      if (bLevel === currentLevel && aLevel !== currentLevel) return 1;
+      return 0;
+    });
+
+    for (const item of list) {
+      finalOrdered.push(item);
+      currentLevel = getTransitionLevel(item.exercise.positions as Position[]);
+    }
+  }
+
+  // Final check to prevent any adjacent identical movement patterns
+  for (let i = 1; i < finalOrdered.length - 1; i++) {
+    const prev = finalOrdered[i - 1].exercise;
+    const curr = finalOrdered[i].exercise;
+    const prevP = prev.movementPatterns || [];
+    const currP = curr.movementPatterns || [];
+    const isIdentical =
+      prevP.length > 0 &&
+      prevP.length === currP.length &&
+      prevP.every((p) => currP.includes(p));
+
+    if (isIdentical && i + 1 < finalOrdered.length) {
+      const next = finalOrdered[i + 1].exercise;
+      const nextP = next.movementPatterns || [];
+      const nextIsIdentical =
+        nextP.length > 0 &&
+        nextP.length === prevP.length &&
+        nextP.every((p) => prevP.includes(p));
+
+      if (!nextIsIdentical) {
+        const temp = finalOrdered[i];
+        finalOrdered[i] = finalOrdered[i + 1];
+        finalOrdered[i + 1] = temp;
+      }
+    }
+  }
+
+  chosenExercises = finalOrdered;
 
   // ── Allocate timings ──────────────────────────────────────────────────
   const effectiveTotalSeconds = (targetDurationMinutes + warmupExtraMinutes + cooldownExtraMinutes) * 60;
@@ -561,7 +638,7 @@ function allocateTimings(
   while (diff !== 0 && Math.abs(diff) > 0) {
     const step = diff > 0 ? 1 : -1;
     const target = assigned[idx % n];
-    if (diff > 0 && target.targetDurationSeconds < 65) {
+    if (diff > 0 && target.targetDurationSeconds < 75) {
       target.targetDurationSeconds += step;
       diff -= step;
     } else if (diff < 0 && target.targetDurationSeconds > 20) {
@@ -569,7 +646,7 @@ function allocateTimings(
       diff -= step;
     }
     idx++;
-    if (idx > n * 15) break;
+    if (idx > n * 50) break;
   }
 
   // Final trim safeguard
@@ -614,7 +691,7 @@ export function replaceExerciseInSession(
   const directCandidates: Exercise[] = [];
   for (const id of [...directAltIds, easierId, harderId]) {
     if (!id || currentSessionIds.has(id)) continue;
-    const ex = EXERCISES_MAP.get(id);
+    const ex = EXERCISES_MAP[id];
     if (ex && ex.enabled) {
       if (session.discomfortZone === "upper" && !ex.compatibleWithUpperBodyDiscomfort) continue;
       if (session.discomfortZone === "lower" && !ex.compatibleWithLowerBodyDiscomfort) continue;
