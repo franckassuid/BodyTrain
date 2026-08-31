@@ -313,13 +313,14 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "20px 16px 16px",
-          backgroundColor: "var(--bg-surface)",
-          borderRadius: "var(--radius-xl)",
-          border: "1.5px solid var(--border-color)",
-          boxShadow: "0 8px 30px rgba(0,0,0,0.04)",
+          padding: snapshot.phase === "rest" ? "24px 20px 20px" : "20px 16px 16px",
+          backgroundColor: snapshot.phase === "rest" ? "rgba(2, 132, 199, 0.03)" : "var(--bg-surface)",
+          borderRadius: "var(--radius-2xl)",
+          border: snapshot.phase === "rest" ? "1px solid rgba(2, 132, 199, 0.15)" : "1.5px solid var(--border-color)",
+          boxShadow: snapshot.phase === "rest" ? "0 12px 40px rgba(2, 132, 199, 0.08)" : "0 8px 30px rgba(0,0,0,0.04)",
           position: "relative",
           overflow: "hidden",
+          transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
         }}
       >
         {/* Unilateral Halfway Side Switch Flash Banner */}
@@ -347,6 +348,7 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
             <span>Changez de côté !</span>
           </div>
         )}
+
         {/* Central Stage: Giant Circular Gauge wrapping the Visual Content */}
         <div
           style={{
@@ -377,7 +379,7 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
               cy={ringSize / 2}
               r={radius}
               fill="transparent"
-              stroke="var(--bg-surface-elevated)"
+              stroke={snapshot.phase === "rest" ? "rgba(2, 132, 199, 0.1)" : "var(--bg-surface-elevated)"}
               strokeWidth={strokeWidth}
             />
             {/* Smooth Animated Progress Arc */}
@@ -408,7 +410,7 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
               alignItems: "center",
               justifyContent: "center",
               position: "relative",
-              backgroundColor: "var(--bg-surface-elevated)",
+              backgroundColor: snapshot.phase === "rest" ? "transparent" : "var(--bg-surface-elevated)",
               zIndex: 1,
             }}
           >
@@ -433,7 +435,7 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
                     width: 140,
                     height: 140,
                     borderRadius: "50%",
-                    backgroundColor: "rgba(2, 132, 199, 0.18)",
+                    backgroundColor: "rgba(2, 132, 199, 0.12)",
                   }}
                 />
 
@@ -444,24 +446,25 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
                     width: 110,
                     height: 110,
                     borderRadius: "50%",
-                    backgroundColor: "rgba(2, 132, 199, 0.14)",
-                    border: "2px solid #0284C7",
+                    background: "linear-gradient(135deg, rgba(2, 132, 199, 0.1) 0%, rgba(2, 132, 199, 0.25) 100%)",
+                    border: "2px solid rgba(2, 132, 199, 0.4)",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "center",
                     gap: 4,
-                    boxShadow: "0 6px 20px rgba(2, 132, 199, 0.2)",
+                    boxShadow: "0 8px 32px rgba(2, 132, 199, 0.2)",
+                    backdropFilter: "blur(4px)",
                   }}
                 >
-                  <Wind size={30} color="#0284C7" />
+                  <Wind size={32} color="#0284C7" strokeWidth={2.5} />
                   <span
                     style={{
-                      fontSize: "0.76rem",
+                      fontSize: "0.78rem",
                       fontWeight: 800,
                       color: "#0284C7",
                       textTransform: "uppercase",
-                      letterSpacing: "0.04em",
+                      letterSpacing: "0.06em",
                     }}
                   >
                     {breathState === "inspire" ? "Inspirez" : "Expirez"}
@@ -488,32 +491,33 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            marginTop: 14,
+            marginTop: 18,
           }}
         >
           <div
             style={{
-              fontSize: "2.7rem",
+              fontSize: "3.2rem",
               fontWeight: 900,
-              color: "var(--text-main)",
+              color: snapshot.phase === "rest" ? "#0284C7" : "var(--text-main)",
               lineHeight: 1,
-              letterSpacing: "-0.03em",
+              letterSpacing: "-0.04em",
+              fontVariantNumeric: "tabular-nums",
             }}
           >
             {remainingPhase}
-            <span style={{ fontSize: "1.3rem", fontWeight: 700, color: "var(--text-subtle)", marginLeft: 2 }}>
+            <span style={{ fontSize: "1.4rem", fontWeight: 700, color: snapshot.phase === "rest" ? "rgba(2, 132, 199, 0.6)" : "var(--text-subtle)", marginLeft: 2 }}>
               s
             </span>
           </div>
 
           <div
             style={{
-              fontSize: "0.8rem",
-              fontWeight: 700,
-              color: phaseDetails.color,
+              fontSize: "0.85rem",
+              fontWeight: 800,
+              color: snapshot.phase === "rest" ? "rgba(2, 132, 199, 0.8)" : phaseDetails.color,
               textTransform: "uppercase",
-              letterSpacing: "0.06em",
-              marginTop: 4,
+              letterSpacing: "0.08em",
+              marginTop: 6,
             }}
           >
             {snapshot.phase === "preparation"
@@ -523,104 +527,130 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
               : "En mouvement"}
           </div>
         </div>
-      </div>
 
-      {/* ── CONTEXTUAL GUIDANCE / NEXT UP BANNER ── */}
-      {snapshot.phase === "rest" ? (
-        /* Next Exercise & Position Preparation Banner during Rest */
-        nextExercise && (
+        {/* ── REST PHASE : INTEGRATED NEXT EXERCISE INFO ── */}
+        {snapshot.phase === "rest" && nextExercise && (
           <div
-            className="animate-slide-up"
+            className="animate-fade-in"
             style={{
               width: "100%",
-              padding: "12px 14px",
+              marginTop: 24,
+              padding: "14px 16px",
               borderRadius: "var(--radius-xl)",
-              backgroundColor: "var(--bg-surface)",
-              border: "1.5px solid var(--border-color)",
-              boxShadow: "0 6px 20px rgba(0,0,0,0.04)",
+              background: "linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.9) 100%)",
+              border: "1px solid rgba(255,255,255,0.8)",
+              boxShadow: "0 4px 16px rgba(2, 132, 199, 0.06)",
               display: "flex",
-              flexDirection: "column",
-              gap: 10,
+              alignItems: "center",
+              gap: 14,
             }}
           >
-            {/* Top Row: Position Alert Badge & Target Duration */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <span
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  padding: "4px 10px",
-                  borderRadius: "var(--radius-full)",
-                  backgroundColor: transitionInfo.badgeBg,
-                  color: transitionInfo.badgeColor,
-                  fontSize: "0.78rem",
-                  fontWeight: 800,
-                  letterSpacing: "0.02em",
-                }}
-              >
-                <span>{transitionInfo.badgeEmoji}</span>
-                <span>{transitionInfo.badgeLabel}</span>
-              </span>
-
-              <span style={{ fontSize: "0.78rem", color: "var(--text-subtle)", fontWeight: 700 }}>
-                À suivre • {snapshot.nextExercise?.targetDurationSeconds || 45}s
-              </span>
-            </div>
-
-            {/* Middle Row: Animated GIF Thumbnail + Exercise Title + Position Advice */}
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            {/* Thumbnail */}
+            <div
+              style={{
+                width: 64,
+                height: 64,
+                borderRadius: "var(--radius-lg)",
+                backgroundColor: "#FFFFFF",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                border: "1px solid rgba(0,0,0,0.04)",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                flexShrink: 0,
+                overflow: "hidden",
+                position: "relative",
+              }}
+            >
+              {/* Subtle transition badge overlay on thumbnail */}
               <div
                 style={{
-                  width: 52,
-                  height: 52,
-                  borderRadius: "var(--radius-md)",
-                  backgroundColor: "var(--bg-surface-elevated)",
-                  overflow: "hidden",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  border: "1px solid var(--border-subtle)",
-                  flexShrink: 0,
+                  position: "absolute",
+                  bottom: -2,
+                  right: -2,
+                  backgroundColor: transitionInfo.badgeBg,
+                  color: transitionInfo.badgeColor,
+                  fontSize: "0.6rem",
+                  padding: "2px 4px",
+                  borderRadius: "4px 0 0 0",
+                  fontWeight: 800,
+                  zIndex: 2,
                 }}
               >
-                <img
-                  src={`/animations/${nextExercise.slug || nextExercise.id}.gif`}
-                  alt={nextExercise.nameFr || nextExercise.name}
-                  style={{ width: "100%", height: "100%", objectFit: "contain" }}
-                  onError={(e) => {
-                    (e.target as HTMLElement).style.display = "none";
-                  }}
-                />
+                {transitionInfo.badgeEmoji}
               </div>
+              <img
+                src={`/animations/${nextExercise.slug || nextExercise.id}.gif`}
+                alt={nextExercise.nameFr || nextExercise.name}
+                style={{ width: "90%", height: "90%", objectFit: "contain", zIndex: 1 }}
+                onError={(e) => {
+                  (e.target as HTMLElement).style.display = "none";
+                }}
+              />
+            </div>
 
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div
+            {/* Next Info */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                <span
                   style={{
-                    fontSize: "0.96rem",
+                    fontSize: "0.68rem",
                     fontWeight: 800,
-                    color: "var(--text-main)",
-                    lineHeight: 1.25,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.04em",
+                    color: "var(--color-primary-dark)",
+                    backgroundColor: "var(--color-primary-soft)",
+                    padding: "2px 6px",
+                    borderRadius: "4px",
                   }}
                 >
-                  {nextExercise.nameFr || nextExercise.name}
-                </div>
-                <div
-                  style={{
-                    fontSize: "0.82rem",
-                    color: "var(--text-muted)",
-                    marginTop: 3,
-                    fontWeight: 500,
-                  }}
-                >
+                  À SUIVRE
+                </span>
+                <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--text-subtle)" }}>
+                  {snapshot.nextExercise?.targetDurationSeconds || 45}s
+                </span>
+              </div>
+              
+              <div
+                style={{
+                  fontSize: "1.05rem",
+                  fontWeight: 800,
+                  color: "var(--text-main)",
+                  lineHeight: 1.2,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {nextExercise.nameFr || nextExercise.name}
+              </div>
+              
+              <div
+                style={{
+                  fontSize: "0.82rem",
+                  color: "var(--text-muted)",
+                  marginTop: 4,
+                  fontWeight: 500,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4,
+                }}
+              >
+                <span style={{ color: transitionInfo.badgeColor, fontWeight: 700 }}>
+                  {transitionInfo.badgeLabel}
+                </span>
+                <span>•</span>
+                <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                   {transitionInfo.instruction}
-                </div>
+                </span>
               </div>
             </div>
           </div>
-        )
-      ) : (
-        /* Instructions Toggle during Work / Prep */
+        )}
+      </div>
+
+      {/* ── CONTEXTUAL GUIDANCE / INSTRUCTIONS (Work Phase Only) ── */}
+      {snapshot.phase !== "rest" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           <button
             type="button"
@@ -647,27 +677,27 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
             <div
               className="animate-slide-down"
               style={{
-                padding: "12px 14px",
+                padding: "16px",
                 backgroundColor: "var(--bg-surface-elevated)",
-                borderRadius: "var(--radius-md)",
-                fontSize: "0.84rem",
+                borderRadius: "var(--radius-xl)",
+                fontSize: "0.88rem",
                 lineHeight: 1.5,
                 color: "var(--text-main)",
                 display: "flex",
                 flexDirection: "column",
-                gap: 8,
+                gap: 10,
                 border: "1px solid var(--border-subtle)",
               }}
             >
               {currentExercise.shortDescriptionFr && (
-                <p style={{ margin: 0, fontWeight: 500, color: "var(--text-muted)" }}>
+                <p style={{ margin: 0, fontWeight: 600, color: "var(--text-muted)" }}>
                   {currentExercise.shortDescriptionFr}
                 </p>
               )}
               {currentExercise.instructionsFr && currentExercise.instructionsFr.length > 0 && (
-                <ol style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 4 }}>
+                <ol style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 6 }}>
                   {currentExercise.instructionsFr.map((step, idx) => (
-                    <li key={idx}>{step}</li>
+                    <li key={idx} style={{ paddingLeft: 4 }}>{step}</li>
                   ))}
                 </ol>
               )}
@@ -676,14 +706,17 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: 6,
-                    color: "var(--color-primary)",
-                    fontSize: "0.8rem",
+                    gap: 8,
+                    color: "var(--color-primary-dark)",
+                    backgroundColor: "var(--color-primary-soft)",
+                    padding: "8px 12px",
+                    borderRadius: "var(--radius-md)",
+                    fontSize: "0.84rem",
                     fontWeight: 700,
-                    marginTop: 2,
+                    marginTop: 4,
                   }}
                 >
-                  <span>🫁 Respiration :</span>
+                  <span style={{ fontSize: "1.1rem" }}>🫁</span>
                   <span>{currentExercise.breathingGuidanceFr}</span>
                 </div>
               )}
