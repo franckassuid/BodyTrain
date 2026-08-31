@@ -149,7 +149,7 @@ export class WorkoutEngine {
     else this.pause();
   }
 
-  /** Advance past current exercise or skip preparation immediately */
+  /** Advance past current phase: prep -> work -> rest -> next work */
   public skip() {
     if (!this.session) return;
     voiceCoach.stop();
@@ -175,7 +175,17 @@ export class WorkoutEngine {
       return;
     }
 
-    this.advanceNext();
+    if (this.currentPhase === "work") {
+      // Finish current work and transition to rest phase before next exercise
+      this.finishCurrentExerciseWork();
+      return;
+    }
+
+    if (this.currentPhase === "rest") {
+      // Skip rest and advance directly to next exercise work
+      this.advanceNext();
+      return;
+    }
   }
 
   /** Replace the exercise currently displayed */
