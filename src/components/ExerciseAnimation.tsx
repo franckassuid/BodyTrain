@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Activity, Wind, Play, Image as ImageIcon } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { Activity, Wind, Play, Pause, Image as ImageIcon } from "lucide-react";
 import type { Exercise } from "../types/exercise.ts";
 
 interface ExerciseAnimationProps {
@@ -7,6 +7,7 @@ interface ExerciseAnimationProps {
   nextExercise?: Exercise | null;
   phase: "preparation" | "work" | "rest" | "finished";
   circularMode?: boolean;
+  isPaused?: boolean;
 }
 
 export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
@@ -14,6 +15,7 @@ export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
   nextExercise,
   phase,
   circularMode = false,
+  isPaused = false,
 }) => {
   const slug = exercise.slug || exercise.id;
 
@@ -27,6 +29,10 @@ export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
   const [activePhotoStep, setActivePhotoStep] = useState<"start" | "end">("start");
   const [photoError, setPhotoError] = useState<boolean>(false);
   const [gifError, setGifError] = useState<boolean>(false);
+  const [isFrozen, setIsFrozen] = useState<boolean>(false);
+
+  const imgRef = useRef<HTMLImageElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const gifUrl = `/animations/${slug}.gif`;
 
@@ -34,9 +40,37 @@ export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
   useEffect(() => {
     setPhotoError(false);
     setGifError(false);
+    setIsFrozen(false);
     setActivePhotoStep("start");
     setViewMode("gif");
   }, [exercise.id, slug]);
+
+  // Pause handling: snapshot frame to canvas to freeze the GIF playback
+  useEffect(() => {
+    if (isPaused) {
+      const img = imgRef.current;
+      const canvas = canvasRef.current;
+      if (img && canvas) {
+        try {
+          const w = img.naturalWidth || img.clientWidth || 300;
+          const h = img.naturalHeight || img.clientHeight || 300;
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, w, h);
+            setIsFrozen(true);
+          }
+        } catch {
+          setIsFrozen(true);
+        }
+      } else {
+        setIsFrozen(true);
+      }
+    } else {
+      setIsFrozen(false);
+    }
+  }, [isPaused]);
 
   // Preload next exercise assets
   useEffect(() => {
@@ -53,14 +87,14 @@ export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
 
   // Alternating photo postures loop (1.7s per posture) if in photo mode
   useEffect(() => {
-    if (viewMode !== "photos" || !hasPhotos || !hasEndPhoto) return;
+    if (isPaused || viewMode !== "photos" || !hasPhotos || !hasEndPhoto) return;
 
     const interval = setInterval(() => {
       setActivePhotoStep((prev) => (prev === "start" ? "end" : "start"));
     }, 1700);
 
     return () => clearInterval(interval);
-  }, [viewMode, hasPhotos, hasEndPhoto, slug]);
+  }, [isPaused, viewMode, hasPhotos, hasEndPhoto, slug]);
 
   const isBreathing = exercise.category === "breathing" || exercise.mode === "breathing";
   const startPhotoUrl = `/exercises/${slug}/start.webp`;
@@ -98,17 +132,51 @@ export const ExerciseAnimation: React.FC<ExerciseAnimationProps> = ({
       >
         {/* MODE 1: Top Priority Fluid Animated GIF */}
         {viewMode === "gif" && !gifError ? (
-          <img
-            src={gifUrl}
-            alt={exercise.nameFr || exercise.name}
-            onError={() => setGifError(true)}
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "contain",
-              display: "block",
-            }}
-          />
+          <>
+            <img
+              ref={imgRef}
+              src={gifUrl}
+              alt={exercise.nameFr || exercise.name}
+              onError={() => setGifError(true)}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                display: isFrozen ? "none" : "block",
+              }}
+            />
+            <canvas
+              ref={canvasRef}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                display: isFrozen ? "block" : "none",
+              }}
+            />
+            {isPaused && (
+              <div
+                style={{
+                  position: "absolute",
+                  backgroundColor: "rgba(0, 0, 0, 0.6)",
+                  color: "#FFFFFF",
+                  padding: "4px 10px",
+                  borderRadius: "var(--radius-full)",
+                  fontSize: "0.74rem",
+                  fontWeight: 800,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4,
+                  zIndex: 10,
+                  letterSpacing: "0.04em",
+                  backdropFilter: "blur(4px)",
+                }}
+              >
+                <Pause size={12} fill="currentColor" />
+                <span>PAUSE</span>
+              </div>
+            )}
+          </>
         ) : (viewMode === "photos" || gifError) && hasPhotos && !photoError ? (
           /* MODE 2: High Quality Photo Demonstration with Live Loop */
           <div

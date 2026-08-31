@@ -235,13 +235,7 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({ onPlay
           return (
             <div
               key={ex.id}
-              onClick={() => {
-                if (onPlayExercise) {
-                  onPlayExercise(ex, 45);
-                } else {
-                  setSelectedExercise(ex);
-                }
-              }}
+              onClick={() => setSelectedExercise(ex)}
               style={{
                 display: "flex",
                 alignItems: "center",

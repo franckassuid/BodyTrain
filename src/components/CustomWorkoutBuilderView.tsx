@@ -713,7 +713,7 @@ export const CustomWorkoutBuilderView: React.FC<CustomWorkoutBuilderViewProps> =
       )}
 
       {/* ══════════════════════════════════════════════════════════════════════
-          EXERCISE PICKER MODAL (131 Exercises)
+          EXERCISE PICKER MODAL (87 Exercises)
       ══════════════════════════════════════════════════════════════════════ */}
       {showExercisePicker &&
         typeof document !== "undefined" &&

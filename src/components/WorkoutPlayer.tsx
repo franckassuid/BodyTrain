@@ -412,15 +412,8 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
               zIndex: 1,
             }}
           >
-            {snapshot.phase === "rest" && nextExercise ? (
-              /* REST PHASE WITH UPCOMING EXERCISE: Show Next Posture in Action */
-              <ExerciseAnimation
-                exercise={nextExercise}
-                phase="preparation"
-                circularMode={true}
-              />
-            ) : snapshot.phase === "rest" ? (
-              /* REST PHASE WITHOUT NEXT EXERCISE: Serene Breath Waves */
+            {snapshot.phase === "rest" ? (
+              /* REST PHASE: Serene Breath Waves & Recovery Sphere */
               <div
                 style={{
                   width: "100%",
@@ -482,6 +475,7 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
                 nextExercise={nextExercise}
                 phase={snapshot.phase}
                 circularMode={true}
+                isPaused={snapshot.isPaused}
               />
             )}
           </div>
