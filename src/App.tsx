@@ -121,6 +121,14 @@ export const App: React.FC = () => {
     setWorkoutScreen("player");
   };
 
+  // Launch a replay session from history
+  const handleStartHistoryWorkout = (session: GeneratedSession) => {
+    setCurrentSession(session);
+    setReturnTabAfterWorkout("history");
+    setActiveTab("workout");
+    setWorkoutScreen("player");
+  };
+
   // Launch a single exercise directly from library
   const handlePlaySingleExercise = (exercise: Exercise, durationSeconds = 45) => {
     const singleSession: GeneratedSession = {
@@ -280,7 +288,7 @@ export const App: React.FC = () => {
         {activeTab === "custom" && <CustomWorkoutBuilderView onStartCustomWorkout={handleStartCustomWorkout} />}
 
         {/* TAB 4: HISTORY */}
-        {activeTab === "history" && <HistoryView />}
+        {activeTab === "history" && <HistoryView onStartWorkout={handleStartHistoryWorkout} />}
 
         {/* TAB 5: SETTINGS */}
         {activeTab === "settings" && <SettingsView />}

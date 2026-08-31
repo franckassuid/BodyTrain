@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { Calendar, Clock, Flame, Dumbbell } from "lucide-react";
+import { Calendar, Clock, Flame, Dumbbell, ChevronRight, Play } from "lucide-react";
 import { storageService } from "../services/storage.ts";
 import type { HistoryStats, SessionHistoryRecord } from "../types/history.ts";
 import { EXERCISES_MAP } from "../data/exercisesData.ts";
 import { DISCOMFORT_LABELS } from "../types/enums.ts";
+import type { GeneratedSession } from "../types/session.ts";
+import { PastSessionDetailModal } from "./PastSessionDetailModal.tsx";
 
-export const HistoryView: React.FC = () => {
+interface HistoryViewProps {
+  onStartWorkout?: (session: GeneratedSession) => void;
+}
+
+export const HistoryView: React.FC<HistoryViewProps> = ({ onStartWorkout }) => {
   const [sessions, setSessions] = useState<SessionHistoryRecord[]>([]);
   const [stats, setStats] = useState<HistoryStats | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [selectedSession, setSelectedSession] = useState<SessionHistoryRecord | null>(null);
 
   useEffect(() => {
     loadData();
@@ -180,26 +187,32 @@ export const HistoryView: React.FC = () => {
               <div
                 key={s.id}
                 className="card"
+                onClick={() => setSelectedSession(s)}
                 style={{
                   padding: "16px 18px",
                   display: "flex",
                   flexDirection: "column",
                   gap: 10,
+                  cursor: "pointer",
+                  transition: "transform 0.15s ease, box-shadow 0.15s ease",
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text-main)" }}>
+                  <div style={{ fontSize: "0.88rem", fontWeight: 700, color: "var(--text-main)" }}>
                     {formatDate(s.date)}
                   </div>
-                  <span
-                    className="badge"
-                    style={{
-                      backgroundColor: isCompleted ? "var(--color-primary-soft)" : "var(--bg-surface-elevated)",
-                      color: isCompleted ? "var(--color-primary-dark)" : "var(--text-muted)",
-                    }}
-                  >
-                    {isCompleted ? "Complète" : "Partielle"}
-                  </span>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <span
+                      className="badge"
+                      style={{
+                        backgroundColor: isCompleted ? "var(--color-primary-soft)" : "var(--bg-surface-elevated)",
+                        color: isCompleted ? "var(--color-primary-dark)" : "var(--text-muted)",
+                      }}
+                    >
+                      {isCompleted ? "Complète" : "Partielle"}
+                    </span>
+                    <ChevronRight size={16} color="var(--text-subtle)" />
+                  </div>
                 </div>
 
                 <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: "0.85rem", color: "var(--text-muted)" }}>
@@ -210,16 +223,44 @@ export const HistoryView: React.FC = () => {
                   <span>Gêne : {DISCOMFORT_LABELS[s.discomfortZone] || s.discomfortZone}</span>
                 </div>
 
-                {s.completedExerciseIds && s.completedExerciseIds.length > 0 && (
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 2 }}>
                   <div style={{ fontSize: "0.8rem", color: "var(--text-subtle)" }}>
-                    {s.completedExerciseIds.length} exercice{s.completedExerciseIds.length > 1 ? "s" : ""} réalisé{s.completedExerciseIds.length > 1 ? "s" : ""}
+                    {s.completedExerciseIds && s.completedExerciseIds.length > 0
+                      ? `${s.completedExerciseIds.length} exercice${s.completedExerciseIds.length > 1 ? "s" : ""} réalisé${s.completedExerciseIds.length > 1 ? "s" : ""}`
+                      : "Séance enregistrée"}
                   </div>
-                )}
+
+                  <span
+                    style={{
+                      fontSize: "0.78rem",
+                      fontWeight: 700,
+                      color: "var(--color-primary)",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 4,
+                    }}
+                  >
+                    <Play size={13} fill="currentColor" />
+                    <span>Détails & Refaire</span>
+                  </span>
+                </div>
               </div>
             );
           })
         )}
       </div>
+
+      {/* Past Session Detail & Replay Modal */}
+      <PastSessionDetailModal
+        session={selectedSession}
+        isOpen={Boolean(selectedSession)}
+        onClose={() => setSelectedSession(null)}
+        onReplaySession={(generatedSession) => {
+          if (onStartWorkout) {
+            onStartWorkout(generatedSession);
+          }
+        }}
+      />
     </div>
   );
 };

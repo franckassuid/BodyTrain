@@ -232,6 +232,7 @@ class VoiceCoachService {
   private playNeuralTts(text: string, reqId: number): Promise<boolean> {
     if (!this.settings.voiceCoachEnabled) return Promise.resolve(false);
     if (typeof window === "undefined" || typeof Audio === "undefined") return Promise.resolve(false);
+    if (typeof navigator !== "undefined" && !navigator.onLine) return Promise.resolve(false);
 
     const voice = this.getNeuralVoiceName();
     const url = `/api/tts?text=${encodeURIComponent(text)}&voice=${encodeURIComponent(voice)}`;
@@ -473,11 +474,14 @@ class VoiceCoachService {
     this.speak("Changez de côté !", { priority: true });
   }
 
-  /** Announce rest period using studio audio cue */
-  public async announceRest(nextExerciseName?: string) {
+  /** Announce rest period and next exercise + position transition cue */
+  public async announceRest(nextExerciseName?: string, positionPrompt?: string) {
     if (!this.settings.voiceCoachEnabled) return;
     if (nextExerciseName && this.settings.announceExerciseNames) {
-      this.speak(`Repos. Prochain mouvement : ${nextExerciseName}`, { priority: true });
+      const cue = positionPrompt
+        ? `Repos. Prochain mouvement : ${nextExerciseName}. ${positionPrompt}`
+        : `Repos. Prochain mouvement : ${nextExerciseName}`;
+      this.speak(cue, { priority: true });
     } else {
       const ok = await this.playStudioCue("rest");
       if (!ok) {

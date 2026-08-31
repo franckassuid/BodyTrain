@@ -3,6 +3,7 @@ import { soundService } from "../services/sound.ts";
 import { vibrationService } from "../services/vibration.ts";
 import { voiceCoach } from "../services/voiceCoach.ts";
 import { wakeLockService } from "../services/wakeLock.ts";
+import { getPositionTransitionInfo } from "../utils/positionTransition.ts";
 
 export type WorkoutState = "not_started" | "preparation" | "work" | "rest" | "paused" | "completed" | "abandoned";
 export type WorkoutPhase = "preparation" | "work" | "rest" | "finished";
@@ -322,7 +323,8 @@ export class WorkoutEngine {
 
       soundService.playRestChime();
       vibrationService.transition();
-      voiceCoach.announceRest(nextEx?.exercise.nameFr || nextEx?.exercise.name);
+      const transition = getPositionTransitionInfo(currentEx?.exercise, nextEx?.exercise);
+      voiceCoach.announceRest(nextEx?.exercise.nameFr || nextEx?.exercise.name, transition.speechPrompt);
       this.notify();
     }
   }

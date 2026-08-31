@@ -16,6 +16,7 @@ import { AudioSettingsModal } from "./AudioSettingsModal.tsx";
 import { replaceExerciseInSession } from "../engine/generator.ts";
 import type { GeneratedSession } from "../types/session.ts";
 import { CATEGORY_LABELS } from "../types/enums.ts";
+import { getPositionTransitionInfo } from "../utils/positionTransition.ts";
 
 interface WorkoutPlayerProps {
   session: GeneratedSession;
@@ -187,6 +188,7 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
   };
 
   const phaseDetails = getPhaseDetails();
+  const transitionInfo = getPositionTransitionInfo(currentExercise, nextExercise);
 
   if (!currentExercise) return null;
 
@@ -249,7 +251,7 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
           }}
         >
           {snapshot.phase === "rest"
-            ? "Repos & Récupération"
+            ? "Repos • Préparez la suite"
             : snapshot.phase === "preparation"
             ? "Préparez-vous..."
             : currentExercise.nameFr || currentExercise.name}
@@ -266,7 +268,11 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
           }}
         >
           {snapshot.phase === "rest" ? (
-            <span>Respirez calmement avant le prochain mouvement</span>
+            <span>
+              {nextExercise
+                ? `À suivre : ${nextExercise.nameFr || nextExercise.name}`
+                : "Dernière récupération avant la fin"}
+            </span>
           ) : (
             <>
               <span>{CATEGORY_LABELS[currentExercise.category] || currentExercise.category}</span>
@@ -406,8 +412,15 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
               zIndex: 1,
             }}
           >
-            {snapshot.phase === "rest" ? (
-              /* REST PHASE: Serene Breath Waves & Expanding Sphere */
+            {snapshot.phase === "rest" && nextExercise ? (
+              /* REST PHASE WITH UPCOMING EXERCISE: Show Next Posture in Action */
+              <ExerciseAnimation
+                exercise={nextExercise}
+                phase="preparation"
+                circularMode={true}
+              />
+            ) : snapshot.phase === "rest" ? (
+              /* REST PHASE WITHOUT NEXT EXERCISE: Serene Breath Waves */
               <div
                 style={{
                   width: "100%",
@@ -463,7 +476,7 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
                 </div>
               </div>
             ) : (
-              /* WORK & PREPARATION PHASES: Circular Posture Visual Loop */
+              /* WORK & PREPARATION PHASES: Current Movement Animation */
               <ExerciseAnimation
                 exercise={currentExercise}
                 nextExercise={nextExercise}
@@ -520,28 +533,55 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
 
       {/* ── CONTEXTUAL GUIDANCE / NEXT UP BANNER ── */}
       {snapshot.phase === "rest" ? (
-        /* Next Exercise Banner during Rest */
+        /* Next Exercise & Position Preparation Banner during Rest */
         nextExercise && (
           <div
             className="animate-slide-up"
             style={{
               width: "100%",
-              padding: "10px 14px",
-              borderRadius: "var(--radius-lg)",
-              backgroundColor: "var(--bg-surface-elevated)",
-              border: "1px solid var(--border-subtle)",
+              padding: "12px 14px",
+              borderRadius: "var(--radius-xl)",
+              backgroundColor: "var(--bg-surface)",
+              border: "1.5px solid var(--border-color)",
+              boxShadow: "0 6px 20px rgba(0,0,0,0.04)",
               display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
+              flexDirection: "column",
+              gap: 10,
             }}
           >
+            {/* Top Row: Position Alert Badge & Target Duration */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "4px 10px",
+                  borderRadius: "var(--radius-full)",
+                  backgroundColor: transitionInfo.badgeBg,
+                  color: transitionInfo.badgeColor,
+                  fontSize: "0.78rem",
+                  fontWeight: 800,
+                  letterSpacing: "0.02em",
+                }}
+              >
+                <span>{transitionInfo.badgeEmoji}</span>
+                <span>{transitionInfo.badgeLabel}</span>
+              </span>
+
+              <span style={{ fontSize: "0.78rem", color: "var(--text-subtle)", fontWeight: 700 }}>
+                À suivre • {snapshot.nextExercise?.targetDurationSeconds || 45}s
+              </span>
+            </div>
+
+            {/* Middle Row: Animated GIF Thumbnail + Exercise Title + Position Advice */}
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <div
                 style={{
-                  width: 40,
-                  height: 40,
+                  width: 52,
+                  height: 52,
                   borderRadius: "var(--radius-md)",
-                  backgroundColor: "#FFFFFF",
+                  backgroundColor: "var(--bg-surface-elevated)",
                   overflow: "hidden",
                   display: "flex",
                   alignItems: "center",
@@ -551,7 +591,7 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
                 }}
               >
                 <img
-                  src={`/exercises/${nextExercise.slug || nextExercise.id}/start.webp`}
+                  src={`/animations/${nextExercise.slug || nextExercise.id}.gif`}
                   alt={nextExercise.nameFr || nextExercise.name}
                   style={{ width: "100%", height: "100%", objectFit: "contain" }}
                   onError={(e) => {
@@ -559,25 +599,30 @@ export const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
                   }}
                 />
               </div>
-              <div>
+
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <div
                   style={{
-                    fontSize: "0.72rem",
-                    fontWeight: 700,
-                    color: "var(--color-primary)",
-                    textTransform: "uppercase",
+                    fontSize: "0.96rem",
+                    fontWeight: 800,
+                    color: "var(--text-main)",
+                    lineHeight: 1.25,
                   }}
                 >
-                  À suivre
-                </div>
-                <div style={{ fontSize: "0.94rem", fontWeight: 700, color: "var(--text-main)" }}>
                   {nextExercise.nameFr || nextExercise.name}
+                </div>
+                <div
+                  style={{
+                    fontSize: "0.82rem",
+                    color: "var(--text-muted)",
+                    marginTop: 3,
+                    fontWeight: 500,
+                  }}
+                >
+                  {transitionInfo.instruction}
                 </div>
               </div>
             </div>
-            <span style={{ fontSize: "0.78rem", color: "var(--text-subtle)", fontWeight: 700 }}>
-              {snapshot.nextExercise?.targetDurationSeconds}s
-            </span>
           </div>
         )
       ) : (
