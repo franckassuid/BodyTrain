@@ -4,14 +4,22 @@ import { EXERCISES, EXERCISES_MAP } from "../data/exercisesData.ts";
 
 /**
  * Converts a past SessionHistoryRecord into a fully playable GeneratedSession.
+ * Supports resuming from a specific start index (e.g. from the stopped exercise).
  */
-export function convertHistoryRecordToGeneratedSession(record: SessionHistoryRecord): GeneratedSession {
-  const exerciseIds =
+export function convertHistoryRecordToGeneratedSession(
+  record: SessionHistoryRecord,
+  startIndex: number = 0
+): GeneratedSession {
+  let exerciseIds =
     record.proposedExerciseIds && record.proposedExerciseIds.length > 0
       ? record.proposedExerciseIds
       : record.completedExerciseIds && record.completedExerciseIds.length > 0
       ? record.completedExerciseIds
       : [];
+
+  if (startIndex > 0 && startIndex < exerciseIds.length) {
+    exerciseIds = exerciseIds.slice(startIndex);
+  }
 
   const sessionExercises: SessionExercise[] = [];
   let totalSeconds = 0;
@@ -38,19 +46,25 @@ export function convertHistoryRecordToGeneratedSession(record: SessionHistoryRec
   }
 
   const durationMin = Math.max(1, Math.round(totalSeconds / 60));
+  const dateStr = new Date(record.date).toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "short",
+  });
+
+  const desc =
+    startIndex > 0
+      ? `Reprise de la séance du ${dateStr} (dès l'ex. ${startIndex + 1})`
+      : `Séance réémise du ${dateStr} (${sessionExercises.length} exercices)`;
 
   return {
-    id: `replay-${record.id}-${Date.now()}`,
+    id: `replay-${record.id}-${startIndex}-${Date.now()}`,
     createdAt: new Date().toISOString(),
     energyScore: record.energyScore,
     discomfortZone: record.discomfortZone,
     targetDurationMinutes: durationMin,
     estimatedTotalSeconds: totalSeconds,
     intensityLevel: `Niveau ${record.energyScore > 6 ? "3" : "2"}/5`,
-    description: `Séance réémise du ${new Date(record.date).toLocaleDateString("fr-FR", {
-      day: "numeric",
-      month: "short",
-    })} (${sessionExercises.length} exercices)`,
+    description: desc,
     exercises: sessionExercises,
     seed: Date.now(),
   };

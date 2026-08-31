@@ -58,4 +58,31 @@ describe("History Session Replayer", () => {
     assert.equal(session.exercises.length, 3);
     assert.equal(session.discomfortZone, "upper");
   });
+
+  it("should support resuming an interrupted session from a specific start index", () => {
+    const mockRecord: SessionHistoryRecord = {
+      id: "hist-partial-stop",
+      date: new Date().toISOString(),
+      energyScore: 5,
+      discomfortZone: "none",
+      plannedDurationSeconds: 420,
+      actualDurationSeconds: 120,
+      status: "partial",
+      proposedExerciseIds: [
+        "respiration-4-6",
+        "chat-vache",
+        "squat-au-poids-du-corps",
+        "gainage-avant-bras",
+        "posture-de-l-enfant",
+      ],
+      completedExerciseIds: ["respiration-4-6", "chat-vache"],
+    };
+
+    // Resuming from stop index 2 (squat-au-poids-du-corps)
+    const resumedSession = convertHistoryRecordToGeneratedSession(mockRecord, 2);
+    assert.equal(resumedSession.exercises.length, 3);
+    assert.equal(resumedSession.exercises[0].exercise.id, "squat-au-poids-du-corps");
+    assert.equal(resumedSession.exercises[2].exercise.id, "posture-de-l-enfant");
+    assert.ok(resumedSession.description.includes("dès l'ex. 3"));
+  });
 });
